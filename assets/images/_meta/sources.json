@@ -1,0 +1,645 @@
+{
+  "merah": {
+    "file": "merah.png",
+    "type": "solid-color"
+  },
+  "biru": {
+    "file": "biru.png",
+    "type": "solid-color"
+  },
+  "hijau": {
+    "file": "hijau.png",
+    "type": "solid-color"
+  },
+  "kuning": {
+    "file": "kuning.png",
+    "type": "solid-color"
+  },
+  "putih": {
+    "file": "putih.png",
+    "type": "solid-color"
+  },
+  "hitam": {
+    "file": "hitam.png",
+    "type": "solid-color"
+  },
+  "ungu": {
+    "file": "ungu.png",
+    "type": "solid-color"
+  },
+  "pink": {
+    "file": "pink.png",
+    "type": "solid-color"
+  },
+  "oranye": {
+    "file": "oranye.png",
+    "type": "solid-color"
+  },
+  "coklat": {
+    "file": "coklat.png",
+    "type": "solid-color"
+  },
+  "pepaya": {
+    "file": "pepaya.svg",
+    "type": "custom-clear"
+  },
+  "durian": {
+    "file": "durian.svg",
+    "type": "custom-clear"
+  },
+  "rambutan": {
+    "file": "rambutan.svg",
+    "type": "custom-clear"
+  },
+  "jambu": {
+    "file": "jambu.svg",
+    "type": "custom-clear"
+  },
+  "belimbing": {
+    "file": "belimbing.svg",
+    "type": "custom-clear"
+  },
+  "meja": {
+    "file": "meja.svg",
+    "type": "custom-clear"
+  },
+  "jendela": {
+    "file": "jendela.svg",
+    "type": "custom-clear"
+  },
+  "bantal": {
+    "file": "bantal.svg",
+    "type": "custom-clear"
+  },
+  "becak": {
+    "file": "becak.svg",
+    "type": "custom-clear"
+  },
+  "apel": {
+    "file": "apel.png",
+    "type": "emoji-icon",
+    "code": "1F34E",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F34E.png",
+    "bytes": 9919
+  },
+  "jeruk": {
+    "file": "jeruk.png",
+    "type": "emoji-icon",
+    "code": "1F34A",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F34A.png",
+    "bytes": 9726
+  },
+  "pisang": {
+    "file": "pisang.png",
+    "type": "emoji-icon",
+    "code": "1F34C",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F34C.png",
+    "bytes": 10005
+  },
+  "anggur": {
+    "file": "anggur.png",
+    "type": "emoji-icon",
+    "code": "1F347",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F347.png",
+    "bytes": 15017
+  },
+  "mangga": {
+    "file": "mangga.png",
+    "type": "emoji-icon",
+    "code": "1F96D",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F96D.png",
+    "bytes": 10718
+  },
+  "melon": {
+    "file": "melon.png",
+    "type": "emoji-icon",
+    "code": "1F348",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F348.png",
+    "bytes": 12317
+  },
+  "nanas": {
+    "file": "nanas.png",
+    "type": "emoji-icon",
+    "code": "1F34D",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F34D.png",
+    "bytes": 10214
+  },
+  "semangka": {
+    "file": "semangka.png",
+    "type": "emoji-icon",
+    "code": "1F349",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F349.png",
+    "bytes": 10682
+  },
+  "stroberi": {
+    "file": "stroberi.png",
+    "type": "emoji-icon",
+    "code": "1F353",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F353.png",
+    "bytes": 12094
+  },
+  "kelapa": {
+    "file": "kelapa.png",
+    "type": "emoji-icon",
+    "code": "1F965",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F965.png",
+    "bytes": 13587
+  },
+  "lemon": {
+    "file": "lemon.png",
+    "type": "emoji-icon",
+    "code": "1F34B",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F34B.png",
+    "bytes": 8695
+  },
+  "ceri": {
+    "file": "ceri.png",
+    "type": "emoji-icon",
+    "code": "1F352",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F352.png",
+    "bytes": 11628
+  },
+  "kiwi": {
+    "file": "kiwi.png",
+    "type": "emoji-icon",
+    "code": "1F95D",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F95D.png",
+    "bytes": 13903
+  },
+  "pir": {
+    "file": "pir.png",
+    "type": "emoji-icon",
+    "code": "1F350",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F350.png",
+    "bytes": 8732
+  },
+  "alpukat": {
+    "file": "alpukat.png",
+    "type": "emoji-icon",
+    "code": "1F951",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F951.png",
+    "bytes": 10725
+  },
+  "kucing": {
+    "file": "kucing.png",
+    "type": "emoji-icon",
+    "code": "1F431",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F431.png",
+    "bytes": 15548
+  },
+  "anjing": {
+    "file": "anjing.png",
+    "type": "emoji-icon",
+    "code": "1F436",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F436.png",
+    "bytes": 13915
+  },
+  "ayam": {
+    "file": "ayam.png",
+    "type": "emoji-icon",
+    "code": "1F414",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F414.png",
+    "bytes": 12127
+  },
+  "bebek": {
+    "file": "bebek.png",
+    "type": "emoji-icon",
+    "code": "1F986",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F986.png",
+    "bytes": 12209
+  },
+  "ikan": {
+    "file": "ikan.png",
+    "type": "emoji-icon",
+    "code": "1F41F",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F41F.png",
+    "bytes": 9948
+  },
+  "gajah": {
+    "file": "gajah.png",
+    "type": "emoji-icon",
+    "code": "1F418",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F418.png",
+    "bytes": 13961
+  },
+  "kelinci": {
+    "file": "kelinci.png",
+    "type": "emoji-icon",
+    "code": "1F430",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F430.png",
+    "bytes": 17564
+  },
+  "kambing": {
+    "file": "kambing.png",
+    "type": "emoji-icon",
+    "code": "1F410",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F410.png",
+    "bytes": 13958
+  },
+  "sapi": {
+    "file": "sapi.png",
+    "type": "emoji-icon",
+    "code": "1F42E",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F42E.png",
+    "bytes": 15099
+  },
+  "harimau": {
+    "file": "harimau.png",
+    "type": "emoji-icon",
+    "code": "1F42F",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F42F.png",
+    "bytes": 18908
+  },
+  "kuda": {
+    "file": "kuda.png",
+    "type": "emoji-icon",
+    "code": "1F434",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F434.png",
+    "bytes": 12581
+  },
+  "burung": {
+    "file": "burung.png",
+    "type": "emoji-icon",
+    "code": "1F426",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F426.png",
+    "bytes": 9797
+  },
+  "monyet": {
+    "file": "monyet.png",
+    "type": "emoji-icon",
+    "code": "1F435",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F435.png",
+    "bytes": 18414
+  },
+  "ular": {
+    "file": "ular.png",
+    "type": "emoji-icon",
+    "code": "1F40D",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F40D.png",
+    "bytes": 10447
+  },
+  "singa": {
+    "file": "singa.png",
+    "type": "emoji-icon",
+    "code": "1F981",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F981.png",
+    "bytes": 19051
+  },
+  "beruang": {
+    "file": "beruang.png",
+    "type": "emoji-icon",
+    "code": "1F43B",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F43B.png",
+    "bytes": 15098
+  },
+  "tikus": {
+    "file": "tikus.png",
+    "type": "emoji-icon",
+    "code": "1F42D",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F42D.png",
+    "bytes": 14016
+  },
+  "kodok": {
+    "file": "kodok.png",
+    "type": "emoji-icon",
+    "code": "1F438",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F438.png",
+    "bytes": 12118
+  },
+  "penyu": {
+    "file": "penyu.png",
+    "type": "emoji-icon",
+    "code": "1F422",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F422.png",
+    "bytes": 15266
+  },
+  "kupu": {
+    "file": "kupu.png",
+    "type": "emoji-icon",
+    "code": "1F98B",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F98B.png",
+    "bytes": 13348
+  },
+  "rumah": {
+    "file": "rumah.png",
+    "type": "emoji-icon",
+    "code": "1F3E0",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F3E0.png",
+    "bytes": 3027
+  },
+  "ibu": {
+    "file": "ibu.png",
+    "type": "emoji-icon",
+    "code": "1F469",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F469.png",
+    "bytes": 12428
+  },
+  "ayah": {
+    "file": "ayah.png",
+    "type": "emoji-icon",
+    "code": "1F468",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F468.png",
+    "bytes": 10357
+  },
+  "kursi": {
+    "file": "kursi.png",
+    "type": "emoji-icon",
+    "code": "1FA91",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1FA91.png",
+    "bytes": 9231
+  },
+  "tas": {
+    "file": "tas.png",
+    "type": "emoji-icon",
+    "code": "1F392",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F392.png",
+    "bytes": 8022
+  },
+  "sepatu": {
+    "file": "sepatu.png",
+    "type": "emoji-icon",
+    "code": "1F45F",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F45F.png",
+    "bytes": 8248
+  },
+  "buku": {
+    "file": "buku.png",
+    "type": "emoji-icon",
+    "code": "1F4D6",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F4D6.png",
+    "bytes": 3926
+  },
+  "bola": {
+    "file": "bola.png",
+    "type": "emoji-icon",
+    "code": "26BD",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/26BD.png",
+    "bytes": 13764
+  },
+  "baju": {
+    "file": "baju.png",
+    "type": "emoji-icon",
+    "code": "1F455",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F455.png",
+    "bytes": 8866
+  },
+  "pintu": {
+    "file": "pintu.png",
+    "type": "emoji-icon",
+    "code": "1F6AA",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F6AA.png",
+    "bytes": 3053
+  },
+  "piring": {
+    "file": "piring.png",
+    "type": "emoji-icon",
+    "code": "1F37D",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F37D.png",
+    "bytes": 18221
+  },
+  "sendok": {
+    "file": "sendok.png",
+    "type": "emoji-icon",
+    "code": "1F944",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F944.png",
+    "bytes": 5478
+  },
+  "gelas": {
+    "file": "gelas.png",
+    "type": "emoji-icon",
+    "code": "1F95B",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F95B.png",
+    "bytes": 5099
+  },
+  "pensil": {
+    "file": "pensil.png",
+    "type": "emoji-icon",
+    "code": "270F",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/270F.png",
+    "bytes": 4583
+  },
+  "kertas": {
+    "file": "kertas.png",
+    "type": "emoji-icon",
+    "code": "1F4C4",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F4C4.png",
+    "bytes": 2979
+  },
+  "lampu": {
+    "file": "lampu.png",
+    "type": "emoji-icon",
+    "code": "1F4A1",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F4A1.png",
+    "bytes": 9595
+  },
+  "kasur": {
+    "file": "kasur.png",
+    "type": "emoji-icon",
+    "code": "1F6CF",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F6CF.png",
+    "bytes": 3357
+  },
+  "mobil": {
+    "file": "mobil.png",
+    "type": "emoji-icon",
+    "code": "1F697",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F697.png",
+    "bytes": 8510
+  },
+  "motor": {
+    "file": "motor.png",
+    "type": "emoji-icon",
+    "code": "1F3CD",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F3CD.png",
+    "bytes": 13007
+  },
+  "bus": {
+    "file": "bus.png",
+    "type": "emoji-icon",
+    "code": "1F68C",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F68C.png",
+    "bytes": 7116
+  },
+  "kereta": {
+    "file": "kereta.png",
+    "type": "emoji-icon",
+    "code": "1F682",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F682.png",
+    "bytes": 8035
+  },
+  "pesawat": {
+    "file": "pesawat.png",
+    "type": "emoji-icon",
+    "code": "2708",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/2708.png",
+    "bytes": 8465
+  },
+  "kapal": {
+    "file": "kapal.png",
+    "type": "emoji-icon",
+    "code": "1F6A2",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F6A2.png",
+    "bytes": 6266
+  },
+  "sepeda": {
+    "file": "sepeda.png",
+    "type": "emoji-icon",
+    "code": "1F6B2",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F6B2.png",
+    "bytes": 11954
+  },
+  "truk": {
+    "file": "truk.png",
+    "type": "emoji-icon",
+    "code": "1F69A",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F69A.png",
+    "bytes": 8475
+  },
+  "perahu": {
+    "file": "perahu.png",
+    "type": "emoji-icon",
+    "code": "26F5",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/26F5.png",
+    "bytes": 6467
+  },
+  "nasi": {
+    "file": "nasi.png",
+    "type": "emoji-icon",
+    "code": "1F35A",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F35A.png",
+    "bytes": 10992
+  },
+  "roti": {
+    "file": "roti.png",
+    "type": "emoji-icon",
+    "code": "1F35E",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F35E.png",
+    "bytes": 4182
+  },
+  "susu": {
+    "file": "susu.png",
+    "type": "emoji-icon",
+    "code": "1F95B",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F95B.png",
+    "bytes": 5099
+  },
+  "telur": {
+    "file": "telur.png",
+    "type": "emoji-icon",
+    "code": "1F95A",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F95A.png",
+    "bytes": 10747
+  },
+  "keju": {
+    "file": "keju.png",
+    "type": "emoji-icon",
+    "code": "1F9C0",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F9C0.png",
+    "bytes": 9617
+  },
+  "mie": {
+    "file": "mie.png",
+    "type": "emoji-icon",
+    "code": "1F35C",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F35C.png",
+    "bytes": 7270
+  },
+  "sup": {
+    "file": "sup.png",
+    "type": "emoji-icon",
+    "code": "1F372",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F372.png",
+    "bytes": 11073
+  },
+  "madu": {
+    "file": "madu.png",
+    "type": "emoji-icon",
+    "code": "1F36F",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F36F.png",
+    "bytes": 6853
+  },
+  "air": {
+    "file": "air.png",
+    "type": "emoji-icon",
+    "code": "1F4A7",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F4A7.png",
+    "bytes": 11274
+  },
+  "jus": {
+    "file": "jus.png",
+    "type": "emoji-icon",
+    "code": "1F9C3",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F9C3.png",
+    "bytes": 6853
+  },
+  "mata": {
+    "file": "mata.png",
+    "type": "emoji-icon",
+    "code": "1F441",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F441.png",
+    "bytes": 13613
+  },
+  "hidung": {
+    "file": "hidung.png",
+    "type": "emoji-icon",
+    "code": "1F443",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F443.png",
+    "bytes": 8092
+  },
+  "mulut": {
+    "file": "mulut.png",
+    "type": "emoji-icon",
+    "code": "1F444",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F444.png",
+    "bytes": 8865
+  },
+  "tangan": {
+    "file": "tangan.png",
+    "type": "emoji-icon",
+    "code": "270B",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/270B.png",
+    "bytes": 10812
+  },
+  "kaki": {
+    "file": "kaki.png",
+    "type": "emoji-icon",
+    "code": "1F9B6",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F9B6.png",
+    "bytes": 8194
+  },
+  "kepala": {
+    "file": "kepala.png",
+    "type": "emoji-icon",
+    "code": "1F464",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F464.png",
+    "bytes": 6806
+  },
+  "gigi": {
+    "file": "gigi.png",
+    "type": "emoji-icon",
+    "code": "1F9B7",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F9B7.png",
+    "bytes": 11579
+  },
+  "telinga": {
+    "file": "telinga.png",
+    "type": "emoji-icon",
+    "code": "1F442",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F442.png",
+    "bytes": 12056
+  },
+  "sekolah": {
+    "file": "sekolah.png",
+    "type": "emoji-icon",
+    "code": "1F3EB",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F3EB.png",
+    "bytes": 9114
+  },
+  "guru": {
+    "file": "guru.png",
+    "type": "emoji-icon",
+    "code": "1F469-200D-1F3EB",
+    "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/15.0.0/color/618x618/1F469-200D-1F3EB.png",
+    "bytes": 15249
+  }
+}

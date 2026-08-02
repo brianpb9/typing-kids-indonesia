@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Kereta">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <rect x="30" y="70" width="140" height="60" rx="8" fill="#3498DB" filter="url(#s)"/><rect x="40" y="80" width="30" height="30" rx="3" fill="#81ECEC"/><rect x="80" y="80" width="30" height="30" rx="3" fill="#81ECEC"/><rect x="120" y="80" width="30" height="30" rx="3" fill="#81ECEC"/><circle cx="55" cy="140" r="12" fill="#2C3E50"/><circle cx="100" cy="140" r="12" fill="#2C3E50"/><circle cx="145" cy="140" r="12" fill="#2C3E50"/><rect x="20" y="95" width="15" height="20" rx="3" fill="#2980B9"/>
-</svg>

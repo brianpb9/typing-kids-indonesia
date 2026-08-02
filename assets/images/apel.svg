@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Apel">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <circle cx="100" cy="112" r="58" fill="#E74C3C" filter="url(#s)"/><ellipse cx="78" cy="95" rx="16" ry="20" fill="#FF8A80" opacity="0.45"/><ellipse cx="100" cy="58" rx="14" ry="6" fill="#C0392B"/><path d="M100 58 Q104 40 112 34" stroke="#6D4C41" stroke-width="7" fill="none" stroke-linecap="round"/><ellipse cx="128" cy="42" rx="20" ry="10" fill="#27AE60" transform="rotate(-30 128 42)"/><ellipse cx="78" cy="90" rx="10" ry="14" fill="#fff" opacity="0.35"/>
-</svg>

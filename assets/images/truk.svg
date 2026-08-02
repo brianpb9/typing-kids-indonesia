@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Truk">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <rect x="20" y="85" width="90" height="50" rx="6" fill="#27AE60" filter="url(#s)"/><rect x="110" y="70" width="55" height="65" rx="6" fill="#2ECC71"/><rect x="120" y="80" width="30" height="25" rx="3" fill="#81ECEC"/><circle cx="50" cy="145" r="14" fill="#2C3E50"/><circle cx="100" cy="145" r="14" fill="#2C3E50"/><circle cx="145" cy="145" r="14" fill="#2C3E50"/>
-</svg>

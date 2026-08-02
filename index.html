@@ -10,7 +10,6 @@
     <meta name="theme-color" content="#FFF8F0" />
     <title>Typing Kids Indonesia — Belajar Mengetik Sambil Bermain</title>
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -21,14 +20,12 @@
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/animations.css" />
 
-    <!-- Favicon: simple apple mark as data SVG -->
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23FFE566'/%3E%3Ccircle cx='50' cy='55' r='28' fill='%23FF6B6B'/%3E%3Cpath d='M50 30 Q54 18 64 22' stroke='%235B8C5A' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"
     />
   </head>
   <body>
-    <!-- Soft sky atmosphere -->
     <div class="sky" aria-hidden="true">
       <div class="cloud cloud-1"></div>
       <div class="cloud cloud-2"></div>
@@ -37,8 +34,20 @@
       <div class="bird bird-2"></div>
     </div>
 
-    <!-- Confetti / sparkle layer -->
     <canvas id="fx-canvas" aria-hidden="true"></canvas>
+
+    <!-- Floating mute (always available) -->
+    <button
+      type="button"
+      id="mute-btn"
+      class="mute-btn"
+      title="Suara nyala/mati"
+      aria-label="Matikan atau nyalakan suara"
+      aria-pressed="false"
+    >
+      <span class="mute-icon mute-on" aria-hidden="true">🔊</span>
+      <span class="mute-icon mute-off hidden" aria-hidden="true">🔇</span>
+    </button>
 
     <div class="app">
       <!-- ========== START ========== -->
@@ -73,13 +82,44 @@
         <h1>Typing Kids Indonesia</h1>
         <p class="subtitle">Belajar Mengetik Sambil Bermain</p>
 
+        <!-- Lifetime collection — motivates return play -->
+        <div class="collection-bar" id="collection-bar">
+          <span class="collection-rank" id="collection-rank">🌱 Pemula</span>
+          <span class="collection-stars">
+            ★ <span id="lifetime-stars">0</span> bintang
+          </span>
+        </div>
+
         <div class="start-card">
-          <p>Lihat gambar, dengar kata, lalu ketik di keyboard laptopmu!</p>
+          <p class="mission-title">🎯 Misi hari ini</p>
+          <p class="mission-goal">
+            Kumpulkan <strong id="mission-target-label">10</strong> bintang!
+          </p>
+          <div class="mission-preview" id="mission-preview" aria-hidden="true"></div>
           <p class="hint">✨ Tidak ada yang salah — coba saja terus ✨</p>
         </div>
 
+        <!-- 3 modes: easy / medium / hard -->
+        <div class="mode-pick mode-pick-3" role="group" aria-label="Tingkat kesulitan">
+          <button type="button" class="mode-btn is-active" data-mode="easy" id="mode-easy">
+            <span class="mode-emoji">🌱</span>
+            <span class="mode-name">Mudah</span>
+            <span class="mode-desc">Ada huruf besar</span>
+          </button>
+          <button type="button" class="mode-btn" data-mode="medium" id="mode-medium">
+            <span class="mode-emoji">⚡</span>
+            <span class="mode-name">Sedang</span>
+            <span class="mode-desc">Tanpa huruf besar</span>
+          </button>
+          <button type="button" class="mode-btn" data-mode="hard" id="mode-hard">
+            <span class="mode-emoji">🔥</span>
+            <span class="mode-name">Sulit</span>
+            <span class="mode-desc">Gambar + suara</span>
+          </button>
+        </div>
+
         <button type="button" id="start-btn" class="btn-start" autofocus>
-          Mulai Main!
+          Mulai Misi!
         </button>
 
         <p class="start-footer">Untuk anak usia 5–6 tahun · Keyboard QWERTY</p>
@@ -92,24 +132,39 @@
         aria-label="Permainan mengetik"
         aria-hidden="true"
       >
-        <div class="top-bar">
+        <!-- Session goal track -->
+        <div class="goal-banner">
+          <div class="goal-text">
+            <span class="goal-label">Target misi</span>
+            <span id="goal-remaining" class="goal-remaining">Kejar 10 bintang ya!</span>
+          </div>
+          <div
+            id="star-track"
+            class="star-track"
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="10"
+            aria-valuenow="0"
+            aria-label="Bintang misi"
+          ></div>
+          <div class="goal-count">
+            <span id="session-stars">0</span>/<span id="session-target">10</span>
+          </div>
+        </div>
+
+        <div class="top-bar" id="letter-progress-bar">
           <div class="progress-wrap">
             <div class="progress-meta">
-              <span>Huruf</span>
+              <span id="progress-meta-label">Huruf di kata ini</span>
               <span id="progress-label">0 / 0</span>
             </div>
             <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100">
               <div id="progress-fill" class="progress-fill"></div>
             </div>
           </div>
-          <div class="score-chip" title="Kata selesai">
-            <span class="star-icon" aria-hidden="true">★</span>
-            <span id="completed-count">0</span>
-          </div>
         </div>
 
         <div class="game-card">
-          <!-- Hidden input: keeps reliable keyboard focus for typing games -->
           <input
             id="key-catcher"
             class="key-catcher"
@@ -133,7 +188,8 @@
               decoding="async"
               draggable="false"
             />
-            <p id="word-label" class="word-label" aria-live="polite"></p>
+            <!-- Hidden by default; revealed after wrong streak (Sprint A) -->
+            <p id="word-label" class="word-label is-hidden" aria-live="polite"></p>
 
             <button
               type="button"
@@ -143,10 +199,7 @@
               aria-label="Dengar kata lagi"
             >
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                  d="M3 10v4h4l5 4V6L7 10H3z"
-                  fill="currentColor"
-                />
+                <path d="M3 10v4h4l5 4V6L7 10H3z" fill="currentColor" />
                 <path
                   d="M16.5 8.5a5 5 0 010 7"
                   stroke="currentColor"
@@ -163,8 +216,7 @@
             </button>
           </div>
 
-          <!-- Big letter to type — essential for ages 5–6 -->
-          <div class="target-block">
+          <div id="target-block" class="target-block">
             <p id="target-hint" class="target-hint">Ketik huruf ini</p>
             <div
               id="target-letter"
@@ -190,11 +242,65 @@
           </div>
         </div>
 
-        <p class="kb-hint">
+        <p id="kb-hint" class="kb-hint">
           <span>Tekan tombol</span>
           <kbd id="hint-key">A</kbd>
           <span>di keyboard laptop</span>
         </p>
+        <p id="kb-hint-hard" class="kb-hint kb-hint-hard hidden">
+          Dengar kata, lalu ketik di keyboard~
+        </p>
+      </section>
+
+      <!-- ========== MILESTONE TOAST ========== -->
+      <div id="milestone-toast" class="milestone-toast hidden" aria-live="assertive">
+        <div class="milestone-card">
+          <div id="milestone-trophy" class="milestone-trophy">🥈</div>
+          <p id="milestone-title" class="milestone-title">Setengah jalan!</p>
+          <p id="milestone-sub" class="milestone-sub">5 bintang!</p>
+        </div>
+      </div>
+
+      <!-- ========== VICTORY ========== -->
+      <section
+        id="victory-screen"
+        class="victory-screen hidden"
+        aria-label="Misi selesai"
+        aria-hidden="true"
+      >
+        <div class="victory-card">
+          <div class="victory-trophy" aria-hidden="true">🏆</div>
+          <h2 id="victory-title">JUARA!</h2>
+          <p id="victory-sub" class="victory-sub">Kamu kumpulkan 10 bintang!</p>
+
+          <div class="victory-stars" id="victory-stars" aria-hidden="true"></div>
+
+          <div class="victory-stats">
+            <div class="stat">
+              <span class="stat-val" id="victory-session">10</span>
+              <span class="stat-lbl">Misi ini</span>
+            </div>
+            <div class="stat">
+              <span class="stat-val" id="victory-total">0</span>
+              <span class="stat-lbl">Total ★</span>
+            </div>
+            <div class="stat">
+              <span class="stat-val" id="victory-rank">🌱</span>
+              <span class="stat-lbl" id="victory-rank-label">Pemula</span>
+            </div>
+          </div>
+
+          <p id="victory-next" class="victory-next">Main lagi untuk jadi Superstar!</p>
+
+          <div class="victory-actions">
+            <button type="button" id="replay-btn" class="btn-start">
+              Misi Baru!
+            </button>
+            <button type="button" id="home-btn" class="btn-secondary">
+              Ke Awal
+            </button>
+          </div>
+        </div>
       </section>
     </div>
 

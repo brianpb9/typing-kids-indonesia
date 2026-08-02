@@ -1,9 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Durian">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <ellipse cx="100" cy="115" rx="55" ry="50" fill="#F4D03F" filter="url(#s)"/><g stroke="#27AE60" stroke-width="3" fill="#F7DC6F"><path d="M100 70 L100 50 M70 80 L55 60 M130 80 L145 60 M60 110 L40 105 M140 110 L160 105 M70 145 L55 160 M130 145 L145 160 M100 155 L100 175"/></g><circle cx="100" cy="115" r="28" fill="#F1C40F"/><ellipse cx="90" cy="105" rx="8" ry="10" fill="#F9E79F" opacity="0.5"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="400" height="400"><rect width="200" height="200" rx="28" fill="#FFF8F0"/><ellipse cx="100" cy="120" rx="58" ry="50" fill="#F1C40F"/><g fill="#27AE60"><path d="M100 75 L100 48 L108 70Z"/><path d="M75 85 L55 60 L85 80Z"/><path d="M125 85 L145 60 L115 80Z"/><path d="M65 120 L40 115 L68 130Z"/><path d="M135 120 L160 115 L132 130Z"/><path d="M80 150 L60 170 L90 155Z"/><path d="M120 150 L140 170 L110 155Z"/></g><ellipse cx="100" cy="120" rx="28" ry="24" fill="#F9E79F"/></svg>

@@ -1,9 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Jambu">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <ellipse cx="100" cy="115" rx="48" ry="50" fill="#E8F5E9" filter="url(#s)"/><ellipse cx="100" cy="115" rx="48" ry="50" fill="#A5D6A7" opacity="0.7"/><ellipse cx="85" cy="100" rx="16" ry="20" fill="#fff" opacity="0.35"/><path d="M100 68 Q108 45 125 50" stroke="#6D4C41" stroke-width="5" fill="none" stroke-linecap="round"/><ellipse cx="120" cy="48" rx="16" ry="9" fill="#27AE60" transform="rotate(-20 120 48)"/><ellipse cx="100" cy="130" rx="20" ry="16" fill="#81C784" opacity="0.4"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="400" height="400"><rect width="200" height="200" rx="28" fill="#FFF8F0"/><ellipse cx="100" cy="115" rx="50" ry="52" fill="#A5D6A7"/><path d="M100 65 Q110 40 128 48" stroke="#6D4C41" stroke-width="6" fill="none" stroke-linecap="round"/><ellipse cx="125" cy="48" rx="16" ry="9" fill="#27AE60"/></svg>

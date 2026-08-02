@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Anjing">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <ellipse cx="100" cy="145" rx="52" ry="32" fill="#C4A574" filter="url(#s)"/><circle cx="100" cy="95" r="42" fill="#D4A574"/><ellipse cx="55" cy="100" rx="18" ry="28" fill="#A67C52" transform="rotate(-20 55 100)"/><ellipse cx="145" cy="100" rx="18" ry="28" fill="#A67C52" transform="rotate(20 145 100)"/><ellipse cx="85" cy="92" rx="7" ry="9" fill="#2C3E50"/><ellipse cx="115" cy="92" rx="7" ry="9" fill="#2C3E50"/><circle cx="87" cy="89" r="2.5" fill="#fff"/><circle cx="117" cy="89" r="2.5" fill="#fff"/><ellipse cx="100" cy="112" rx="18" ry="14" fill="#E8D5B7"/><ellipse cx="100" cy="108" rx="8" ry="6" fill="#2C3E50"/><ellipse cx="100" cy="128" rx="7" ry="6" fill="#FF8A80"/>
-</svg>

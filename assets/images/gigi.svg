@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Gigi">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <rect x="55" y="70" width="90" height="70" rx="12" fill="#FAFAFA" filter="url(#s)" stroke="#B0BEC5" stroke-width="2"/><line x1="85" y1="70" x2="85" y2="140" stroke="#ECEFF1" stroke-width="3"/><line x1="115" y1="70" x2="115" y2="140" stroke="#ECEFF1" stroke-width="3"/><line x1="55" y1="105" x2="145" y2="105" stroke="#ECEFF1" stroke-width="3"/><rect x="60" y="75" width="20" height="25" rx="3" fill="#fff"/><rect x="90" y="75" width="20" height="25" rx="3" fill="#fff"/>
-</svg>

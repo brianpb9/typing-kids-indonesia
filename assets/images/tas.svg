@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Tas">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <rect x="55" y="75" width="90" height="85" rx="12" fill="#FD79A8" filter="url(#s)"/><path d="M75 75 Q75 45 100 45 Q125 45 125 75" stroke="#E84393" stroke-width="10" fill="none" stroke-linecap="round"/><rect x="85" y="105" width="30" height="20" rx="4" fill="#E84393"/><circle cx="100" cy="115" r="4" fill="#F4D03F"/>
-</svg>

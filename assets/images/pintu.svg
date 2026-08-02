@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Pintu">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <rect x="55" y="40" width="90" height="130" rx="6" fill="#D4A574" filter="url(#s)"/><rect x="62" y="48" width="76" height="114" rx="3" fill="#E8C9A0"/><circle cx="120" cy="110" r="6" fill="#F4D03F"/><rect x="70" y="60" width="28" height="35" rx="2" fill="#81ECEC" opacity="0.5"/>
-</svg>

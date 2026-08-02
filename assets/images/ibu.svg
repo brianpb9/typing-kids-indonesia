@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Ibu">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <circle cx="100" cy="70" r="32" fill="#FFDAB9" filter="url(#s)"/><path d="M68 70 Q70 40 100 38 Q130 40 132 70" fill="#5D4037"/><ellipse cx="88" cy="72" rx="4" ry="5" fill="#2C3E50"/><ellipse cx="112" cy="72" rx="4" ry="5" fill="#2C3E50"/><path d="M90 88 Q100 96 110 88" stroke="#E17055" stroke-width="2" fill="none"/><path d="M70 105 Q100 100 130 105 L140 170 L60 170 Z" fill="#FD79A8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="400" height="400" role="img" aria-label="Ibu">
+  <rect width="200" height="200" rx="28" fill="#FFF0F5"/>
+  <circle cx="100" cy="72" r="36" fill="#FFDAB9"/>
+  <path d="M64 72 Q66 32 100 30 Q134 32 136 72" fill="#5D4037"/>
+  <path d="M64 70 Q55 95 68 100" fill="#5D4037"/>
+  <path d="M136 70 Q145 95 132 100" fill="#5D4037"/>
+  <circle cx="88" cy="72" r="4" fill="#2D3436"/>
+  <circle cx="112" cy="72" r="4" fill="#2D3436"/>
+  <path d="M88 90 Q100 100 112 90" stroke="#E17055" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="80" cy="82" rx="7" ry="4" fill="#FFB6C1" opacity="0.5"/>
+  <ellipse cx="120" cy="82" rx="7" ry="4" fill="#FFB6C1" opacity="0.5"/>
+  <path d="M62 110 Q100 100 138 110 L150 180 L50 180 Z" fill="#FD79A8"/>
+  <circle cx="100" cy="48" r="7" fill="#E74C3C"/>
 </svg>

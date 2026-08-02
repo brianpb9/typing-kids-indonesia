@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Kambing">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <ellipse cx="100" cy="140" rx="50" ry="35" fill="#E8E0D5" filter="url(#s)"/><circle cx="100" cy="95" r="38" fill="#E8E0D5"/><path d="M70 70 Q55 40 65 30" stroke="#8D6E63" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M130 70 Q145 40 135 30" stroke="#8D6E63" stroke-width="10" fill="none" stroke-linecap="round"/><ellipse cx="85" cy="92" rx="5" ry="7" fill="#2C3E50"/><ellipse cx="115" cy="92" rx="5" ry="7" fill="#2C3E50"/><ellipse cx="100" cy="112" rx="14" ry="10" fill="#D7CCC8"/><path d="M95 120 Q100 145 105 120" fill="#BCAAA4"/>
-</svg>

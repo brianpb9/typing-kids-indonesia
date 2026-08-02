@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Ayah">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <circle cx="100" cy="70" r="32" fill="#FFDAB9" filter="url(#s)"/><path d="M70 60 Q70 35 100 32 Q130 35 130 60" fill="#2C3E50"/><ellipse cx="88" cy="72" rx="4" ry="5" fill="#2C3E50"/><ellipse cx="112" cy="72" rx="4" ry="5" fill="#2C3E50"/><path d="M90 88 Q100 95 110 88" stroke="#E17055" stroke-width="2" fill="none"/><path d="M70 105 Q100 100 130 105 L140 170 L60 170 Z" fill="#0984E3"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="400" height="400" role="img" aria-label="Ayah">
+  <rect width="200" height="200" rx="28" fill="#E8F4FC"/>
+  <circle cx="100" cy="72" r="36" fill="#FFDAB9"/>
+  <path d="M66 62 Q66 30 100 28 Q134 30 134 62" fill="#2D3436"/>
+  <rect x="68" y="55" width="64" height="10" rx="2" fill="#2D3436"/>
+  <circle cx="88" cy="72" r="4" fill="#2D3436"/>
+  <circle cx="112" cy="72" r="4" fill="#2D3436"/>
+  <path d="M88 90 Q100 98 112 90" stroke="#E17055" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M62 110 Q100 100 138 110 L150 180 L50 180 Z" fill="#0984E3"/>
+  <rect x="88" y="110" width="24" height="30" fill="#74B9FF" opacity="0.5"/>
 </svg>

@@ -9,14 +9,18 @@ Bahasa: **Indonesia**. Platform: **HTML + CSS + Vanilla JS**. Siap deploy ke **V
 
 ## Fitur
 
-- Loop sederhana: gambar → suara kata → ketik di keyboard fisik → pujian → kata berikutnya
-- **No-fail design**: huruf salah tidak menghapus progress, tidak ada “salah / gagal / game over”
-- Suara kata lewat **SpeechSynthesis** browser (+ SFX lembut lewat Web Audio)
-- 30 kata: buah, hewan, kata sehari-hari
-- Ilustrasi SVG pastel konsisten (bukan emoji)
-- Confetti, bintang, animasi pop & float
-- Keyboard QWERTY saja (tanpa keyboard on-screen)
-- Modular & siap dikembangkan (kategori, difficulty, PWA, dll.)
+- Loop: gambar → suara kata → ketik keyboard → pujian → kata berikutnya
+- **Misi 10 bintang** — anak kejar target sampai juara 🏆
+- Milestone di 3 / 5 / 8 bintang + layar kemenangan
+- **Koleksi bintang seumur hidup** + rank (Pemula → Legenda) di `localStorage`
+- **3 mode:** Mudah (huruf besar + kotak) · Sedang (tanpa huruf besar) · Sulit (gambar + TTS saja)
+- Label kata: Mudah/Sedang (bantuan setelah salah) · Sulit tidak pernah
+- Tombol **mute** suara (TTS + SFX)
+- **No-fail**: salah tidak menghapus progress
+- 100 kata (buah, hewan, sehari-hari, kendaraan, warna, makanan, tubuh)
+- **Ikon jelas** (OpenMoji) + warna solid — bukan foto rancu (langit/bunga/dll.)
+- TTS browser + SFX Web Audio
+- Keyboard QWERTY saja
 
 ---
 
@@ -132,12 +136,12 @@ typing-kids-indonesia/
 
 ## Mengganti gambar
 
-1. Siapkan file **SVG** (disarankan) atau PNG transparan.  
-2. Gaya: pastel, rounded, mirip aset yang ada (viewBox ~200×200).  
-3. Simpan di `assets/images/<id>.svg`.  
-4. Pastikan `image` di `words.json` mengarah ke path yang benar.
+1. Simpan ikon **PNG/SVG** di `assets/images/<id>.png` (ikon jelas, 1 objek, background polos).  
+2. Update `image` di `data/words.json`, contoh: `"image": "assets/images/apel.png?v=2"`  
+3. **Warna** harus solid (bukan langit/bunga).  
+4. Atribusi: `assets/images/_meta/ATTRIBUTION.md`
 
-Hak komersial: aset bawaan adalah SVG kustom (MIT bersama proyek). Boleh diganti OpenMoji, Icons8 (lisensi sesuai sumber), Storyset, dll.
+Aset bawaan: **OpenMoji** (CC BY-SA) + solid color + SVG custom Indonesia.
 
 ---
 

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Perahu">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <path d="M35 110 Q50 150 100 155 Q150 150 165 110 Z" fill="#D4A574" filter="url(#s)"/><rect x="95" y="50" width="10" height="65" fill="#8D6E63"/><path d="M105 55 L145 95 L105 95 Z" fill="#E74C3C"/><path d="M25 110 Q100 125 175 110" stroke="#3498DB" stroke-width="5" fill="none"/>
-</svg>

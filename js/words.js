@@ -1,8 +1,7 @@
 /**
- * Words — load, filter, shuffle word list
- * Future-ready: category filters, difficulty by letter count, locales
+ * Words — load, filter, shuffle by mode letter range
  */
-import { CONFIG } from './config.js';
+import { CONFIG, getMode } from './config.js';
 
 export class WordBank {
   constructor() {
@@ -14,6 +13,8 @@ export class WordBank {
     this._queue = [];
     this._lastId = null;
     this.loaded = false;
+    /** @type {'easy'|'medium'|'hard'} */
+    this.difficulty = CONFIG.gameplay.defaultDifficulty;
   }
 
   async load(url = CONFIG.paths.wordsData) {
@@ -23,7 +24,8 @@ export class WordBank {
 
     this.categories = data.categories || {};
     this.praise = data.praise || ['Hebat!', 'Bagus!', 'Pintar!'];
-    this.encouragements = data.encouragements || ['Kamu hebat!', 'Ayo, kamu bisa!'];
+    this.encouragements =
+      data.encouragements || ['Kamu hebat!', 'Ayo, kamu bisa!'];
     this.words = (data.words || []).map((w) => ({
       ...w,
       word: String(w.word).toLowerCase(),
@@ -37,22 +39,35 @@ export class WordBank {
   }
 
   /**
-   * Active word pool (respects future category / difficulty filters)
-   * @returns {typeof this.words}
+   * @param {'easy'|'medium'|'hard'|string} mode
    */
+  setDifficulty(mode) {
+    const m = getMode(mode);
+    this.difficulty = m.id;
+    this._queue = [];
+    this._refillQueue();
+  }
+
   getPool() {
     let pool = [...this.words];
-    const { activeCategories, minLetters, maxLetters } = CONFIG.gameplay;
+    const { activeCategories } = CONFIG.gameplay;
+    const mode = getMode(this.difficulty);
 
     if (activeCategories && activeCategories.length) {
       pool = pool.filter((w) => activeCategories.includes(w.category));
     }
-    pool = pool.filter((w) => w.letters >= minLetters && w.letters <= maxLetters);
+
+    pool = pool.filter(
+      (w) => w.letters >= mode.minLetters && w.letters <= mode.maxLetters
+    );
 
     return pool.length ? pool : [...this.words];
   }
 
-  /** Next word — random continuous play, avoid immediate repeat */
+  poolSize() {
+    return this.getPool().length;
+  }
+
   next() {
     if (!this._queue.length) this._refillQueue();
 
@@ -76,7 +91,9 @@ export class WordBank {
   }
 
   randomEncouragement() {
-    return this.encouragements[Math.floor(Math.random() * this.encouragements.length)];
+    return this.encouragements[
+      Math.floor(Math.random() * this.encouragements.length)
+    ];
   }
 
   _refillQueue() {

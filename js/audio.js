@@ -9,6 +9,8 @@ export class AudioManager {
     this.ctx = null;
     this.enabled = CONFIG.audio.enabled;
     this.masterVolume = CONFIG.audio.masterVolume;
+    /** Master mute — SFX + TTS */
+    this.muted = false;
     this._speechReady =
       typeof window !== 'undefined' && 'speechSynthesis' in window;
     this._voices = [];
@@ -116,7 +118,21 @@ export class AudioManager {
    * @param {{ rate?: number, pitch?: number, force?: boolean }} [opts]
    * @returns {Promise<void>}
    */
+  /**
+   * @param {boolean} muted
+   */
+  setMuted(muted) {
+    this.muted = Boolean(muted);
+    if (this.muted) this.stopSpeech();
+  }
+
+  toggleMute() {
+    this.setMuted(!this.muted);
+    return this.muted;
+  }
+
   speak(text, opts = {}) {
+    if (this.muted && !opts.force) return Promise.resolve();
     if (!this._speechReady || !text) return Promise.resolve();
 
     this._loadVoices();
@@ -216,33 +232,41 @@ export class AudioManager {
 
   /** Soft click for UI */
   playClick() {
+    if (this.muted) return;
     this._tone({ freq: 520, duration: 0.06, type: 'sine', vol: 0.15, attack: 0.005, decay: 0.05 });
   }
 
   playCorrect() {
+    if (this.muted) return;
     this._tone({ freq: 660, duration: 0.1, type: 'sine', vol: 0.22, attack: 0.005, decay: 0.09 });
     setTimeout(() => {
+      if (this.muted) return;
       this._tone({ freq: 880, duration: 0.12, type: 'sine', vol: 0.18, attack: 0.005, decay: 0.1 });
     }, 40);
   }
 
   playWrong() {
+    if (this.muted) return;
     this._tone({ freq: 280, duration: 0.12, type: 'triangle', vol: 0.12, attack: 0.01, decay: 0.1 });
   }
 
   playSparkle() {
+    if (this.muted) return;
     const notes = [880, 1100, 1320, 1760];
     notes.forEach((freq, i) => {
       setTimeout(() => {
+        if (this.muted) return;
         this._tone({ freq, duration: 0.15, type: 'sine', vol: 0.1, attack: 0.005, decay: 0.12 });
       }, i * 45);
     });
   }
 
   playCelebration() {
+    if (this.muted) return;
     const melody = [523, 659, 784, 1047];
     melody.forEach((freq, i) => {
       setTimeout(() => {
+        if (this.muted) return;
         this._tone({ freq, duration: 0.2, type: 'sine', vol: 0.2, attack: 0.01, decay: 0.18 });
       }, i * 90);
     });
@@ -252,6 +276,7 @@ export class AudioManager {
    * @param {{ freq: number, duration: number, type?: OscillatorType, vol?: number, attack?: number, decay?: number }} p
    */
   _tone({ freq, duration, type = 'sine', vol = 0.2, attack = 0.01, decay = 0.1 }) {
+    if (this.muted) return;
     const ctx = this._ensureCtx();
     if (!ctx) return;
 

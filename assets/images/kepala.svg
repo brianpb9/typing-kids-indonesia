@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Kepala">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <circle cx="100" cy="110" r="55" fill="#FFDAB9" filter="url(#s)"/><path d="M50 90 Q50 50 100 45 Q150 50 150 90" fill="#5D4037"/><ellipse cx="80" cy="105" rx="6" ry="8" fill="#2C3E50"/><ellipse cx="120" cy="105" rx="6" ry="8" fill="#2C3E50"/><ellipse cx="100" cy="125" rx="8" ry="5" fill="#E8B896"/><path d="M88 140 Q100 150 112 140" stroke="#E17055" stroke-width="2" fill="none"/>
-</svg>

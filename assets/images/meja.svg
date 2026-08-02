@@ -1,9 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Meja">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <rect x="35" y="90" width="130" height="18" rx="4" fill="#D4A574" filter="url(#s)"/><rect x="48" y="108" width="12" height="55" rx="3" fill="#C4956A"/><rect x="140" y="108" width="12" height="55" rx="3" fill="#C4956A"/><circle cx="100" cy="80" r="12" fill="#E74C3C"/><ellipse cx="100" cy="72" rx="8" ry="4" fill="#27AE60"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="400" height="400"><rect width="200" height="200" rx="28" fill="#FFF8F0"/><rect x="30" y="85" width="140" height="20" rx="4" fill="#C4956A"/><rect x="42" y="105" width="14" height="55" rx="3" fill="#A67C52"/><rect x="144" y="105" width="14" height="55" rx="3" fill="#A67C52"/></svg>

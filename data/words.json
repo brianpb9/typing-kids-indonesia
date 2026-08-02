@@ -37,7 +37,7 @@
       "word": "apel",
       "display": "Apel",
       "category": "buah",
-      "image": "assets/images/apel.svg?v=3",
+      "image": "assets/images/apel.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -46,7 +46,7 @@
       "word": "jeruk",
       "display": "Jeruk",
       "category": "buah",
-      "image": "assets/images/jeruk.svg?v=3",
+      "image": "assets/images/jeruk.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -55,7 +55,7 @@
       "word": "pisang",
       "display": "Pisang",
       "category": "buah",
-      "image": "assets/images/pisang.svg?v=3",
+      "image": "assets/images/pisang.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -64,7 +64,7 @@
       "word": "anggur",
       "display": "Anggur",
       "category": "buah",
-      "image": "assets/images/anggur.svg?v=3",
+      "image": "assets/images/anggur.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -73,7 +73,7 @@
       "word": "mangga",
       "display": "Mangga",
       "category": "buah",
-      "image": "assets/images/mangga.svg?v=3",
+      "image": "assets/images/mangga.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -82,7 +82,7 @@
       "word": "melon",
       "display": "Melon",
       "category": "buah",
-      "image": "assets/images/melon.svg?v=3",
+      "image": "assets/images/melon.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -91,7 +91,7 @@
       "word": "pepaya",
       "display": "Pepaya",
       "category": "buah",
-      "image": "assets/images/pepaya.svg?v=3",
+      "image": "assets/images/pepaya.svg?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -100,7 +100,7 @@
       "word": "nanas",
       "display": "Nanas",
       "category": "buah",
-      "image": "assets/images/nanas.svg?v=3",
+      "image": "assets/images/nanas.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -109,7 +109,7 @@
       "word": "semangka",
       "display": "Semangka",
       "category": "buah",
-      "image": "assets/images/semangka.svg?v=3",
+      "image": "assets/images/semangka.png?v=cartoon-2",
       "audio": null,
       "letters": 8
     },
@@ -118,7 +118,7 @@
       "word": "stroberi",
       "display": "Stroberi",
       "category": "buah",
-      "image": "assets/images/stroberi.svg?v=3",
+      "image": "assets/images/stroberi.png?v=cartoon-2",
       "audio": null,
       "letters": 8
     },
@@ -127,7 +127,7 @@
       "word": "durian",
       "display": "Durian",
       "category": "buah",
-      "image": "assets/images/durian.svg?v=3",
+      "image": "assets/images/durian.svg?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -136,7 +136,7 @@
       "word": "rambutan",
       "display": "Rambutan",
       "category": "buah",
-      "image": "assets/images/rambutan.svg?v=3",
+      "image": "assets/images/rambutan.svg?v=cartoon-2",
       "audio": null,
       "letters": 8
     },
@@ -145,7 +145,7 @@
       "word": "jambu",
       "display": "Jambu",
       "category": "buah",
-      "image": "assets/images/jambu.svg?v=3",
+      "image": "assets/images/jambu.svg?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -154,7 +154,7 @@
       "word": "kelapa",
       "display": "Kelapa",
       "category": "buah",
-      "image": "assets/images/kelapa.svg?v=3",
+      "image": "assets/images/kelapa.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -163,7 +163,7 @@
       "word": "lemon",
       "display": "Lemon",
       "category": "buah",
-      "image": "assets/images/lemon.svg?v=3",
+      "image": "assets/images/lemon.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -172,7 +172,7 @@
       "word": "ceri",
       "display": "Ceri",
       "category": "buah",
-      "image": "assets/images/ceri.svg?v=3",
+      "image": "assets/images/ceri.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -181,7 +181,7 @@
       "word": "kiwi",
       "display": "Kiwi",
       "category": "buah",
-      "image": "assets/images/kiwi.svg?v=3",
+      "image": "assets/images/kiwi.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -190,7 +190,7 @@
       "word": "pir",
       "display": "Pir",
       "category": "buah",
-      "image": "assets/images/pir.svg?v=3",
+      "image": "assets/images/pir.png?v=cartoon-2",
       "audio": null,
       "letters": 3
     },
@@ -199,7 +199,7 @@
       "word": "alpukat",
       "display": "Alpukat",
       "category": "buah",
-      "image": "assets/images/alpukat.svg?v=3",
+      "image": "assets/images/alpukat.png?v=cartoon-2",
       "audio": null,
       "letters": 7
     },
@@ -208,7 +208,7 @@
       "word": "belimbing",
       "display": "Belimbing",
       "category": "buah",
-      "image": "assets/images/belimbing.svg?v=3",
+      "image": "assets/images/belimbing.svg?v=cartoon-2",
       "audio": null,
       "letters": 9
     },
@@ -217,7 +217,7 @@
       "word": "kucing",
       "display": "Kucing",
       "category": "hewan",
-      "image": "assets/images/kucing.svg?v=3",
+      "image": "assets/images/kucing.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -226,7 +226,7 @@
       "word": "anjing",
       "display": "Anjing",
       "category": "hewan",
-      "image": "assets/images/anjing.svg?v=3",
+      "image": "assets/images/anjing.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -235,7 +235,7 @@
       "word": "ayam",
       "display": "Ayam",
       "category": "hewan",
-      "image": "assets/images/ayam.svg?v=3",
+      "image": "assets/images/ayam.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -244,7 +244,7 @@
       "word": "bebek",
       "display": "Bebek",
       "category": "hewan",
-      "image": "assets/images/bebek.svg?v=3",
+      "image": "assets/images/bebek.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -253,7 +253,7 @@
       "word": "ikan",
       "display": "Ikan",
       "category": "hewan",
-      "image": "assets/images/ikan.svg?v=3",
+      "image": "assets/images/ikan.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -262,7 +262,7 @@
       "word": "gajah",
       "display": "Gajah",
       "category": "hewan",
-      "image": "assets/images/gajah.svg?v=3",
+      "image": "assets/images/gajah.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -271,7 +271,7 @@
       "word": "kelinci",
       "display": "Kelinci",
       "category": "hewan",
-      "image": "assets/images/kelinci.svg?v=3",
+      "image": "assets/images/kelinci.png?v=cartoon-2",
       "audio": null,
       "letters": 7
     },
@@ -280,7 +280,7 @@
       "word": "kambing",
       "display": "Kambing",
       "category": "hewan",
-      "image": "assets/images/kambing.svg?v=3",
+      "image": "assets/images/kambing.png?v=cartoon-2",
       "audio": null,
       "letters": 7
     },
@@ -289,7 +289,7 @@
       "word": "sapi",
       "display": "Sapi",
       "category": "hewan",
-      "image": "assets/images/sapi.svg?v=3",
+      "image": "assets/images/sapi.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -298,7 +298,7 @@
       "word": "harimau",
       "display": "Harimau",
       "category": "hewan",
-      "image": "assets/images/harimau.svg?v=3",
+      "image": "assets/images/harimau.png?v=cartoon-2",
       "audio": null,
       "letters": 7
     },
@@ -307,7 +307,7 @@
       "word": "kuda",
       "display": "Kuda",
       "category": "hewan",
-      "image": "assets/images/kuda.svg?v=3",
+      "image": "assets/images/kuda.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -316,7 +316,7 @@
       "word": "burung",
       "display": "Burung",
       "category": "hewan",
-      "image": "assets/images/burung.svg?v=3",
+      "image": "assets/images/burung.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -325,7 +325,7 @@
       "word": "monyet",
       "display": "Monyet",
       "category": "hewan",
-      "image": "assets/images/monyet.svg?v=3",
+      "image": "assets/images/monyet.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -334,7 +334,7 @@
       "word": "ular",
       "display": "Ular",
       "category": "hewan",
-      "image": "assets/images/ular.svg?v=3",
+      "image": "assets/images/ular.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -343,7 +343,7 @@
       "word": "singa",
       "display": "Singa",
       "category": "hewan",
-      "image": "assets/images/singa.svg?v=3",
+      "image": "assets/images/singa.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -352,7 +352,7 @@
       "word": "beruang",
       "display": "Beruang",
       "category": "hewan",
-      "image": "assets/images/beruang.svg?v=3",
+      "image": "assets/images/beruang.png?v=cartoon-2",
       "audio": null,
       "letters": 7
     },
@@ -361,7 +361,7 @@
       "word": "tikus",
       "display": "Tikus",
       "category": "hewan",
-      "image": "assets/images/tikus.svg?v=3",
+      "image": "assets/images/tikus.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -370,7 +370,7 @@
       "word": "kodok",
       "display": "Kodok",
       "category": "hewan",
-      "image": "assets/images/kodok.svg?v=3",
+      "image": "assets/images/kodok.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -379,7 +379,7 @@
       "word": "penyu",
       "display": "Penyu",
       "category": "hewan",
-      "image": "assets/images/penyu.svg?v=3",
+      "image": "assets/images/penyu.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -388,7 +388,7 @@
       "word": "kupu",
       "display": "Kupu",
       "category": "hewan",
-      "image": "assets/images/kupu.svg?v=3",
+      "image": "assets/images/kupu.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -397,7 +397,7 @@
       "word": "rumah",
       "display": "Rumah",
       "category": "sehari-hari",
-      "image": "assets/images/rumah.svg?v=3",
+      "image": "assets/images/rumah.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -406,7 +406,7 @@
       "word": "ibu",
       "display": "Ibu",
       "category": "sehari-hari",
-      "image": "assets/images/ibu.svg?v=3",
+      "image": "assets/images/ibu.svg?v=cartoon-2",
       "audio": null,
       "letters": 3
     },
@@ -415,7 +415,7 @@
       "word": "ayah",
       "display": "Ayah",
       "category": "sehari-hari",
-      "image": "assets/images/ayah.svg?v=3",
+      "image": "assets/images/ayah.svg?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -424,7 +424,7 @@
       "word": "meja",
       "display": "Meja",
       "category": "sehari-hari",
-      "image": "assets/images/meja.svg?v=3",
+      "image": "assets/images/meja.svg?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -433,7 +433,7 @@
       "word": "kursi",
       "display": "Kursi",
       "category": "sehari-hari",
-      "image": "assets/images/kursi.svg?v=3",
+      "image": "assets/images/kursi.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -442,7 +442,7 @@
       "word": "tas",
       "display": "Tas",
       "category": "sehari-hari",
-      "image": "assets/images/tas.svg?v=3",
+      "image": "assets/images/tas.png?v=cartoon-2",
       "audio": null,
       "letters": 3
     },
@@ -451,7 +451,7 @@
       "word": "sepatu",
       "display": "Sepatu",
       "category": "sehari-hari",
-      "image": "assets/images/sepatu.svg?v=3",
+      "image": "assets/images/sepatu.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -460,7 +460,7 @@
       "word": "buku",
       "display": "Buku",
       "category": "sehari-hari",
-      "image": "assets/images/buku.svg?v=3",
+      "image": "assets/images/buku.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -469,7 +469,7 @@
       "word": "bola",
       "display": "Bola",
       "category": "sehari-hari",
-      "image": "assets/images/bola.svg?v=3",
+      "image": "assets/images/bola.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -478,7 +478,7 @@
       "word": "baju",
       "display": "Baju",
       "category": "sehari-hari",
-      "image": "assets/images/baju.svg?v=3",
+      "image": "assets/images/baju.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -487,7 +487,7 @@
       "word": "pintu",
       "display": "Pintu",
       "category": "sehari-hari",
-      "image": "assets/images/pintu.svg?v=3",
+      "image": "assets/images/pintu.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -496,7 +496,7 @@
       "word": "jendela",
       "display": "Jendela",
       "category": "sehari-hari",
-      "image": "assets/images/jendela.svg?v=3",
+      "image": "assets/images/jendela.svg?v=cartoon-2",
       "audio": null,
       "letters": 7
     },
@@ -505,7 +505,7 @@
       "word": "piring",
       "display": "Piring",
       "category": "sehari-hari",
-      "image": "assets/images/piring.svg?v=3",
+      "image": "assets/images/piring.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -514,7 +514,7 @@
       "word": "sendok",
       "display": "Sendok",
       "category": "sehari-hari",
-      "image": "assets/images/sendok.svg?v=3",
+      "image": "assets/images/sendok.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -523,7 +523,7 @@
       "word": "gelas",
       "display": "Gelas",
       "category": "sehari-hari",
-      "image": "assets/images/gelas.svg?v=3",
+      "image": "assets/images/gelas.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -532,7 +532,7 @@
       "word": "pensil",
       "display": "Pensil",
       "category": "sehari-hari",
-      "image": "assets/images/pensil.svg?v=3",
+      "image": "assets/images/pensil.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -541,7 +541,7 @@
       "word": "kertas",
       "display": "Kertas",
       "category": "sehari-hari",
-      "image": "assets/images/kertas.svg?v=3",
+      "image": "assets/images/kertas.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -550,7 +550,7 @@
       "word": "lampu",
       "display": "Lampu",
       "category": "sehari-hari",
-      "image": "assets/images/lampu.svg?v=3",
+      "image": "assets/images/lampu.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -559,7 +559,7 @@
       "word": "kasur",
       "display": "Kasur",
       "category": "sehari-hari",
-      "image": "assets/images/kasur.svg?v=3",
+      "image": "assets/images/kasur.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -568,7 +568,7 @@
       "word": "bantal",
       "display": "Bantal",
       "category": "sehari-hari",
-      "image": "assets/images/bantal.svg?v=3",
+      "image": "assets/images/bantal.svg?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -577,7 +577,7 @@
       "word": "mobil",
       "display": "Mobil",
       "category": "kendaraan",
-      "image": "assets/images/mobil.svg?v=3",
+      "image": "assets/images/mobil.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -586,7 +586,7 @@
       "word": "motor",
       "display": "Motor",
       "category": "kendaraan",
-      "image": "assets/images/motor.svg?v=3",
+      "image": "assets/images/motor.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -595,7 +595,7 @@
       "word": "bus",
       "display": "Bus",
       "category": "kendaraan",
-      "image": "assets/images/bus.svg?v=3",
+      "image": "assets/images/bus.png?v=cartoon-2",
       "audio": null,
       "letters": 3
     },
@@ -604,7 +604,7 @@
       "word": "kereta",
       "display": "Kereta",
       "category": "kendaraan",
-      "image": "assets/images/kereta.svg?v=3",
+      "image": "assets/images/kereta.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -613,7 +613,7 @@
       "word": "pesawat",
       "display": "Pesawat",
       "category": "kendaraan",
-      "image": "assets/images/pesawat.svg?v=3",
+      "image": "assets/images/pesawat.png?v=cartoon-2",
       "audio": null,
       "letters": 7
     },
@@ -622,7 +622,7 @@
       "word": "kapal",
       "display": "Kapal",
       "category": "kendaraan",
-      "image": "assets/images/kapal.svg?v=3",
+      "image": "assets/images/kapal.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -631,7 +631,7 @@
       "word": "sepeda",
       "display": "Sepeda",
       "category": "kendaraan",
-      "image": "assets/images/sepeda.svg?v=3",
+      "image": "assets/images/sepeda.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -640,7 +640,7 @@
       "word": "truk",
       "display": "Truk",
       "category": "kendaraan",
-      "image": "assets/images/truk.svg?v=3",
+      "image": "assets/images/truk.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -649,7 +649,7 @@
       "word": "becak",
       "display": "Becak",
       "category": "kendaraan",
-      "image": "assets/images/becak.svg?v=3",
+      "image": "assets/images/becak.svg?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -658,7 +658,7 @@
       "word": "perahu",
       "display": "Perahu",
       "category": "kendaraan",
-      "image": "assets/images/perahu.svg?v=3",
+      "image": "assets/images/perahu.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -667,7 +667,7 @@
       "word": "merah",
       "display": "Merah",
       "category": "warna",
-      "image": "assets/images/merah.svg?v=3",
+      "image": "assets/images/merah.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -676,7 +676,7 @@
       "word": "biru",
       "display": "Biru",
       "category": "warna",
-      "image": "assets/images/biru.svg?v=3",
+      "image": "assets/images/biru.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -685,7 +685,7 @@
       "word": "hijau",
       "display": "Hijau",
       "category": "warna",
-      "image": "assets/images/hijau.svg?v=3",
+      "image": "assets/images/hijau.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -694,7 +694,7 @@
       "word": "kuning",
       "display": "Kuning",
       "category": "warna",
-      "image": "assets/images/kuning.svg?v=3",
+      "image": "assets/images/kuning.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -703,7 +703,7 @@
       "word": "putih",
       "display": "Putih",
       "category": "warna",
-      "image": "assets/images/putih.svg?v=3",
+      "image": "assets/images/putih.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -712,7 +712,7 @@
       "word": "hitam",
       "display": "Hitam",
       "category": "warna",
-      "image": "assets/images/hitam.svg?v=3",
+      "image": "assets/images/hitam.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -721,7 +721,7 @@
       "word": "ungu",
       "display": "Ungu",
       "category": "warna",
-      "image": "assets/images/ungu.svg?v=3",
+      "image": "assets/images/ungu.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -730,7 +730,7 @@
       "word": "pink",
       "display": "Pink",
       "category": "warna",
-      "image": "assets/images/pink.svg?v=3",
+      "image": "assets/images/pink.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -739,7 +739,7 @@
       "word": "oranye",
       "display": "Oranye",
       "category": "warna",
-      "image": "assets/images/oranye.svg?v=3",
+      "image": "assets/images/oranye.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -748,7 +748,7 @@
       "word": "coklat",
       "display": "Coklat",
       "category": "warna",
-      "image": "assets/images/coklat.svg?v=3",
+      "image": "assets/images/coklat.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -757,7 +757,7 @@
       "word": "nasi",
       "display": "Nasi",
       "category": "makanan",
-      "image": "assets/images/nasi.svg?v=3",
+      "image": "assets/images/nasi.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -766,7 +766,7 @@
       "word": "roti",
       "display": "Roti",
       "category": "makanan",
-      "image": "assets/images/roti.svg?v=3",
+      "image": "assets/images/roti.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -775,7 +775,7 @@
       "word": "susu",
       "display": "Susu",
       "category": "makanan",
-      "image": "assets/images/susu.svg?v=3",
+      "image": "assets/images/susu.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -784,7 +784,7 @@
       "word": "telur",
       "display": "Telur",
       "category": "makanan",
-      "image": "assets/images/telur.svg?v=3",
+      "image": "assets/images/telur.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -793,7 +793,7 @@
       "word": "keju",
       "display": "Keju",
       "category": "makanan",
-      "image": "assets/images/keju.svg?v=3",
+      "image": "assets/images/keju.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -802,7 +802,7 @@
       "word": "mie",
       "display": "Mie",
       "category": "makanan",
-      "image": "assets/images/mie.svg?v=3",
+      "image": "assets/images/mie.png?v=cartoon-2",
       "audio": null,
       "letters": 3
     },
@@ -811,7 +811,7 @@
       "word": "sup",
       "display": "Sup",
       "category": "makanan",
-      "image": "assets/images/sup.svg?v=3",
+      "image": "assets/images/sup.png?v=cartoon-2",
       "audio": null,
       "letters": 3
     },
@@ -820,7 +820,7 @@
       "word": "madu",
       "display": "Madu",
       "category": "makanan",
-      "image": "assets/images/madu.svg?v=3",
+      "image": "assets/images/madu.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -829,7 +829,7 @@
       "word": "air",
       "display": "Air",
       "category": "makanan",
-      "image": "assets/images/air.svg?v=3",
+      "image": "assets/images/air.png?v=cartoon-2",
       "audio": null,
       "letters": 3
     },
@@ -838,7 +838,7 @@
       "word": "jus",
       "display": "Jus",
       "category": "makanan",
-      "image": "assets/images/jus.svg?v=3",
+      "image": "assets/images/jus.png?v=cartoon-2",
       "audio": null,
       "letters": 3
     },
@@ -847,7 +847,7 @@
       "word": "mata",
       "display": "Mata",
       "category": "tubuh",
-      "image": "assets/images/mata.svg?v=3",
+      "image": "assets/images/mata.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -856,7 +856,7 @@
       "word": "hidung",
       "display": "Hidung",
       "category": "tubuh",
-      "image": "assets/images/hidung.svg?v=3",
+      "image": "assets/images/hidung.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -865,7 +865,7 @@
       "word": "mulut",
       "display": "Mulut",
       "category": "tubuh",
-      "image": "assets/images/mulut.svg?v=3",
+      "image": "assets/images/mulut.png?v=cartoon-2",
       "audio": null,
       "letters": 5
     },
@@ -874,7 +874,7 @@
       "word": "tangan",
       "display": "Tangan",
       "category": "tubuh",
-      "image": "assets/images/tangan.svg?v=3",
+      "image": "assets/images/tangan.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -883,7 +883,7 @@
       "word": "kaki",
       "display": "Kaki",
       "category": "tubuh",
-      "image": "assets/images/kaki.svg?v=3",
+      "image": "assets/images/kaki.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -892,7 +892,7 @@
       "word": "kepala",
       "display": "Kepala",
       "category": "tubuh",
-      "image": "assets/images/kepala.svg?v=3",
+      "image": "assets/images/kepala.png?v=cartoon-2",
       "audio": null,
       "letters": 6
     },
@@ -901,7 +901,7 @@
       "word": "gigi",
       "display": "Gigi",
       "category": "tubuh",
-      "image": "assets/images/gigi.svg?v=3",
+      "image": "assets/images/gigi.png?v=cartoon-2",
       "audio": null,
       "letters": 4
     },
@@ -910,7 +910,7 @@
       "word": "telinga",
       "display": "Telinga",
       "category": "tubuh",
-      "image": "assets/images/telinga.svg?v=3",
+      "image": "assets/images/telinga.png?v=cartoon-2",
       "audio": null,
       "letters": 7
     },
@@ -919,7 +919,7 @@
       "word": "sekolah",
       "display": "Sekolah",
       "category": "tubuh",
-      "image": "assets/images/sekolah.svg?v=3",
+      "image": "assets/images/sekolah.png?v=cartoon-2",
       "audio": null,
       "letters": 7
     },
@@ -928,7 +928,7 @@
       "word": "guru",
       "display": "Guru",
       "category": "tubuh",
-      "image": "assets/images/guru.svg?v=3",
+      "image": "assets/images/guru.svg?v=cartoon-2",
       "audio": null,
       "letters": 4
     }

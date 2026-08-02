@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Stroberi">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <path d="M100 55 C145 55 155 95 145 125 C135 155 110 170 100 175 C90 170 65 155 55 125 C45 95 55 55 100 55Z" fill="#E74C3C" filter="url(#s)"/><ellipse cx="80" cy="95" rx="3" ry="4" fill="#F9E79F" transform="rotate(-25 80 95)"/><ellipse cx="100" cy="90" rx="3" ry="4" fill="#F9E79F"/><ellipse cx="120" cy="95" rx="3" ry="4" fill="#F9E79F" transform="rotate(25 120 95)"/><ellipse cx="75" cy="120" rx="3" ry="4" fill="#F9E79F"/><ellipse cx="100" cy="115" rx="3" ry="4" fill="#F9E79F"/><ellipse cx="125" cy="120" rx="3" ry="4" fill="#F9E79F"/><path d="M100 58 L78 38 L95 50 L100 30 L105 50 L122 38 Z" fill="#27AE60"/>
-</svg>

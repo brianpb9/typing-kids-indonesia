@@ -8,8 +8,9 @@ async function boot() {
   document.title = `${CONFIG.app.name} — ${CONFIG.app.subtitle}`;
 
   const game = new Game();
-  // Expose for future parent dashboard / debugging (optional)
-  window.__typingKids = { game, config: CONFIG };
+  if (typeof window !== 'undefined') {
+    window.__typingKids = { game, config: CONFIG };
+  }
 
   await game.init();
 }

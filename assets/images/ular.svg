@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Ular">
-  <defs>
-    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
-    </filter>
-  </defs>
-  <path d="M40 120 Q60 80 90 110 Q120 140 150 100 Q170 80 175 90" stroke="#27AE60" stroke-width="22" fill="none" stroke-linecap="round" filter="url(#s)"/><path d="M40 120 Q60 80 90 110 Q120 140 150 100 Q170 80 175 90" stroke="#2ECC71" stroke-width="14" fill="none" stroke-linecap="round"/><circle cx="175" cy="88" r="12" fill="#27AE60"/><circle cx="178" cy="85" r="3" fill="#2C3E50"/><path d="M185 90 L195 95 L185 98" fill="#E74C3C"/><path d="M70 100 Q80 95 85 105" stroke="#F4D03F" stroke-width="3" fill="none"/><path d="M110 125 Q120 120 125 130" stroke="#F4D03F" stroke-width="3" fill="none"/>
-</svg>
