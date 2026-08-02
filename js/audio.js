@@ -32,6 +32,8 @@ export class AudioManager {
     /** @type {HTMLAudioElement|null} */
     this._packAudio = null;
     this._packToken = 0;
+    /** @type {((playing:boolean)=>void)|null} */
+    this.onSpeakingChange = null;
 
     if (this._speechReady) {
       this._loadVoices();
@@ -194,6 +196,23 @@ export class AudioManager {
   }
 
   /**
+   * Paths for preloading upcoming words
+   * @param {string[]} ids
+   * @returns {string[]}
+   */
+  packPathsForIds(ids) {
+    return (ids || []).map((id) => this._packPath(id)).filter(Boolean);
+  }
+
+  _setSpeaking(playing) {
+    try {
+      this.onSpeakingChange?.(Boolean(playing));
+    } catch {
+      /* ignore */
+    }
+  }
+
+  /**
    * Play a packed MP3 if present.
    * @param {string} key word id or _phrase
    * @returns {Promise<boolean>} true if played from pack
@@ -225,12 +244,14 @@ export class AudioManager {
         const a = new Audio(src);
         a.volume = Math.min(1, this.masterVolume * 1.35);
         this._packAudio = a;
+        this._setSpeaking(true);
         const finish = (ok) => {
           if (token !== this._packToken) {
             resolve(false);
             return;
           }
           if (this._packAudio === a) this._packAudio = null;
+          this._setSpeaking(false);
           resolve(ok);
         };
         a.onended = () => finish(true);
@@ -239,7 +260,6 @@ export class AudioManager {
         if (p && typeof p.then === 'function') {
           p.catch(() => finish(false));
         }
-        // Safety timeout
         setTimeout(() => finish(true), 8000);
       } catch {
         resolve(false);
@@ -286,6 +306,7 @@ export class AudioManager {
 
             const u = new SpeechSynthesisUtterance(clean);
             this._currentUtterance = u;
+            this._setSpeaking(true);
 
             const voice = this._preferredVoice;
             u.lang =
@@ -300,6 +321,7 @@ export class AudioManager {
               if (done) return;
               done = true;
               if (this._currentUtterance === u) this._currentUtterance = null;
+              this._setSpeaking(false);
               resolve();
             };
 
@@ -332,6 +354,15 @@ export class AudioManager {
       rate: CONFIG.speech.rate ?? 0.85,
       pitch: CONFIG.speech.pitch ?? 1.1,
     });
+  }
+
+  /**
+   * Speak a single letter name (for Easy letter feedback / letters mode)
+   * @param {string} spokenName e.g. "be" or "B"
+   */
+  speakLetter(spokenName) {
+    if (this.muted || !spokenName) return Promise.resolve();
+    return this.speak(spokenName, { rate: 1.05, pitch: 1.15 });
   }
 
   /**

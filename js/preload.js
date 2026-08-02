@@ -1,9 +1,9 @@
 /**
- * Image preloader — warm browser cache for smoother word transitions
+ * Image + audio preloader — warm browser cache
  */
 
 /**
- * @param {string[]} urls absolute or relative image paths
+ * @param {string[]} urls
  * @param {number} [concurrency]
  * @returns {Promise<void>}
  */
@@ -35,4 +35,38 @@ export function preloadImages(urls, concurrency = 6) {
   return Promise.all(Array.from({ length: n }, () => worker())).then(() => {});
 }
 
-export default { preloadImages };
+/**
+ * Warm audio URLs (does not wait for full decode)
+ * @param {string[]} urls
+ * @returns {Promise<void>}
+ */
+export function preloadAudio(urls) {
+  if (!urls?.length) return Promise.resolve();
+  const list = [...new Set(urls.filter(Boolean))].slice(0, 12);
+  return Promise.all(
+    list.map(
+      (src) =>
+        new Promise((resolve) => {
+          try {
+            const a = new Audio();
+            a.preload = 'auto';
+            const done = () => resolve();
+            a.addEventListener('canplaythrough', done, { once: true });
+            a.addEventListener('error', done, { once: true });
+            a.src = src;
+            // Safari sometimes needs load()
+            try {
+              a.load();
+            } catch {
+              /* ignore */
+            }
+            setTimeout(done, 2500);
+          } catch {
+            resolve();
+          }
+        })
+    )
+  ).then(() => {});
+}
+
+export default { preloadImages, preloadAudio };

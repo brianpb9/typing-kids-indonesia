@@ -170,16 +170,19 @@ Tidak ada mouse wajib di mode bermain (kecuali tombol speaker opsional).
 
 ---
 
-## Fitur v1.6
+## Fitur v1.7
 
-- 3 mode (Mudah / Sedang / Sulit) + Bahasa ID/EN  
-- Voice pack offline 100 kata × 2 bahasa  
-- Misi harian (deterministik per tanggal) + streak hari  
-- Combo kata beruntun + badge HUD  
-- Easy: huruf yang sudah diketik redup di kata full  
-- Classroom: kode 4 huruf → misi sama (tanpa server)  
-- Bagikan ringkasan ke orang tua (Web Share / clipboard)  
-- PWA + unit test + Playwright smoke (`npm test` / `npm run test:e2e`)
+- 4 mode: Mudah / Sedang / Sulit / **Huruf A–Z** + ID/EN  
+- On-screen QWERTY + finger guide + highlight target key  
+- Letter TTS (Easy + A–Z) · speaker pulse saat bicara  
+- Voice pack offline 100 kata × 2 bahasa + preload  
+- Misi harian + **misi minggu** + streak  
+- Combo, achievements/lencana, mastery kata  
+- Parent dashboard (akurasi, waktu, badges, a11y)  
+- Sertifikat PNG share/download  
+- Classroom: kode, papan skor lokal, export CSV  
+- Tema **Huruf susah**, high-contrast / large text  
+- PWA (cache voice) + unit + Playwright E2E
 
 ---
 

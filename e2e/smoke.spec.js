@@ -96,4 +96,33 @@ test.describe('Typing Kids smoke', () => {
     expect(json.en).toBeTruthy();
     expect(Object.keys(json.id).length).toBeGreaterThan(50);
   });
+
+  test('on-screen keyboard and letters mode exist', async ({ page }) => {
+    await page.goto('/');
+    await page.evaluate(() => {
+      localStorage.setItem(
+        'typingKidsID_v1',
+        JSON.stringify({
+          totalStars: 0,
+          missionsWon: 0,
+          muted: true,
+          difficulty: 'letters',
+          category: 'all',
+          language: 'id',
+          tutorialDone: true,
+          tutorialDoneEn: true,
+        })
+      );
+    });
+    await page.reload();
+    await expect(page.locator('#mode-letters')).toBeVisible();
+    await expect(page.locator('#parent-dash')).toBeVisible();
+    await expect(page.locator('#weekly-card')).toBeVisible();
+    await page.locator('#mode-letters').click();
+    await page.locator('#start-btn').click();
+    await expect(page.locator('#game-screen')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('#osk')).toBeVisible();
+    await expect(page.locator('.osk-key').first()).toBeVisible();
+    await expect(page.locator('#game-screen')).toHaveClass(/mode-letters/);
+  });
 });

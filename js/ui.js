@@ -109,7 +109,42 @@ export class UI {
       comboBadge: document.getElementById('combo-badge'),
       shareBtn: document.getElementById('share-btn'),
       shareMsg: document.getElementById('share-msg'),
+      modeLetters: document.getElementById('mode-letters'),
+      weeklyCard: document.getElementById('weekly-card'),
+      weeklyTitle: document.getElementById('weekly-title'),
+      weeklyDesc: document.getElementById('weekly-desc'),
+      weeklyBtn: document.getElementById('weekly-btn'),
+      weeklyBadge: document.getElementById('weekly-badge'),
+      parentDash: document.getElementById('parent-dash'),
+      parentDashTitle: document.getElementById('parent-dash-title'),
+      parentDashList: document.getElementById('parent-dash-list'),
+      masteryTitle: document.getElementById('mastery-title'),
+      masteryLine: document.getElementById('mastery-line'),
+      badgesTitle: document.getElementById('badges-title'),
+      badgesGrid: document.getElementById('badges-grid'),
+      analyticsOptIn: document.getElementById('analytics-optin'),
+      analyticsLabel: document.getElementById('analytics-label'),
+      a11yTitle: document.getElementById('a11y-title'),
+      a11yContrast: document.getElementById('a11y-contrast'),
+      a11yLarge: document.getElementById('a11y-large'),
+      a11yContrastLabel: document.getElementById('a11y-contrast-label'),
+      a11yLargeLabel: document.getElementById('a11y-large-label'),
+      osk: document.getElementById('osk'),
+      oskRows: document.getElementById('osk-rows'),
+      oskFinger: document.getElementById('osk-finger'),
+      achToast: document.getElementById('ach-toast'),
+      achToastEmoji: document.getElementById('ach-toast-emoji'),
+      achToastTitle: document.getElementById('ach-toast-title'),
+      achToastName: document.getElementById('ach-toast-name'),
+      certBtn: document.getElementById('cert-btn'),
+      classNameInput: document.getElementById('class-name-input'),
+      classExportBtn: document.getElementById('class-export-btn'),
+      classBoard: document.getElementById('class-board'),
+      classBoardTitle: document.getElementById('class-board-title'),
     };
+
+    this._oskBuilt = false;
+    this._oskTarget = '';
 
     /** @type {ReturnType<typeof getMode>} */
     this.mode = getMode('easy');
@@ -120,6 +155,7 @@ export class UI {
     this._buildStarTrack(this._sessionTarget);
     this._buildMissionPreview(this._sessionTarget);
     this._buildCategoryChips();
+    this._buildOsk();
     if (this.els.sessionTarget) {
       this.els.sessionTarget.textContent = String(this._sessionTarget);
     }
@@ -183,17 +219,41 @@ export class UI {
     if (this.els.classCodeInput)
       this.els.classCodeInput.placeholder = t.classCodePh;
     if (this.els.shareBtn) this.els.shareBtn.textContent = t.shareBtn;
+    if (this.els.certBtn) this.els.certBtn.textContent = t.certBtn;
+    if (this.els.weeklyTitle) this.els.weeklyTitle.textContent = t.weeklyTitle;
+    if (this.els.weeklyBtn) this.els.weeklyBtn.textContent = t.weeklyBtn;
+    if (this.els.parentDashTitle)
+      this.els.parentDashTitle.textContent = t.parentDashTitle;
+    if (this.els.masteryTitle) this.els.masteryTitle.textContent = t.masteryTitle;
+    if (this.els.badgesTitle) this.els.badgesTitle.textContent = t.parentBadges;
+    if (this.els.analyticsLabel)
+      this.els.analyticsLabel.textContent = t.analyticsOptIn;
+    if (this.els.a11yTitle) this.els.a11yTitle.textContent = t.a11yTitle;
+    if (this.els.a11yContrastLabel)
+      this.els.a11yContrastLabel.textContent = t.a11yContrast;
+    if (this.els.a11yLargeLabel)
+      this.els.a11yLargeLabel.textContent = t.a11yLarge;
+    if (this.els.classExportBtn)
+      this.els.classExportBtn.textContent = t.classExport;
+    if (this.els.classBoardTitle)
+      this.els.classBoardTitle.textContent = t.classBoardTitle;
+    if (this.els.classNameInput)
+      this.els.classNameInput.placeholder = t.classNamePh;
+    if (this.els.osk) this.els.osk.setAttribute('aria-label', t.oskLabel);
+    if (this.els.achToastTitle)
+      this.els.achToastTitle.textContent = t.achUnlocked;
 
     // Modes
     const setMode = (nameId, descId, key) => {
       const n = document.getElementById(nameId);
       const d = document.getElementById(descId);
-      if (n) n.textContent = t.modes[key].name;
-      if (d) d.textContent = t.modes[key].desc;
+      if (n) n.textContent = t.modes[key]?.name || key;
+      if (d) d.textContent = t.modes[key]?.desc || '';
     };
     setMode('mode-easy-name', 'mode-easy-desc', 'easy');
     setMode('mode-medium-name', 'mode-medium-desc', 'medium');
     setMode('mode-hard-name', 'mode-hard-desc', 'hard');
+    setMode('mode-letters-name', 'mode-letters-desc', 'letters');
 
     // Lang buttons
     this.els.langId?.classList.toggle('is-active', this.language === 'id');
@@ -351,6 +411,7 @@ export class UI {
     this.els.modeEasy?.classList.toggle('is-active', id === 'easy');
     this.els.modeMedium?.classList.toggle('is-active', id === 'medium');
     this.els.modeHard?.classList.toggle('is-active', id === 'hard');
+    this.els.modeLetters?.classList.toggle('is-active', id === 'letters');
     this.applyModeLayout();
   }
 
@@ -367,7 +428,6 @@ export class UI {
   /** Show/hide big letter, slots, full word, timer, hints based on mode */
   applyModeLayout() {
     const m = this.mode;
-    // Medium & Hard: NO big single letter ("U", "A", …)
     const showBig = Boolean(m.showBigLetter);
     this.els.targetBlock?.classList.toggle('hidden', !showBig);
     if (this.els.targetBlock) {
@@ -378,14 +438,21 @@ export class UI {
     this.els.letterProgressBar?.classList.toggle('hidden', !m.showLetterProgress);
     this.els.kbHint?.classList.toggle('hidden', !m.showKbHint);
     this.els.kbHintHard?.classList.toggle('hidden', m.id !== 'hard');
-    // Easy + Medium: full word; Hard: hide
     this.els.wordFull?.classList.toggle('hidden', !m.showFullWord);
     const hasTimer = (m.timerSeconds || 0) > 0;
     this.els.timerWrap?.classList.toggle('hidden', !hasTimer);
+    const showImg = m.showImage !== false;
+    this.els.imageWrap?.classList.toggle('hidden', !showImg);
 
     this.els.gameScreen?.classList.toggle('mode-hard', m.id === 'hard');
     this.els.gameScreen?.classList.toggle('mode-medium', m.id === 'medium');
     this.els.gameScreen?.classList.toggle('mode-easy', m.id === 'easy');
+    this.els.gameScreen?.classList.toggle('mode-letters', m.id === 'letters');
+
+    // OSK visible in game for all modes when feature on
+    if (CONFIG.features.onScreenKeyboard) {
+      this.els.osk?.classList.remove('hidden');
+    }
   }
 
   /**
@@ -504,10 +571,15 @@ export class UI {
     if (img) {
       img.classList.remove('image-enter', 'float-idle');
       void img.offsetWidth;
-      img.src = word.image;
-      img.alt = showFull ? word.display : 'Gambar kata';
-      img.classList.add('image-enter');
-      setTimeout(() => img.classList.add('float-idle'), 450);
+      if (word.image) {
+        img.src = word.image;
+        img.alt = showFull ? word.display : word.display || 'Gambar kata';
+        img.classList.add('image-enter');
+        setTimeout(() => img.classList.add('float-idle'), 450);
+      } else {
+        img.removeAttribute('src');
+        img.alt = word.display || '';
+      }
     }
 
     this.setFullWord(word.display, showFull, 0);
@@ -618,6 +690,7 @@ export class UI {
       el.textContent = '★';
       el.classList.add('done');
       if (hint) hint.textContent = this.t.done;
+      this.setOskTarget('');
       return;
     }
 
@@ -629,6 +702,7 @@ export class UI {
     el.classList.add('target-pop');
     if (hint) hint.textContent = this.t.typeThisLetter;
     if (hintKey) hintKey.textContent = up;
+    this.setOskTarget(letter);
   }
 
   renderSlots(word, filledCount) {
@@ -659,7 +733,7 @@ export class UI {
       container.appendChild(slot);
     });
 
-    // Big letter tile only in Easy — never Medium/Hard
+    // Big letter tile only when mode allows
     if (this.mode.showBigLetter) {
       if (filledCount < word.length) {
         this.setTargetLetter(word[filledCount]);
@@ -671,6 +745,13 @@ export class UI {
     // Easy dim-typed full word
     if (this._dimTyped && this.mode.showFullWord) {
       this.updateFullWordProgress(filledCount);
+    }
+
+    // OSK target = next letter
+    if (filledCount < word.length) {
+      this.setOskTarget(word[filledCount]);
+    } else {
+      this.setOskTarget('');
     }
   }
 
@@ -838,43 +919,6 @@ export class UI {
     });
   }
 
-  /**
-   * @param {{ onJoin: (code:string)=>void, onCreate: ()=>void, onShare: ()=>void, onClear: ()=>void }} handlers
-   */
-  onClassroom(handlers) {
-    this.els.classJoinBtn?.addEventListener('click', (e) => {
-      e.preventDefault();
-      const code =
-        this.els.classCodeInput instanceof HTMLInputElement
-          ? this.els.classCodeInput.value
-          : '';
-      handlers.onJoin?.(code);
-    });
-    this.els.classCreateBtn?.addEventListener('click', (e) => {
-      e.preventDefault();
-      handlers.onCreate?.();
-    });
-    this.els.classShareBtn?.addEventListener('click', (e) => {
-      e.preventDefault();
-      handlers.onShare?.();
-    });
-    this.els.classClearBtn?.addEventListener('click', (e) => {
-      e.preventDefault();
-      handlers.onClear?.();
-    });
-    this.els.classCodeInput?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        e.stopPropagation();
-        const code =
-          this.els.classCodeInput instanceof HTMLInputElement
-            ? this.els.classCodeInput.value
-            : '';
-        handlers.onJoin?.(code);
-      }
-    });
-  }
-
   onReplay(handler) {
     this.els.replayBtn?.addEventListener('click', (e) => {
       e.preventDefault();
@@ -929,7 +973,7 @@ export class UI {
   }
 
   /**
-   * @param {(mode: 'easy'|'medium'|'hard') => void} handler
+   * @param {(mode: 'easy'|'medium'|'hard'|'letters') => void} handler
    */
   onDifficulty(handler) {
     const bind = (btn, mode) => {
@@ -942,6 +986,7 @@ export class UI {
     bind(this.els.modeEasy, 'easy');
     bind(this.els.modeMedium, 'medium');
     bind(this.els.modeHard, 'hard');
+    bind(this.els.modeLetters, 'letters');
   }
 
   /**
@@ -1019,6 +1064,291 @@ export class UI {
       ? this.els.keyCatcher
       : null;
   }
+
+  // ——— On-screen keyboard ———
+  _buildOsk() {
+    if (this._oskBuilt || !this.els.oskRows) return;
+    const rows = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+    this.els.oskRows.innerHTML = '';
+    rows.forEach((row, ri) => {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'osk-row' + (ri === 1 ? ' osk-row-mid' : ri === 2 ? ' osk-row-bot' : '');
+      for (const ch of row) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'osk-key';
+        btn.dataset.key = ch;
+        btn.textContent = ch.toUpperCase();
+        btn.setAttribute('aria-label', ch.toUpperCase());
+        rowEl.appendChild(btn);
+      }
+      this.els.oskRows.appendChild(rowEl);
+    });
+    this._oskBuilt = true;
+  }
+
+  /**
+   * @param {(letter: string) => void} handler
+   */
+  onOsk(handler) {
+    this._buildOsk();
+    this.els.oskRows?.addEventListener('pointerdown', (e) => {
+      const t = e.target;
+      if (!(t instanceof Element)) return;
+      const key = t.closest('.osk-key');
+      if (!(key instanceof HTMLElement) || !key.dataset.key) return;
+      e.preventDefault();
+      e.stopPropagation();
+      key.classList.add('is-pressed');
+      setTimeout(() => key.classList.remove('is-pressed'), 120);
+      handler(key.dataset.key);
+    });
+  }
+
+  /**
+   * Highlight target key + move finger guide
+   * @param {string} letter
+   */
+  setOskTarget(letter) {
+    this._oskTarget = String(letter || '').toLowerCase();
+    this.els.oskRows?.querySelectorAll('.osk-key').forEach((btn) => {
+      const on = btn.dataset.key === this._oskTarget;
+      btn.classList.toggle('is-target', on);
+      if (on && this.els.oskFinger) {
+        const r = btn.getBoundingClientRect();
+        const host = this.els.osk?.getBoundingClientRect();
+        if (host) {
+          this.els.oskFinger.style.left = `${r.left - host.left + r.width / 2}px`;
+          this.els.oskFinger.style.top = `${r.top - host.top - 8}px`;
+          this.els.oskFinger.classList.add('is-on');
+        }
+      }
+    });
+    if (!this._oskTarget) {
+      this.els.oskFinger?.classList.remove('is-on');
+    }
+  }
+
+  /**
+   * Flash key result
+   * @param {string} letter
+   * @param {'ok'|'bad'} kind
+   */
+  flashOskKey(letter, kind) {
+    const ch = String(letter || '').toLowerCase();
+    const btn = this.els.oskRows?.querySelector(`.osk-key[data-key="${ch}"]`);
+    if (!btn) return;
+    btn.classList.remove('is-ok', 'is-bad');
+    void btn.offsetWidth;
+    btn.classList.add(kind === 'ok' ? 'is-ok' : 'is-bad');
+    setTimeout(() => btn.classList.remove('is-ok', 'is-bad'), 280);
+  }
+
+  setSpeakingPulse(on) {
+    this.els.speakBtn?.classList.toggle('is-speaking', Boolean(on));
+    this.els.imageWrap?.classList.toggle('is-speaking', Boolean(on));
+  }
+
+  // ——— Daily / weekly / parent / a11y / badges ———
+  renderWeekly(weekly) {
+    if (this.els.weeklyDesc) this.els.weeklyDesc.textContent = weekly.desc;
+    this.els.weeklyBadge?.classList.toggle('hidden', !weekly.done);
+    this.els.weeklyCard?.classList.toggle('is-done', Boolean(weekly.done));
+    if (this.els.weeklyBtn) {
+      this.els.weeklyBtn.textContent = weekly.done
+        ? this.t.weeklyDone
+        : weekly.btnLabel || this.t.weeklyBtn;
+      this.els.weeklyBtn.disabled = Boolean(weekly.done);
+    }
+  }
+
+  /**
+   * @param {{
+   *   totalStars: number,
+   *   missionsWon: number,
+   *   accuracy: number,
+   *   masteryLine: string,
+   *   playMin: number,
+   *   achievements: string[],
+   *   analyticsOptIn: boolean,
+   *   a11y: { highContrast?: boolean, largeText?: boolean },
+   *   badgeLabels: Array<{ id: string, emoji: string, title: string, unlocked: boolean }>,
+   * }} data
+   */
+  renderParentDash(data) {
+    const t = this.t;
+    const list = this.els.parentDashList;
+    if (list) {
+      const rows = [
+        [t.parentTotal, String(data.totalStars)],
+        [t.victorySession, String(data.missionsWon)],
+        [t.parentAccuracy, `${data.accuracy}%`],
+        [t.parentPlayTime, t.minutes(data.playMin)],
+      ];
+      list.innerHTML = rows
+        .map(
+          ([k, v]) =>
+            `<li><span class="parent-k">${k}</span><span class="parent-v">${v}</span></li>`
+        )
+        .join('');
+    }
+    if (this.els.masteryLine) this.els.masteryLine.textContent = data.masteryLine;
+    if (this.els.analyticsOptIn instanceof HTMLInputElement) {
+      this.els.analyticsOptIn.checked = Boolean(data.analyticsOptIn);
+    }
+    if (this.els.a11yContrast instanceof HTMLInputElement) {
+      this.els.a11yContrast.checked = Boolean(data.a11y?.highContrast);
+    }
+    if (this.els.a11yLarge instanceof HTMLInputElement) {
+      this.els.a11yLarge.checked = Boolean(data.a11y?.largeText);
+    }
+    const grid = this.els.badgesGrid;
+    if (grid) {
+      grid.innerHTML = (data.badgeLabels || [])
+        .map(
+          (b) =>
+            `<span class="badge-chip ${b.unlocked ? 'is-on' : 'is-off'}" title="${b.title}">${b.emoji}<span class="badge-name">${b.title}</span></span>`
+        )
+        .join('');
+    }
+  }
+
+  applyA11y(a11y) {
+    document.documentElement.classList.toggle(
+      'a11y-contrast',
+      Boolean(a11y?.highContrast)
+    );
+    document.documentElement.classList.toggle(
+      'a11y-large',
+      Boolean(a11y?.largeText)
+    );
+  }
+
+  /**
+   * @param {{ emoji: string, title: string, name: string }} a
+   */
+  showAchievementToast(a) {
+    if (this.els.achToastEmoji) this.els.achToastEmoji.textContent = a.emoji;
+    if (this.els.achToastTitle) this.els.achToastTitle.textContent = a.title;
+    if (this.els.achToastName) this.els.achToastName.textContent = a.name;
+    this.els.achToast?.classList.remove('hidden');
+    this.els.achToast?.classList.add('visible');
+    clearTimeout(this._achTimer);
+    this._achTimer = setTimeout(() => this.hideAchievementToast(), 2400);
+  }
+
+  hideAchievementToast() {
+    this.els.achToast?.classList.add('hidden');
+    this.els.achToast?.classList.remove('visible');
+  }
+
+  /**
+   * @param {Array<{name:string,stars:number}>} rows
+   */
+  renderClassBoard(rows) {
+    const has = rows && rows.length;
+    this.els.classBoardTitle?.classList.toggle('hidden', !has);
+    this.els.classExportBtn?.classList.toggle('hidden', !has);
+    const el = this.els.classBoard;
+    if (!el) return;
+    el.innerHTML = (rows || [])
+      .slice(0, 8)
+      .map((r) => `<li><span>${r.name}</span><span>★ ${r.stars}</span></li>`)
+      .join('');
+  }
+
+  onWeekly(handler) {
+    this.els.weeklyBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      handler();
+    });
+  }
+
+  onCert(handler) {
+    this.els.certBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      handler();
+    });
+  }
+
+  onA11y(handlers) {
+    this.els.a11yContrast?.addEventListener('change', () => {
+      handlers.onContrast?.(
+        this.els.a11yContrast instanceof HTMLInputElement
+          ? this.els.a11yContrast.checked
+          : false
+      );
+    });
+    this.els.a11yLarge?.addEventListener('change', () => {
+      handlers.onLarge?.(
+        this.els.a11yLarge instanceof HTMLInputElement
+          ? this.els.a11yLarge.checked
+          : false
+      );
+    });
+    this.els.analyticsOptIn?.addEventListener('change', () => {
+      handlers.onAnalytics?.(
+        this.els.analyticsOptIn instanceof HTMLInputElement
+          ? this.els.analyticsOptIn.checked
+          : false
+      );
+    });
+  }
+
+  getPlayerName() {
+    if (this.els.classNameInput instanceof HTMLInputElement) {
+      return this.els.classNameInput.value.trim();
+    }
+    return '';
+  }
+
+  setPlayerName(name) {
+    if (this.els.classNameInput instanceof HTMLInputElement) {
+      this.els.classNameInput.value = name || '';
+    }
+  }
+
+  /**
+   * @param {{ onJoin: Function, onCreate: Function, onShare: Function, onClear: Function, onExport?: Function }} handlers
+   */
+  onClassroom(handlers) {
+    this.els.classJoinBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const code =
+        this.els.classCodeInput instanceof HTMLInputElement
+          ? this.els.classCodeInput.value
+          : '';
+      handlers.onJoin?.(code);
+    });
+    this.els.classCreateBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      handlers.onCreate?.();
+    });
+    this.els.classShareBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      handlers.onShare?.();
+    });
+    this.els.classClearBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      handlers.onClear?.();
+    });
+    this.els.classExportBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      handlers.onExport?.();
+    });
+    this.els.classCodeInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        e.stopPropagation();
+        const code =
+          this.els.classCodeInput instanceof HTMLInputElement
+            ? this.els.classCodeInput.value
+            : '';
+        handlers.onJoin?.(code);
+      }
+    });
+  }
 }
 
 export default UI;
+

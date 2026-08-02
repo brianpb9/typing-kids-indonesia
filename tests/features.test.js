@@ -8,22 +8,29 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CONFIG, getMode } from '../js/config.js';
 import { getDailyMission, dateKey } from '../js/daily.js';
+import { getWeeklyMission, weekKey } from '../js/weekly.js';
 import {
   generateClassCode,
   normalizeCode,
   resolveClassroom,
 } from '../js/classroom.js';
+import { buildLetterBank, letterSpeakName } from '../js/letters.js';
+import { evaluateAchievements, BADGES } from '../js/achievements.js';
 import { getStrings } from '../js/i18n.js';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 describe('features flags', () => {
-  it('enables voice, daily, classroom, combo, share', () => {
+  it('enables voice, daily, classroom, combo, share, OSK, weekly', () => {
     assert.equal(CONFIG.features.voicePacks, true);
     assert.equal(CONFIG.features.dailyChallenge, true);
+    assert.equal(CONFIG.features.weeklyChallenge, true);
     assert.equal(CONFIG.features.multiplayer, true);
     assert.equal(CONFIG.features.combo, true);
     assert.equal(CONFIG.features.parentShare, true);
+    assert.equal(CONFIG.features.onScreenKeyboard, true);
+    assert.equal(CONFIG.features.letterMode, true);
+    assert.equal(CONFIG.features.certificate, true);
   });
 });
 
@@ -106,7 +113,7 @@ describe('voice pack assets', () => {
 });
 
 describe('i18n new keys', () => {
-  it('daily/class/share keys exist in both langs', () => {
+  it('daily/class/share/weekly/a11y keys exist in both langs', () => {
     const keys = [
       'dailyTitle',
       'dailyBtn',
@@ -115,12 +122,47 @@ describe('i18n new keys', () => {
       'classTitle',
       'shareBtn',
       'shareTitle',
+      'weeklyTitle',
+      'certBtn',
+      'a11yContrast',
+      'oskLabel',
+      'masteryTitle',
     ];
     for (const lang of ['id', 'en']) {
       const t = getStrings(lang);
       for (const k of keys) {
         assert.ok(k in t, `${lang}.${k}`);
       }
+      assert.ok(t.modes.letters);
+      assert.ok(t.categories['huruf-susah']);
     }
+  });
+});
+
+describe('weekly + letters + achievements', () => {
+  it('weekly mission is deterministic', () => {
+    const d = new Date('2026-03-15T12:00:00');
+    const a = getWeeklyMission(d);
+    const b = getWeeklyMission(d);
+    assert.equal(a.key, b.key);
+    assert.equal(a.key, weekKey(d));
+    assert.ok(a.target >= 8);
+  });
+
+  it('letter bank has 26 letters', () => {
+    const bank = buildLetterBank('id');
+    assert.equal(bank.length, 26);
+    assert.equal(bank[0].word, 'a');
+    assert.equal(letterSpeakName('b', 'id'), 'be');
+    assert.equal(letterSpeakName('b', 'en'), 'B');
+  });
+
+  it('achievements unlock on conditions', () => {
+    assert.ok(BADGES.length >= 10);
+    const unlocked = evaluateAchievements(
+      { totalStars: 1, missionsWon: 0, achievements: [] },
+      {}
+    );
+    assert.ok(unlocked.includes('first_star'));
   });
 });

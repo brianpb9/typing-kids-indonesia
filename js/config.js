@@ -1,12 +1,12 @@
 /**
  * Typing Kids Indonesia — Global configuration
- * Modes: easy | medium | hard
+ * Modes: easy | medium | hard | letters
  */
 export const CONFIG = {
   app: {
     name: 'Typing Kids Indonesia',
     subtitle: 'Belajar Mengetik Sambil Bermain',
-    version: '1.6.0',
+    version: '1.7.0',
     language: 'id',
   },
 
@@ -18,7 +18,6 @@ export const CONFIG = {
     fallbackLangs: ['id-ID', 'id', 'ms-MY', 'en-US'],
   },
 
-  /** Word data paths per language */
   languages: {
     id: { wordsPath: 'data/words.json', speechLang: 'id-ID' },
     en: { wordsPath: 'data/words-en.json', speechLang: 'en-US' },
@@ -32,16 +31,14 @@ export const CONFIG = {
     speakDelayAfterLoadMs: 350,
     milestoneMs: 1800,
     victoryHoldMs: 0,
-    /** Hard mode: seconds per word (no-fail: timeout → soft skip, no star) */
     hardTimerSeconds: 35,
   },
 
   /**
-   * Three play modes
-   *
-   * easy   — full word + big letter + slots
-   * medium — full word + slots (no big letter cheat)
-   * hard   — image + TTS only + timer (no full word, no slots)
+   * easy    — full word + big letter + slots + dim typed + letter TTS
+   * medium  — full word + slots (no big letter)
+   * hard    — image + voice + timer
+   * letters — A–Z warm-up (single letter, no image)
    */
   modes: {
     easy: {
@@ -55,10 +52,10 @@ export const CONFIG = {
       showSlots: true,
       showKbHint: true,
       showLetterProgress: true,
-      /** Always show full word (Apel, Kucing, …) */
       showFullWord: true,
-      /** Dim completed letters in the full word as the child types */
       dimTypedLetters: true,
+      showImage: true,
+      speakLetterOnCorrect: true,
       showLabelAfterWrongs: 0,
       hintLetterAfterWrongs: 3,
       timerSeconds: 0,
@@ -70,14 +67,14 @@ export const CONFIG = {
       desc: 'Kata full · tanpa huruf satuan',
       minLetters: 4,
       maxLetters: 8,
-      /** No big single-letter cheat tile */
       showBigLetter: false,
       showSlots: true,
       showKbHint: false,
       showLetterProgress: true,
-      /** Full word always visible (e.g. APEL) */
       showFullWord: true,
       dimTypedLetters: false,
+      showImage: true,
+      speakLetterOnCorrect: false,
       showLabelAfterWrongs: 0,
       hintLetterAfterWrongs: 0,
       timerSeconds: 0,
@@ -95,14 +92,33 @@ export const CONFIG = {
       showLetterProgress: false,
       showFullWord: false,
       dimTypedLetters: false,
+      showImage: true,
+      speakLetterOnCorrect: false,
       showLabelAfterWrongs: 0,
       hintLetterAfterWrongs: 0,
-      /** Per-word countdown; 0 = off */
       timerSeconds: 35,
+    },
+    letters: {
+      id: 'letters',
+      label: 'Huruf A–Z',
+      emoji: '🔤',
+      desc: 'Latihan huruf satu-satu',
+      minLetters: 1,
+      maxLetters: 1,
+      showBigLetter: true,
+      showSlots: false,
+      showKbHint: true,
+      showLetterProgress: false,
+      showFullWord: false,
+      dimTypedLetters: false,
+      showImage: false,
+      speakLetterOnCorrect: true,
+      showLabelAfterWrongs: 0,
+      hintLetterAfterWrongs: 2,
+      timerSeconds: 0,
     },
   },
 
-  /** Category chips on start screen */
   categoryOptions: [
     { id: 'all', label: 'Campur', emoji: '🎲' },
     { id: 'buah', label: 'Buah', emoji: '🍎' },
@@ -112,6 +128,7 @@ export const CONFIG = {
     { id: 'warna', label: 'Warna', emoji: '🎨' },
     { id: 'makanan', label: 'Makanan', emoji: '🍚' },
     { id: 'tubuh', label: 'Tubuh', emoji: '👀' },
+    { id: 'huruf-susah', label: 'Huruf susah', emoji: '🧩' },
   ],
 
   gameplay: {
@@ -121,18 +138,18 @@ export const CONFIG = {
     maxLetters: 10,
     defaultDifficulty: 'easy',
     defaultCategory: 'all',
-    /** If category+mode pool smaller than this, fall back to mix */
     minPoolSize: 5,
-    /** Hard: one +10s bonus when ≤5s left and progress > 0 */
     hardBonusSeconds: 10,
     hardBonusTriggerAt: 5,
-    /** Progressive letter ramp inside a mission (within mode bounds) */
     progressiveDifficulty: true,
+    /** Letters mode mission length */
+    lettersTarget: 10,
+    /** Preload next N voice clips */
+    preloadVoiceCount: 5,
   },
 
   goals: {
     sessionTarget: 10,
-    /** Milestone *times* only — copy from i18n.milestones */
     milestoneAts: [3, 5, 8, 10],
     ranks: [
       { min: 0, id: 'pemula', label: 'Pemula', emoji: '🌱' },
@@ -170,21 +187,26 @@ export const CONFIG = {
     progressTracking: true,
     achievements: true,
     dailyChallenge: true,
+    weeklyChallenge: true,
     englishMode: true,
     multiplayer: true,
     voicePacks: true,
     pwa: true,
     combo: true,
     parentShare: true,
+    onScreenKeyboard: true,
+    letterMode: true,
+    certificate: true,
+    analytics: true,
   },
 };
 
 /**
- * @param {'easy'|'medium'|'hard'|string} id
+ * @param {'easy'|'medium'|'hard'|'letters'|string} id
  */
 export function getMode(id) {
   const modes = CONFIG.modes;
-  if (id === 'all') return modes.hard; // migrate old save
+  if (id === 'all') return modes.hard;
   return modes[id] || modes.easy;
 }
 

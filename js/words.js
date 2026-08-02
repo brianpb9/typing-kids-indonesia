@@ -1,11 +1,12 @@
 /**
- * Words — load, filter by mode + category, shuffle
+ * Words — load, filter by mode + category, shuffle, letter mode, hard letters
  */
 import { CONFIG, getMode } from './config.js';
+import { buildLetterBank, filterHardLetterWords } from './letters.js';
 
 export class WordBank {
   constructor() {
-    /** @type {Array<{id:string,word:string,display:string,category:string,image:string,audio:string|null,letters:number}>} */
+    /** @type {Array<{id:string,word:string,display:string,category:string,image:string,audio:string|null,letters:number,isLetter?:boolean}>} */
     this.words = [];
     this.categories = {};
     this.praise = [];
@@ -13,10 +14,14 @@ export class WordBank {
     this._queue = [];
     this._lastId = null;
     this.loaded = false;
-    /** @type {'easy'|'medium'|'hard'} */
+    /** @type {'easy'|'medium'|'hard'|'letters'} */
     this.difficulty = CONFIG.gameplay.defaultDifficulty;
     /** @type {string} 'all' or category id */
     this.category = CONFIG.gameplay.defaultCategory || 'all';
+    /** @type {'id'|'en'} */
+    this.language = 'id';
+    /** Synthetic A–Z bank */
+    this._letterBank = buildLetterBank('id');
   }
 
   /**
@@ -46,7 +51,15 @@ export class WordBank {
   }
 
   /**
-   * @param {'easy'|'medium'|'hard'|string} mode
+   * @param {'id'|'en'} lang
+   */
+  setLanguage(lang) {
+    this.language = lang === 'en' ? 'en' : 'id';
+    this._letterBank = buildLetterBank(this.language);
+  }
+
+  /**
+   * @param {'easy'|'medium'|'hard'|'letters'|string} mode
    */
   setDifficulty(mode) {
     this.difficulty = getMode(mode).id;
@@ -68,12 +81,27 @@ export class WordBank {
    * preferMaxLetters: progressive ramp — prefer words up to this length
    */
   getPool(opts = {}) {
-    let pool = [...this.words];
     const mode = getMode(this.difficulty);
     const minPool = opts.minPool ?? CONFIG.gameplay.minPoolSize ?? 5;
     let usedFallback = false;
 
-    if (this.category && this.category !== 'all') {
+    // A–Z warm-up: synthetic letters only
+    if (mode.id === 'letters') {
+      this._lastPoolFallback = false;
+      this._lastPoolSize = this._letterBank.length;
+      return [...this._letterBank];
+    }
+
+    let pool = [...this.words];
+
+    if (this.category === 'huruf-susah') {
+      pool = filterHardLetterWords(pool);
+      if (pool.length < minPool) {
+        usedFallback = true;
+        pool = filterHardLetterWords([...this.words]);
+        if (pool.length < minPool) pool = [...this.words];
+      }
+    } else if (this.category && this.category !== 'all') {
       pool = pool.filter((w) => w.category === this.category);
     }
 
@@ -87,14 +115,17 @@ export class WordBank {
     let maxL = opts.preferMaxLetters ?? mode.maxLetters;
     let filtered = byLen(pool, maxL);
 
-    // Progressive: if too few at preferred max, widen up to mode max
     while (filtered.length < minPool && maxL < mode.maxLetters) {
       maxL += 1;
       filtered = byLen(pool, maxL);
     }
 
-    // Category too thin → fall back to all categories
-    if (filtered.length < minPool && this.category && this.category !== 'all') {
+    if (
+      filtered.length < minPool &&
+      this.category &&
+      this.category !== 'all' &&
+      this.category !== 'huruf-susah'
+    ) {
       usedFallback = true;
       filtered = byLen([...this.words], mode.maxLetters);
     }
@@ -107,6 +138,15 @@ export class WordBank {
     this._lastPoolFallback = usedFallback;
     this._lastPoolSize = filtered.length;
     return filtered;
+  }
+
+  /**
+   * Peek next N word ids (for voice preload) without consuming queue
+   * @param {number} n
+   */
+  peekIds(n = 5) {
+    if (!this._queue.length) this._refillQueue();
+    return this._queue.slice(0, n).map((w) => w.id).filter(Boolean);
   }
 
   lastPoolUsedFallback() {

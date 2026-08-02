@@ -1,5 +1,5 @@
-/* Typing Kids — lightweight offline shell */
-const CACHE = 'typing-kids-v14';
+/* Typing Kids — offline shell + runtime cache for voice/images */
+const CACHE = 'typing-kids-v17';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -21,22 +21,36 @@ const PRECACHE = [
   '/js/storage.js',
   '/js/i18n.js',
   '/js/preload.js',
+  '/js/daily.js',
+  '/js/weekly.js',
+  '/js/classroom.js',
+  '/js/achievements.js',
+  '/js/letters.js',
+  '/js/certificate.js',
+  '/js/analytics.js',
   '/data/words.json',
   '/data/words-en.json',
+  '/assets/audio/voice/manifest.json',
   '/manifest.webmanifest',
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)).then(() => self.skipWaiting())
+    caches
+      .open(CACHE)
+      .then((cache) => cache.addAll(PRECACHE))
+      .then(() => self.skipWaiting())
   );
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
-    ).then(() => self.clients.claim())
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
+      )
+      .then(() => self.clients.claim())
   );
 });
 
@@ -48,13 +62,24 @@ self.addEventListener('fetch', (event) => {
     caches.match(req).then((cached) => {
       const fetchPromise = fetch(req)
         .then((res) => {
-          if (res && res.ok && (req.url.includes('/assets/') || req.url.includes('/data/') || req.url.includes('/js/') || req.url.includes('/css/'))) {
+          if (
+            res &&
+            res.ok &&
+            (req.url.includes('/assets/') ||
+              req.url.includes('/data/') ||
+              req.url.includes('/js/') ||
+              req.url.includes('/css/'))
+          ) {
             const clone = res.clone();
             caches.open(CACHE).then((cache) => cache.put(req, clone));
           }
           return res;
         })
         .catch(() => cached);
+      // Cache-first for voice pack & images; network-first-ish for html
+      if (req.url.includes('/assets/audio/voice/') || req.url.includes('/assets/images/')) {
+        return cached || fetchPromise;
+      }
       return cached || fetchPromise;
     })
   );

@@ -35,6 +35,15 @@ describe('mode matrix', () => {
     assert.equal(m.showSlots, false);
     assert.ok((m.timerSeconds || 0) > 0);
   });
+
+  it('letters mode is single-letter warm-up', () => {
+    const m = getMode('letters');
+    assert.equal(m.minLetters, 1);
+    assert.equal(m.maxLetters, 1);
+    assert.equal(m.showBigLetter, true);
+    assert.equal(m.showImage, false);
+    assert.equal(m.speakLetterOnCorrect, true);
+  });
 });
 
 describe('word data', () => {

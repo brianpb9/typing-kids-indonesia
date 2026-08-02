@@ -119,17 +119,54 @@
           <p class="hint" id="start-hint">✨ Tidak ada yang salah — coba saja terus ✨</p>
         </div>
 
-        <!-- Daily mission -->
-        <div class="daily-card" id="daily-card">
-          <div class="daily-head">
-            <p class="daily-title" id="daily-title">📅 Misi harian</p>
-            <span class="daily-badge hidden" id="daily-badge">✅</span>
+        <!-- Daily + weekly -->
+        <div class="mission-row">
+          <div class="daily-card" id="daily-card">
+            <div class="daily-head">
+              <p class="daily-title" id="daily-title">📅 Misi harian</p>
+              <span class="daily-badge hidden" id="daily-badge">✅</span>
+            </div>
+            <p class="daily-desc" id="daily-desc"></p>
+            <button type="button" id="daily-btn" class="btn-daily">Main misi harian</button>
           </div>
-          <p class="daily-desc" id="daily-desc"></p>
-          <button type="button" id="daily-btn" class="btn-daily">Main misi harian</button>
+          <div class="daily-card weekly-card" id="weekly-card">
+            <div class="daily-head">
+              <p class="daily-title" id="weekly-title">📆 Misi minggu ini</p>
+              <span class="daily-badge hidden" id="weekly-badge">✅</span>
+            </div>
+            <p class="daily-desc" id="weekly-desc"></p>
+            <button type="button" id="weekly-btn" class="btn-daily btn-weekly">Main misi minggu</button>
+          </div>
         </div>
 
-        <!-- Classroom (lightweight shared seed) -->
+        <!-- Parent dashboard -->
+        <details class="parent-dash" id="parent-dash">
+          <summary id="parent-dash-title">👨‍👩‍👧 Untuk orang tua</summary>
+          <div class="parent-dash-body">
+            <ul class="parent-dash-list" id="parent-dash-list"></ul>
+            <p class="mastery-title" id="mastery-title">Progress kata</p>
+            <p class="mastery-line" id="mastery-line"></p>
+            <p class="badges-title" id="badges-title">Lencana</p>
+            <div class="badges-grid" id="badges-grid" aria-label="Badges"></div>
+            <label class="a11y-check">
+              <input type="checkbox" id="analytics-optin" />
+              <span id="analytics-label">Simpan statistik lokal (tanpa internet)</span>
+            </label>
+            <p class="a11y-title" id="a11y-title">Aksesibilitas</p>
+            <div class="a11y-row">
+              <label class="a11y-check">
+                <input type="checkbox" id="a11y-contrast" />
+                <span id="a11y-contrast-label">Kontras tinggi</span>
+              </label>
+              <label class="a11y-check">
+                <input type="checkbox" id="a11y-large" />
+                <span id="a11y-large-label">Teks besar</span>
+              </label>
+            </div>
+          </div>
+        </details>
+
+        <!-- Classroom -->
         <details class="class-panel" id="class-panel">
           <summary id="class-title">👩‍🏫 Kelas</summary>
           <div class="class-body">
@@ -147,17 +184,29 @@
               />
               <button type="button" id="class-join-btn" class="btn-secondary btn-sm">Gabung</button>
             </div>
+            <input
+              type="text"
+              id="class-name-input"
+              class="class-input class-name-input"
+              maxlength="20"
+              placeholder="Nama siswa"
+              autocomplete="nickname"
+              spellcheck="false"
+            />
             <div class="class-actions">
               <button type="button" id="class-create-btn" class="btn-secondary btn-sm">Buat kode kelas</button>
               <button type="button" id="class-share-btn" class="btn-secondary btn-sm hidden">Bagikan kode kelas</button>
+              <button type="button" id="class-export-btn" class="btn-secondary btn-sm hidden">Export CSV</button>
               <button type="button" id="class-clear-btn" class="btn-secondary btn-sm hidden">Keluar kelas</button>
             </div>
+            <p class="class-board-title hidden" id="class-board-title">Papan skor kelas</p>
+            <ol class="class-board" id="class-board"></ol>
             <p class="class-msg" id="class-msg" aria-live="polite"></p>
           </div>
         </details>
 
-        <!-- 3 modes -->
-        <div class="mode-pick mode-pick-3" role="group" aria-label="Difficulty" id="mode-pick">
+        <!-- 4 modes -->
+        <div class="mode-pick mode-pick-4" role="group" aria-label="Difficulty" id="mode-pick">
           <button type="button" class="mode-btn is-active" data-mode="easy" id="mode-easy">
             <span class="mode-emoji">🌱</span>
             <span class="mode-name" id="mode-easy-name">Mudah</span>
@@ -172,6 +221,11 @@
             <span class="mode-emoji">🔥</span>
             <span class="mode-name" id="mode-hard-name">Sulit</span>
             <span class="mode-desc" id="mode-hard-desc">Gambar + suara + waktu</span>
+          </button>
+          <button type="button" class="mode-btn" data-mode="letters" id="mode-letters">
+            <span class="mode-emoji">🔤</span>
+            <span class="mode-name" id="mode-letters-name">Huruf A–Z</span>
+            <span class="mode-desc" id="mode-letters-desc">Latihan huruf</span>
           </button>
         </div>
 
@@ -339,7 +393,27 @@
         <p id="kb-hint-hard" class="kb-hint kb-hint-hard hidden">
           Dengar kata, lalu ketik di keyboard~
         </p>
+
+        <!-- On-screen QWERTY + finger guide -->
+        <div
+          id="osk"
+          class="osk"
+          role="group"
+          aria-label="Keyboard di layar"
+        >
+          <div class="osk-finger" id="osk-finger" aria-hidden="true">👆</div>
+          <div class="osk-rows" id="osk-rows"></div>
+        </div>
       </section>
+
+      <!-- Achievement toast -->
+      <div id="ach-toast" class="ach-toast hidden" aria-live="polite">
+        <span id="ach-toast-emoji" class="ach-toast-emoji">⭐</span>
+        <div>
+          <p id="ach-toast-title" class="ach-toast-title">Lencana baru!</p>
+          <p id="ach-toast-name" class="ach-toast-name"></p>
+        </div>
+      </div>
 
       <!-- ========== MILESTONE TOAST ========== -->
       <div id="milestone-toast" class="milestone-toast hidden" aria-live="assertive">
@@ -390,6 +464,9 @@
           <div class="victory-actions">
             <button type="button" id="share-btn" class="btn-secondary">
               Bagikan ke orang tua
+            </button>
+            <button type="button" id="cert-btn" class="btn-secondary">
+              Sertifikat
             </button>
             <button type="button" id="replay-btn" class="btn-start">
               Misi Baru!
