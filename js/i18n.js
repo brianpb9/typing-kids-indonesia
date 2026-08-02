@@ -1,5 +1,5 @@
 /**
- * UI strings — Indonesian + English
+ * UI strings — Indonesian + English (full parity including milestones)
  */
 export const LANGS = {
   id: {
@@ -11,13 +11,11 @@ export const LANGS = {
     wordsPath: 'data/words.json',
     appName: 'Typing Kids Indonesia',
     subtitle: 'Belajar Mengetik Sambil Bermain',
-    rankPrefix: '',
     starsWord: 'bintang',
     missionTitle: '🎯 Misi hari ini',
     missionGoalBefore: 'Kumpulkan',
     missionGoalAfter: 'bintang!',
     hint: '✨ Tidak ada yang salah — coba saja terus ✨',
-    modeLabel: 'Tingkat kesulitan',
     modes: {
       easy: { name: 'Mudah', desc: 'Kata full + huruf' },
       medium: { name: 'Sedang', desc: 'Kata full · tanpa huruf satuan' },
@@ -37,7 +35,6 @@ export const LANGS = {
     startBtn: 'Mulai Misi!',
     footer: 'Untuk anak usia 5–6 tahun · Keyboard QWERTY',
     goalLabel: 'Target misi',
-    goalStart: 'Kejar 10 bintang ya!',
     letterProgress: 'Huruf di kata ini',
     typeThisLetter: 'Ketik huruf ini',
     done: 'Selesai!',
@@ -47,16 +44,19 @@ export const LANGS = {
     timerUnit: 'detik',
     speakAria: 'Dengar kata lagi',
     muteAria: 'Matikan atau nyalakan suara',
+    helpAria: 'Buka cara main',
     encouragementDefault: 'Ayo, kamu bisa!',
     yesContinue: 'Ya! Lanjut~',
     findLetter: (L) => `Cari huruf ${L} di keyboard~`,
     hardStart: 'Dengar, ketik, sebelum waktu habis!',
     hardRetry: 'Dengar lagi suaranya ya~',
     timeout: 'Waktu habis~ Coba kata berikutnya!',
+    bonusTime: '⏱️ +10 detik bonus!',
     keyboardHint: 'Ketik di keyboard laptop ya! ⌨️',
     oneStarLeft: '1 bintang lagi juara! 🏆',
     nStarsLeft: (n) => `${n} bintang lagi! Ayo!`,
     chaseStars: (n) => `Kejar ${n} bintang ya!`,
+    poolFallback: 'Tema ini sedikit katanya — main campur ya!',
     victoryTitle: 'JUARA!',
     victorySub: (n) => `Kamu kumpulkan ${n} bintang!`,
     victorySession: 'Misi ini',
@@ -64,8 +64,18 @@ export const LANGS = {
     victoryNextRank: (n, emoji, label) =>
       `${n} bintang lagi jadi ${emoji} ${label}!`,
     victoryLegend: 'Kamu sudah Legenda! Main lagi yuk~',
+    victorySpeech: 'Juara! Hebat sekali!',
+    victorySpeechRank: (n, label) => `${n} bintang lagi jadi ${label}`,
     replay: 'Misi Baru!',
     home: 'Ke Awal',
+    parentTitle: 'Ringkasan untuk orang tua',
+    parentWords: 'Kata selesai',
+    parentMode: 'Mode',
+    parentTheme: 'Tema',
+    parentLang: 'Bahasa',
+    parentRank: 'Peringkat',
+    parentTotal: 'Total bintang',
+    parentClose: 'Tutup',
     ranks: {
       pemula: 'Pemula',
       petarung: 'Petarung',
@@ -73,6 +83,12 @@ export const LANGS = {
       superstar: 'Superstar',
       legenda: 'Legenda',
     },
+    milestones: [
+      { at: 3, title: 'Bagus!', subtitle: '3 bintang! Terus kejar~', trophy: '🥉' },
+      { at: 5, title: 'Setengah jalan!', subtitle: '5 bintang! 5 lagi juara!', trophy: '🥈' },
+      { at: 8, title: 'Hampir juara!', subtitle: '2 bintang lagi!', trophy: '⭐' },
+      { at: 10, title: 'JUARA!', subtitle: 'Misi selesai! Hebat sekali!', trophy: '🏆' },
+    ],
     tutorial: [
       {
         emoji: '👀',
@@ -95,7 +111,6 @@ export const LANGS = {
     ],
     tutorialSkip: 'Lewati',
     loadError: 'Oops, data kata gagal dimuat. Muat ulang ya!',
-    langPick: 'Bahasa',
   },
   en: {
     code: 'en',
@@ -106,13 +121,11 @@ export const LANGS = {
     wordsPath: 'data/words-en.json',
     appName: 'Typing Kids',
     subtitle: 'Learn Typing While Playing',
-    rankPrefix: '',
     starsWord: 'stars',
     missionTitle: '🎯 Today’s mission',
     missionGoalBefore: 'Collect',
     missionGoalAfter: 'stars!',
     hint: '✨ Nothing wrong — just keep trying ✨',
-    modeLabel: 'Difficulty',
     modes: {
       easy: { name: 'Easy', desc: 'Full word + big letter' },
       medium: { name: 'Medium', desc: 'Full word · no big letter' },
@@ -132,7 +145,6 @@ export const LANGS = {
     startBtn: 'Start Mission!',
     footer: 'Ages 5–6 · QWERTY keyboard',
     goalLabel: 'Mission target',
-    goalStart: 'Chase 10 stars!',
     letterProgress: 'Letters in this word',
     typeThisLetter: 'Type this letter',
     done: 'Done!',
@@ -142,16 +154,19 @@ export const LANGS = {
     timerUnit: 'sec',
     speakAria: 'Hear the word again',
     muteAria: 'Mute or unmute sound',
+    helpAria: 'How to play',
     encouragementDefault: 'You can do it!',
     yesContinue: 'Yes! Keep going~',
     findLetter: (L) => `Find the letter ${L} on the keyboard~`,
     hardStart: 'Listen, type, before time runs out!',
     hardRetry: 'Listen to the word again~',
     timeout: 'Time’s up~ Try the next word!',
+    bonusTime: '⏱️ +10 sec bonus!',
     keyboardHint: 'Type on your laptop keyboard! ⌨️',
     oneStarLeft: '1 star left for champion! 🏆',
     nStarsLeft: (n) => `${n} stars left! Let’s go!`,
     chaseStars: (n) => `Chase ${n} stars!`,
+    poolFallback: 'Not enough words in this theme — playing Mix!',
     victoryTitle: 'CHAMPION!',
     victorySub: (n) => `You collected ${n} stars!`,
     victorySession: 'This mission',
@@ -159,8 +174,18 @@ export const LANGS = {
     victoryNextRank: (n, emoji, label) =>
       `${n} more stars to become ${emoji} ${label}!`,
     victoryLegend: 'You’re a Legend! Play again~',
+    victorySpeech: 'Champion! Amazing!',
+    victorySpeechRank: (n, label) => `${n} more stars to become ${label}`,
     replay: 'New Mission!',
     home: 'Home',
+    parentTitle: 'Parent summary',
+    parentWords: 'Words finished',
+    parentMode: 'Mode',
+    parentTheme: 'Theme',
+    parentLang: 'Language',
+    parentRank: 'Rank',
+    parentTotal: 'Total stars',
+    parentClose: 'Close',
     ranks: {
       pemula: 'Starter',
       petarung: 'Fighter',
@@ -168,6 +193,12 @@ export const LANGS = {
       superstar: 'Superstar',
       legenda: 'Legend',
     },
+    milestones: [
+      { at: 3, title: 'Nice!', subtitle: '3 stars! Keep going~', trophy: '🥉' },
+      { at: 5, title: 'Halfway!', subtitle: '5 stars! 5 more for the win!', trophy: '🥈' },
+      { at: 8, title: 'Almost there!', subtitle: '2 stars left!', trophy: '⭐' },
+      { at: 10, title: 'CHAMPION!', subtitle: 'Mission complete! Amazing!', trophy: '🏆' },
+    ],
     tutorial: [
       {
         emoji: '👀',
@@ -190,7 +221,6 @@ export const LANGS = {
     ],
     tutorialSkip: 'Skip',
     loadError: 'Oops, words failed to load. Please refresh!',
-    langPick: 'Language',
   },
 };
 

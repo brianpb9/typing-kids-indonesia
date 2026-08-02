@@ -203,11 +203,11 @@ body {
   display: none !important;
 }
 
-/* Mute FAB */
-.mute-btn {
+/* Floating controls */
+.mute-btn,
+.help-btn {
   position: fixed;
   top: 1rem;
-  right: 1rem;
   z-index: 50;
   width: 52px;
   height: 52px;
@@ -221,9 +221,22 @@ body {
   align-items: center;
   justify-content: center;
   transition: transform 0.15s ease;
+  font-family: var(--font);
+  font-weight: 900;
+  color: var(--primary-deep);
 }
 
-.mute-btn:hover {
+.mute-btn {
+  right: 1rem;
+}
+
+.help-btn {
+  right: 4.5rem;
+  font-size: 1.25rem;
+}
+
+.mute-btn:hover,
+.help-btn:hover {
   transform: scale(1.08);
 }
 
@@ -234,6 +247,51 @@ body {
 
 .mute-btn .mute-icon.hidden {
   display: none;
+}
+
+/* Parent summary on victory */
+.parent-summary {
+  text-align: left;
+  background: var(--bg-soft);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.1rem;
+  margin: 0 0 1.25rem;
+}
+
+.parent-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-soft);
+  margin-bottom: 0.5rem;
+}
+
+.parent-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.parent-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.parent-list li:last-child {
+  border-bottom: none;
+}
+
+.parent-k {
+  color: var(--text-soft);
+}
+
+.parent-v {
+  color: var(--text);
+  font-weight: 800;
 }
 
 /* ---------- Start screen ---------- */

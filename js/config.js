@@ -6,7 +6,7 @@ export const CONFIG = {
   app: {
     name: 'Typing Kids Indonesia',
     subtitle: 'Belajar Mengetik Sambil Bermain',
-    version: '1.4.0',
+    version: '1.5.0',
     language: 'id',
   },
 
@@ -117,16 +117,19 @@ export const CONFIG = {
     maxLetters: 10,
     defaultDifficulty: 'easy',
     defaultCategory: 'all',
+    /** If category+mode pool smaller than this, fall back to mix */
+    minPoolSize: 5,
+    /** Hard: one +10s bonus when ≤5s left and progress > 0 */
+    hardBonusSeconds: 10,
+    hardBonusTriggerAt: 5,
+    /** Progressive letter ramp inside a mission (within mode bounds) */
+    progressiveDifficulty: true,
   },
 
   goals: {
     sessionTarget: 10,
-    milestones: [
-      { at: 3, title: 'Bagus!', subtitle: '3 bintang! Terus kejar~', trophy: '🥉' },
-      { at: 5, title: 'Setengah jalan!', subtitle: '5 bintang! 5 lagi juara!', trophy: '🥈' },
-      { at: 8, title: 'Hampir juara!', subtitle: '2 bintang lagi!', trophy: '⭐' },
-      { at: 10, title: 'JUARA!', subtitle: 'Misi selesai! Hebat sekali!', trophy: '🏆' },
-    ],
+    /** Milestone *times* only — copy from i18n.milestones */
+    milestoneAts: [3, 5, 8, 10],
     ranks: [
       { min: 0, id: 'pemula', label: 'Pemula', emoji: '🌱' },
       { min: 10, id: 'petarung', label: 'Petarung', emoji: '💪' },
@@ -158,15 +161,15 @@ export const CONFIG = {
 
   features: {
     difficultyLevels: true,
-    categorySelect: false,
-    parentDashboard: false,
+    categorySelect: true,
+    parentDashboard: true,
     progressTracking: true,
     achievements: true,
     dailyChallenge: false,
-    englishMode: false,
+    englishMode: true,
     multiplayer: false,
     voicePacks: false,
-    pwa: false,
+    pwa: true,
   },
 };
 

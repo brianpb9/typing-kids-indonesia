@@ -8,8 +8,12 @@ async function boot() {
   document.title = `${CONFIG.app.name} — ${CONFIG.app.subtitle}`;
 
   const game = new Game();
+  // Debug handle only on local hosts
   if (typeof window !== 'undefined') {
-    window.__typingKids = { game, config: CONFIG };
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') {
+      window.__typingKids = { game, config: CONFIG };
+    }
   }
 
   await game.init();

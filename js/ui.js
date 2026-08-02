@@ -17,6 +17,10 @@ export class UI {
       replayBtn: document.getElementById('replay-btn'),
       homeBtn: document.getElementById('home-btn'),
       muteBtn: document.getElementById('mute-btn'),
+      helpBtn: document.getElementById('help-btn'),
+      parentSummary: document.getElementById('parent-summary'),
+      parentTitle: document.getElementById('parent-title'),
+      parentList: document.getElementById('parent-list'),
       wordImage: document.getElementById('word-image'),
       wordLabel: document.getElementById('word-label'),
       wordFull: document.getElementById('word-full'),
@@ -141,6 +145,8 @@ export class UI {
       this.els.encouragement.textContent = t.encouragementDefault;
     if (this.els.speakBtn) this.els.speakBtn.setAttribute('aria-label', t.speakAria);
     if (this.els.muteBtn) this.els.muteBtn.setAttribute('aria-label', t.muteAria);
+    if (this.els.helpBtn) this.els.helpBtn.setAttribute('aria-label', t.helpAria);
+    if (this.els.parentTitle) this.els.parentTitle.textContent = t.parentTitle;
     if (this.els.victorySessionLbl)
       this.els.victorySessionLbl.textContent = t.victorySession;
     if (this.els.victoryTotalLbl)
@@ -681,6 +687,38 @@ export class UI {
       e.preventDefault();
       handler();
     });
+  }
+
+  onHelp(handler) {
+    this.els.helpBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      handler();
+    });
+  }
+
+  /**
+   * Parent summary card on victory
+   * @param {{ words: number, mode: string, theme: string, lang: string, rank: string, total: number }} data
+   */
+  renderParentSummary(data) {
+    const t = this.t;
+    const list = this.els.parentList;
+    if (!list) return;
+    if (this.els.parentTitle) this.els.parentTitle.textContent = t.parentTitle;
+    const rows = [
+      [t.parentWords, String(data.words)],
+      [t.parentMode, data.mode],
+      [t.parentTheme, data.theme],
+      [t.parentLang, data.lang],
+      [t.parentRank, data.rank],
+      [t.parentTotal, String(data.total)],
+    ];
+    list.innerHTML = rows
+      .map(
+        ([k, v]) =>
+          `<li><span class="parent-k">${k}</span><span class="parent-v">${v}</span></li>`
+      )
+      .join('');
   }
 
   /**

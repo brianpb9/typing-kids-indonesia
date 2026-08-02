@@ -13,14 +13,12 @@ Bahasa: **Indonesia**. Platform: **HTML + CSS + Vanilla JS**. Siap deploy ke **V
 - **Misi 10 bintang** — anak kejar target sampai juara 🏆
 - Milestone di 3 / 5 / 8 bintang + layar kemenangan
 - **Koleksi bintang seumur hidup** + rank (Pemula → Legenda) di `localStorage`
-- **3 mode:** Mudah (huruf besar + kotak) · Sedang (tanpa huruf besar) · Sulit (gambar + TTS saja)
-- Label kata: Mudah/Sedang (bantuan setelah salah) · Sulit tidak pernah
-- Tombol **mute** suara (TTS + SFX)
-- **No-fail**: salah tidak menghapus progress
-- 100 kata (buah, hewan, sehari-hari, kendaraan, warna, makanan, tubuh)
-- **Ikon jelas** (OpenMoji) + warna solid — bukan foto rancu (langit/bunga/dll.)
-- TTS browser + SFX Web Audio
-- Keyboard QWERTY saja
+- **3 mode:** Easy (kata full + huruf satuan) · Medium (kata full, tanpa huruf satuan) · Hard (gambar + TTS + timer)
+- 🇮🇩 / 🇬🇧 language toggle + 100 kata English
+- Tutorial, pilih tema, misi 10 bintang, rank, ringkasan orang tua
+- Hard: timer + bonus +10 dtk sekali · progressive length dalam misi
+- PWA offline shell · font Nunito self-hosted · `npm test`
+- **No-fail** · ikon OpenMoji + warna solid · keyboard QWERTY
 
 ---
 

@@ -38,6 +38,10 @@ export class Game {
     this._timerId = 0;
     this._timerLeft = 0;
     this._timerActive = false;
+    this._hardBonusUsed = false;
+    this._sessionWordsDone = 0; // successful words this mission
+    this._sessionModeLabel = '';
+    this._sessionThemeLabel = '';
 
     this.input = new InputManager({
       onLetter: (letter) => this.handleLetter(letter),
@@ -90,6 +94,7 @@ export class Game {
       () => this._tutorialNext(),
       () => this._tutorialFinish(true)
     );
+    this.ui.onHelp(() => this.openHelp());
 
     this.ui.onSpeak(() => {
       this.audio.unlock();
@@ -217,14 +222,32 @@ export class Game {
     const done =
       this.language === 'en' ? save.tutorialDoneEn : save.tutorialDone;
     if (!done) {
-      this._tutorialStep = 0;
-      this.state = 'tutorial';
-      this.audio.unlock();
-      this.audio.playClick();
-      this._showTutorialStep();
+      this._openTutorial(false);
       return;
     }
     this.startMission();
+  }
+
+  /** Help button — re-open tutorial without forcing start */
+  openHelp() {
+    if (this.state === 'playing' || this.state === 'celebrating') {
+      // Pause soft: stop timer, show help
+      this._stopTimer();
+    }
+    this._openTutorial(true);
+  }
+
+  /**
+   * @param {boolean} helpOnly if true, return to previous screen after
+   */
+  _openTutorial(helpOnly) {
+    this._tutorialStep = 0;
+    this._tutorialHelpOnly = helpOnly;
+    this._prevState = this.state;
+    this.state = 'tutorial';
+    this.audio.unlock();
+    this.audio.playClick();
+    this._showTutorialStep();
   }
 
   _showTutorialStep() {
@@ -234,8 +257,14 @@ export class Game {
       this._tutorialFinish(false);
       return;
     }
+    const isLast = this._tutorialStep >= steps.length - 1;
     this.ui.showTutorialStep({
       ...s,
+      nextLabel: isLast
+        ? this._tutorialHelpOnly
+          ? this._t().parentClose || s.nextLabel
+          : s.nextLabel
+        : s.nextLabel,
       step: this._tutorialStep,
       total: steps.length,
     });
@@ -262,6 +291,24 @@ export class Game {
     }
     this.ui.hideTutorial();
     this.audio.playClick();
+
+    if (this._tutorialHelpOnly) {
+      this._tutorialHelpOnly = false;
+      // Resume game screen if we were playing
+      if (this._prevState === 'playing' && this.current) {
+        this.state = 'playing';
+        this.ui.showGame();
+        const mode = this._mode();
+        if ((mode.timerSeconds || 0) > 0 && this._timerLeft > 0) {
+          this._startTimer(this._timerLeft);
+        }
+        this.input.focus();
+      } else {
+        this.state = 'start';
+        this.ui.showStart();
+      }
+      return;
+    }
     this.startMission();
   }
 
@@ -278,28 +325,65 @@ export class Game {
     this.audio.playClick();
 
     this.sessionStars = 0;
+    this._sessionWordsDone = 0;
     this._milestonesHit = new Set();
     this._wrongStreak = 0;
     this._transitionLock = false;
+    this._hardBonusUsed = false;
     this._stopTimer();
 
     this.words.setDifficulty(this.difficulty);
     this.words.setCategory(this.category);
+    // Progressive: start with shorter words
+    if (CONFIG.gameplay.progressiveDifficulty) {
+      const mode = this._mode();
+      const startMax = Math.min(mode.minLetters + 1, mode.maxLetters);
+      this.words.refillProgressive(startMax);
+    }
+    if (this.words.lastPoolUsedFallback?.()) {
+      this.category = 'all';
+      this.words.setCategory('all');
+      this.ui.setCategoryUI('all');
+    }
+
     this.ui.setDifficultyUI(this.difficulty);
     this.ui.setCategoryUI(this.category);
     this.ui.showGame();
     this.ui.applyModeLayout();
     this.ui.setSessionStars(0, this._sessionTarget);
+    this._sessionModeLabel = this._t().modes[this.difficulty]?.name || this.difficulty;
+    this._sessionThemeLabel =
+      this._t().categories[this.category] || this.category;
+
+    if (this.words.lastPoolUsedFallback?.()) {
+      this.ui.setEncouragement(this._t().poolFallback);
+    }
+
     this.state = 'playing';
     preloadImages(this.words.imageUrls(40)).catch(() => {});
     this.loadNextWord();
     this.input.focus();
   }
 
+  /** Progressive max letters based on stars earned this mission */
+  _preferMaxLetters() {
+    const mode = this._mode();
+    if (!CONFIG.gameplay.progressiveDifficulty) return mode.maxLetters;
+    // Ramp: +1 letter length every 2 stars
+    const ramp = mode.minLetters + Math.floor(this.sessionStars / 2) + 1;
+    return Math.min(Math.max(ramp, mode.minLetters), mode.maxLetters);
+  }
+
   loadNextWord() {
     this._stopTimer();
     this._transitionLock = false;
     this._wrongStreak = 0;
+    this._hardBonusUsed = false;
+
+    if (CONFIG.gameplay.progressiveDifficulty) {
+      this.words.refillProgressive(this._preferMaxLetters());
+    }
+
     this.current = this.words.next();
     if (!this.current) return;
 
@@ -313,7 +397,6 @@ export class Game {
     this.state = 'playing';
     this.input.focus();
 
-    // Preload a bit more of the queue
     preloadImages(this.words.imageUrls(12)).catch(() => {});
 
     setTimeout(() => {
@@ -337,6 +420,21 @@ export class Game {
     this._timerId = window.setInterval(() => {
       if (!this._timerActive || this.state !== 'playing') return;
       this._timerLeft -= 1;
+
+      // One-time bonus near end if child has progress
+      const bonusAt = CONFIG.gameplay.hardBonusTriggerAt ?? 5;
+      const bonusSec = CONFIG.gameplay.hardBonusSeconds ?? 10;
+      if (
+        !this._hardBonusUsed &&
+        this.cursor > 0 &&
+        this._timerLeft === bonusAt
+      ) {
+        this._hardBonusUsed = true;
+        this._timerLeft += bonusSec;
+        this.ui.setEncouragement(this._t().bonusTime);
+        this.audio.playSparkle();
+      }
+
       const urgent = this._timerLeft <= 8;
       this.ui.setTimer(this._timerLeft, { urgent });
       if (this._timerLeft <= 0) {
@@ -485,6 +583,7 @@ export class Game {
     this.state = 'celebrating';
     this._transitionLock = true;
     this.sessionStars += 1;
+    this._sessionWordsDone += 1;
 
     const save = patchSave({
       totalStars: loadSave().totalStars + 1,
@@ -522,7 +621,8 @@ export class Game {
   }
 
   _checkMilestone() {
-    const list = CONFIG.goals.milestones.filter(
+    const t = this._t();
+    const list = (t.milestones || []).filter(
       (m) => m.at < this._sessionTarget
     );
     for (const m of list) {
@@ -565,26 +665,31 @@ export class Game {
     this.anim.celebrate();
     setTimeout(() => this.anim.celebrate(), 400);
 
+    const t = this._t();
+    const rank = getRank(updated.totalStars, t.ranks);
     this.ui.renderVictory({
       sessionStars: this.sessionStars,
       totalStars: updated.totalStars,
       target: this._sessionTarget,
     });
+    this.ui.renderParentSummary({
+      words: this._sessionWordsDone,
+      mode: this._sessionModeLabel,
+      theme: this._sessionThemeLabel,
+      lang: this.language === 'en' ? 'English' : 'Bahasa Indonesia',
+      rank: `${rank.emoji} ${rank.label}`,
+      total: updated.totalStars,
+    });
     this.ui.showVictory();
     this.ui.renderCollection(updated);
 
     this.audio.playCelebration();
-    const rank = getRank(updated.totalStars, this._t().ranks);
-    const winLine =
-      this.language === 'en' ? 'Champion! Amazing!' : 'Juara! Hebat sekali!';
-    this.audio.speakPraise(winLine);
+    this.audio.speakPraise(t.victorySpeech);
     setTimeout(() => {
       if (rank.next) {
-        const line =
-          this.language === 'en'
-            ? `${rank.starsToNext} more stars to become ${rank.next.label}`
-            : `${rank.starsToNext} bintang lagi jadi ${rank.next.label}`;
-        this.audio.speak(line);
+        this.audio.speak(
+          t.victorySpeechRank(rank.starsToNext, rank.next.label)
+        );
       }
     }, 2200);
   }

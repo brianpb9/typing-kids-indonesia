@@ -10,15 +10,12 @@
     <meta name="theme-color" content="#FFF8F0" />
     <title>Typing Kids Indonesia — Belajar Mengetik Sambil Bermain</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap"
-      rel="stylesheet"
-    />
-
+    <!-- Self-hosted font (offline-friendly) -->
+    <link rel="stylesheet" href="assets/fonts/nunito.css" />
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/animations.css" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
 
     <link
       rel="icon"
@@ -36,7 +33,16 @@
 
     <canvas id="fx-canvas" aria-hidden="true"></canvas>
 
-    <!-- Floating mute (always available) -->
+    <!-- Floating controls -->
+    <button
+      type="button"
+      id="help-btn"
+      class="help-btn"
+      title="Cara main"
+      aria-label="Buka cara main"
+    >
+      ?
+    </button>
     <button
       type="button"
       id="mute-btn"
@@ -180,7 +186,13 @@
             <span id="session-stars">0</span>/<span id="session-target">10</span>
           </div>
           <!-- Hard mode timer -->
-          <div id="timer-wrap" class="timer-wrap hidden" aria-live="polite">
+          <div
+            id="timer-wrap"
+            class="timer-wrap hidden"
+            role="timer"
+            aria-live="polite"
+            aria-atomic="true"
+          >
             <span class="timer-icon" aria-hidden="true">⏱️</span>
             <span id="timer-value" class="timer-value">35</span>
             <span class="timer-unit">detik</span>
@@ -249,7 +261,7 @@
           </div>
 
           <!-- Full word (Easy + Medium always) -->
-          <p id="word-full" class="word-full" aria-live="polite"></p>
+          <p id="word-full" class="word-full" aria-live="polite" aria-atomic="true"></p>
 
           <div id="target-block" class="target-block">
             <p id="target-hint" class="target-hint">Ketik huruf ini</p>
@@ -330,6 +342,12 @@
 
           <p id="victory-next" class="victory-next">Main lagi untuk jadi Superstar!</p>
 
+          <!-- Parent summary -->
+          <div id="parent-summary" class="parent-summary" aria-label="Parent summary">
+            <p class="parent-title" id="parent-title">Ringkasan untuk orang tua</p>
+            <ul class="parent-list" id="parent-list"></ul>
+          </div>
+
           <div class="victory-actions">
             <button type="button" id="replay-btn" class="btn-start">
               Misi Baru!
@@ -343,5 +361,12 @@
     </div>
 
     <script type="module" src="js/main.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js').catch(function () {});
+        });
+      }
+    </script>
   </body>
 </html>

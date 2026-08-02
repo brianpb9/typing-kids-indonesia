@@ -63,25 +63,54 @@ export class WordBank {
     this._refillQueue();
   }
 
-  getPool() {
+  /**
+   * @param {{ preferMaxLetters?: number, minPool?: number }} [opts]
+   * preferMaxLetters: progressive ramp — prefer words up to this length
+   */
+  getPool(opts = {}) {
     let pool = [...this.words];
     const mode = getMode(this.difficulty);
+    const minPool = opts.minPool ?? CONFIG.gameplay.minPoolSize ?? 5;
+    let usedFallback = false;
 
     if (this.category && this.category !== 'all') {
       pool = pool.filter((w) => w.category === this.category);
     }
 
-    pool = pool.filter(
-      (w) => w.letters >= mode.minLetters && w.letters <= mode.maxLetters
-    );
-
-    // Fallback if filter too tight
-    if (!pool.length) {
-      pool = [...this.words].filter(
-        (w) => w.letters >= mode.minLetters && w.letters <= mode.maxLetters
+    const byLen = (list, maxL) =>
+      list.filter(
+        (w) =>
+          w.letters >= mode.minLetters &&
+          w.letters <= Math.min(maxL ?? mode.maxLetters, mode.maxLetters)
       );
+
+    let maxL = opts.preferMaxLetters ?? mode.maxLetters;
+    let filtered = byLen(pool, maxL);
+
+    // Progressive: if too few at preferred max, widen up to mode max
+    while (filtered.length < minPool && maxL < mode.maxLetters) {
+      maxL += 1;
+      filtered = byLen(pool, maxL);
     }
-    return pool.length ? pool : [...this.words];
+
+    // Category too thin → fall back to all categories
+    if (filtered.length < minPool && this.category && this.category !== 'all') {
+      usedFallback = true;
+      filtered = byLen([...this.words], mode.maxLetters);
+    }
+
+    if (!filtered.length) {
+      filtered = byLen([...this.words], mode.maxLetters);
+      usedFallback = true;
+    }
+
+    this._lastPoolFallback = usedFallback;
+    this._lastPoolSize = filtered.length;
+    return filtered;
+  }
+
+  lastPoolUsedFallback() {
+    return Boolean(this._lastPoolFallback);
   }
 
   poolSize() {
@@ -133,9 +162,21 @@ export class WordBank {
     ];
   }
 
-  _refillQueue() {
-    const pool = this.getPool();
+  /**
+   * @param {{ preferMaxLetters?: number }} [opts]
+   */
+  _refillQueue(opts = {}) {
+    const pool = this.getPool(opts);
     this._queue = CONFIG.gameplay.shuffleWords ? this._shuffle(pool) : [...pool];
+  }
+
+  /**
+   * Refill with progressive max letter preference
+   * @param {number} preferMaxLetters
+   */
+  refillProgressive(preferMaxLetters) {
+    this._queue = [];
+    this._refillQueue({ preferMaxLetters });
   }
 
   _shuffle(arr) {
