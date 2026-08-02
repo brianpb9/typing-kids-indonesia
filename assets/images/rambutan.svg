@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Rambutan">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <circle cx="100" cy="115" r="40" fill="#E74C3C" filter="url(#s)"/><g stroke="#C0392B" stroke-width="4" stroke-linecap="round" fill="none"><path d="M100 75 L100 55 M70 85 L50 70 M130 85 L150 70 M65 115 L42 115 M135 115 L158 115 M70 145 L50 160 M130 145 L150 160 M100 155 L100 175"/></g><ellipse cx="88" cy="105" rx="10" ry="12" fill="#FF8A80" opacity="0.4"/><path d="M100 75 Q110 55 120 60" stroke="#27AE60" stroke-width="4" fill="none"/>
+</svg>

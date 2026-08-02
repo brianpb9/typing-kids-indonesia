@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Sekolah">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <rect x="40" y="80" width="120" height="80" fill="#74B9FF" filter="url(#s)"/><path d="M30 80 L100 40 L170 80 Z" fill="#E74C3C"/><rect x="85" y="110" width="30" height="50" fill="#F4D03F"/><rect x="50" y="95" width="25" height="25" fill="#81ECEC"/><rect x="125" y="95" width="25" height="25" fill="#81ECEC"/><rect x="90" y="30" width="20" height="25" fill="#90A4AE"/>
+</svg>

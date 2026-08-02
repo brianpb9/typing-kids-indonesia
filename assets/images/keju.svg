@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Keju">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <path d="M40 130 L100 50 L160 130 Z" fill="#F4D03F" filter="url(#s)"/><path d="M40 130 L100 50 L160 130 Z" fill="#F1C40F" opacity="0.3"/><circle cx="90" cy="100" r="8" fill="#F9E79F"/><circle cx="115" cy="115" r="6" fill="#F9E79F"/><circle cx="85" cy="120" r="5" fill="#F9E79F"/>
+</svg>

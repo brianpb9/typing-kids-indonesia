@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Motor">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <circle cx="55" cy="140" r="22" fill="#2C3E50" filter="url(#s)"/><circle cx="145" cy="140" r="22" fill="#2C3E50"/><circle cx="55" cy="140" r="10" fill="#B0BEC5"/><circle cx="145" cy="140" r="10" fill="#B0BEC5"/><path d="M55 140 L90 90 L130 90 L145 140" stroke="#3498DB" stroke-width="10" fill="none" stroke-linejoin="round"/><rect x="95" y="70" width="30" height="25" rx="4" fill="#2980B9"/><circle cx="100" cy="95" r="8" fill="#F4D03F"/>
+</svg>

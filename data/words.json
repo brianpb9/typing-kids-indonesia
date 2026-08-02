@@ -1,0 +1,958 @@
+{
+  "version": 2,
+  "language": "id",
+  "categories": {
+    "buah": {
+      "id": "buah",
+      "label": "Buah"
+    },
+    "hewan": {
+      "id": "hewan",
+      "label": "Hewan"
+    },
+    "sehari-hari": {
+      "id": "sehari-hari",
+      "label": "Sehari-hari"
+    },
+    "kendaraan": {
+      "id": "kendaraan",
+      "label": "Kendaraan"
+    },
+    "warna": {
+      "id": "warna",
+      "label": "Warna"
+    },
+    "makanan": {
+      "id": "makanan",
+      "label": "Makanan"
+    },
+    "tubuh": {
+      "id": "tubuh",
+      "label": "Tubuh & Sekolah"
+    }
+  },
+  "words": [
+    {
+      "id": "apel",
+      "word": "apel",
+      "display": "Apel",
+      "category": "buah",
+      "image": "assets/images/apel.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "jeruk",
+      "word": "jeruk",
+      "display": "Jeruk",
+      "category": "buah",
+      "image": "assets/images/jeruk.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "pisang",
+      "word": "pisang",
+      "display": "Pisang",
+      "category": "buah",
+      "image": "assets/images/pisang.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "anggur",
+      "word": "anggur",
+      "display": "Anggur",
+      "category": "buah",
+      "image": "assets/images/anggur.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "mangga",
+      "word": "mangga",
+      "display": "Mangga",
+      "category": "buah",
+      "image": "assets/images/mangga.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "melon",
+      "word": "melon",
+      "display": "Melon",
+      "category": "buah",
+      "image": "assets/images/melon.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "pepaya",
+      "word": "pepaya",
+      "display": "Pepaya",
+      "category": "buah",
+      "image": "assets/images/pepaya.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "nanas",
+      "word": "nanas",
+      "display": "Nanas",
+      "category": "buah",
+      "image": "assets/images/nanas.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "semangka",
+      "word": "semangka",
+      "display": "Semangka",
+      "category": "buah",
+      "image": "assets/images/semangka.svg?v=3",
+      "audio": null,
+      "letters": 8
+    },
+    {
+      "id": "stroberi",
+      "word": "stroberi",
+      "display": "Stroberi",
+      "category": "buah",
+      "image": "assets/images/stroberi.svg?v=3",
+      "audio": null,
+      "letters": 8
+    },
+    {
+      "id": "durian",
+      "word": "durian",
+      "display": "Durian",
+      "category": "buah",
+      "image": "assets/images/durian.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "rambutan",
+      "word": "rambutan",
+      "display": "Rambutan",
+      "category": "buah",
+      "image": "assets/images/rambutan.svg?v=3",
+      "audio": null,
+      "letters": 8
+    },
+    {
+      "id": "jambu",
+      "word": "jambu",
+      "display": "Jambu",
+      "category": "buah",
+      "image": "assets/images/jambu.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "kelapa",
+      "word": "kelapa",
+      "display": "Kelapa",
+      "category": "buah",
+      "image": "assets/images/kelapa.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "lemon",
+      "word": "lemon",
+      "display": "Lemon",
+      "category": "buah",
+      "image": "assets/images/lemon.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "ceri",
+      "word": "ceri",
+      "display": "Ceri",
+      "category": "buah",
+      "image": "assets/images/ceri.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "kiwi",
+      "word": "kiwi",
+      "display": "Kiwi",
+      "category": "buah",
+      "image": "assets/images/kiwi.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "pir",
+      "word": "pir",
+      "display": "Pir",
+      "category": "buah",
+      "image": "assets/images/pir.svg?v=3",
+      "audio": null,
+      "letters": 3
+    },
+    {
+      "id": "alpukat",
+      "word": "alpukat",
+      "display": "Alpukat",
+      "category": "buah",
+      "image": "assets/images/alpukat.svg?v=3",
+      "audio": null,
+      "letters": 7
+    },
+    {
+      "id": "belimbing",
+      "word": "belimbing",
+      "display": "Belimbing",
+      "category": "buah",
+      "image": "assets/images/belimbing.svg?v=3",
+      "audio": null,
+      "letters": 9
+    },
+    {
+      "id": "kucing",
+      "word": "kucing",
+      "display": "Kucing",
+      "category": "hewan",
+      "image": "assets/images/kucing.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "anjing",
+      "word": "anjing",
+      "display": "Anjing",
+      "category": "hewan",
+      "image": "assets/images/anjing.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "ayam",
+      "word": "ayam",
+      "display": "Ayam",
+      "category": "hewan",
+      "image": "assets/images/ayam.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "bebek",
+      "word": "bebek",
+      "display": "Bebek",
+      "category": "hewan",
+      "image": "assets/images/bebek.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "ikan",
+      "word": "ikan",
+      "display": "Ikan",
+      "category": "hewan",
+      "image": "assets/images/ikan.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "gajah",
+      "word": "gajah",
+      "display": "Gajah",
+      "category": "hewan",
+      "image": "assets/images/gajah.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "kelinci",
+      "word": "kelinci",
+      "display": "Kelinci",
+      "category": "hewan",
+      "image": "assets/images/kelinci.svg?v=3",
+      "audio": null,
+      "letters": 7
+    },
+    {
+      "id": "kambing",
+      "word": "kambing",
+      "display": "Kambing",
+      "category": "hewan",
+      "image": "assets/images/kambing.svg?v=3",
+      "audio": null,
+      "letters": 7
+    },
+    {
+      "id": "sapi",
+      "word": "sapi",
+      "display": "Sapi",
+      "category": "hewan",
+      "image": "assets/images/sapi.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "harimau",
+      "word": "harimau",
+      "display": "Harimau",
+      "category": "hewan",
+      "image": "assets/images/harimau.svg?v=3",
+      "audio": null,
+      "letters": 7
+    },
+    {
+      "id": "kuda",
+      "word": "kuda",
+      "display": "Kuda",
+      "category": "hewan",
+      "image": "assets/images/kuda.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "burung",
+      "word": "burung",
+      "display": "Burung",
+      "category": "hewan",
+      "image": "assets/images/burung.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "monyet",
+      "word": "monyet",
+      "display": "Monyet",
+      "category": "hewan",
+      "image": "assets/images/monyet.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "ular",
+      "word": "ular",
+      "display": "Ular",
+      "category": "hewan",
+      "image": "assets/images/ular.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "singa",
+      "word": "singa",
+      "display": "Singa",
+      "category": "hewan",
+      "image": "assets/images/singa.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "beruang",
+      "word": "beruang",
+      "display": "Beruang",
+      "category": "hewan",
+      "image": "assets/images/beruang.svg?v=3",
+      "audio": null,
+      "letters": 7
+    },
+    {
+      "id": "tikus",
+      "word": "tikus",
+      "display": "Tikus",
+      "category": "hewan",
+      "image": "assets/images/tikus.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "kodok",
+      "word": "kodok",
+      "display": "Kodok",
+      "category": "hewan",
+      "image": "assets/images/kodok.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "penyu",
+      "word": "penyu",
+      "display": "Penyu",
+      "category": "hewan",
+      "image": "assets/images/penyu.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "kupu",
+      "word": "kupu",
+      "display": "Kupu",
+      "category": "hewan",
+      "image": "assets/images/kupu.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "rumah",
+      "word": "rumah",
+      "display": "Rumah",
+      "category": "sehari-hari",
+      "image": "assets/images/rumah.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "ibu",
+      "word": "ibu",
+      "display": "Ibu",
+      "category": "sehari-hari",
+      "image": "assets/images/ibu.svg?v=3",
+      "audio": null,
+      "letters": 3
+    },
+    {
+      "id": "ayah",
+      "word": "ayah",
+      "display": "Ayah",
+      "category": "sehari-hari",
+      "image": "assets/images/ayah.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "meja",
+      "word": "meja",
+      "display": "Meja",
+      "category": "sehari-hari",
+      "image": "assets/images/meja.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "kursi",
+      "word": "kursi",
+      "display": "Kursi",
+      "category": "sehari-hari",
+      "image": "assets/images/kursi.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "tas",
+      "word": "tas",
+      "display": "Tas",
+      "category": "sehari-hari",
+      "image": "assets/images/tas.svg?v=3",
+      "audio": null,
+      "letters": 3
+    },
+    {
+      "id": "sepatu",
+      "word": "sepatu",
+      "display": "Sepatu",
+      "category": "sehari-hari",
+      "image": "assets/images/sepatu.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "buku",
+      "word": "buku",
+      "display": "Buku",
+      "category": "sehari-hari",
+      "image": "assets/images/buku.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "bola",
+      "word": "bola",
+      "display": "Bola",
+      "category": "sehari-hari",
+      "image": "assets/images/bola.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "baju",
+      "word": "baju",
+      "display": "Baju",
+      "category": "sehari-hari",
+      "image": "assets/images/baju.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "pintu",
+      "word": "pintu",
+      "display": "Pintu",
+      "category": "sehari-hari",
+      "image": "assets/images/pintu.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "jendela",
+      "word": "jendela",
+      "display": "Jendela",
+      "category": "sehari-hari",
+      "image": "assets/images/jendela.svg?v=3",
+      "audio": null,
+      "letters": 7
+    },
+    {
+      "id": "piring",
+      "word": "piring",
+      "display": "Piring",
+      "category": "sehari-hari",
+      "image": "assets/images/piring.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "sendok",
+      "word": "sendok",
+      "display": "Sendok",
+      "category": "sehari-hari",
+      "image": "assets/images/sendok.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "gelas",
+      "word": "gelas",
+      "display": "Gelas",
+      "category": "sehari-hari",
+      "image": "assets/images/gelas.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "pensil",
+      "word": "pensil",
+      "display": "Pensil",
+      "category": "sehari-hari",
+      "image": "assets/images/pensil.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "kertas",
+      "word": "kertas",
+      "display": "Kertas",
+      "category": "sehari-hari",
+      "image": "assets/images/kertas.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "lampu",
+      "word": "lampu",
+      "display": "Lampu",
+      "category": "sehari-hari",
+      "image": "assets/images/lampu.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "kasur",
+      "word": "kasur",
+      "display": "Kasur",
+      "category": "sehari-hari",
+      "image": "assets/images/kasur.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "bantal",
+      "word": "bantal",
+      "display": "Bantal",
+      "category": "sehari-hari",
+      "image": "assets/images/bantal.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "mobil",
+      "word": "mobil",
+      "display": "Mobil",
+      "category": "kendaraan",
+      "image": "assets/images/mobil.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "motor",
+      "word": "motor",
+      "display": "Motor",
+      "category": "kendaraan",
+      "image": "assets/images/motor.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "bus",
+      "word": "bus",
+      "display": "Bus",
+      "category": "kendaraan",
+      "image": "assets/images/bus.svg?v=3",
+      "audio": null,
+      "letters": 3
+    },
+    {
+      "id": "kereta",
+      "word": "kereta",
+      "display": "Kereta",
+      "category": "kendaraan",
+      "image": "assets/images/kereta.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "pesawat",
+      "word": "pesawat",
+      "display": "Pesawat",
+      "category": "kendaraan",
+      "image": "assets/images/pesawat.svg?v=3",
+      "audio": null,
+      "letters": 7
+    },
+    {
+      "id": "kapal",
+      "word": "kapal",
+      "display": "Kapal",
+      "category": "kendaraan",
+      "image": "assets/images/kapal.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "sepeda",
+      "word": "sepeda",
+      "display": "Sepeda",
+      "category": "kendaraan",
+      "image": "assets/images/sepeda.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "truk",
+      "word": "truk",
+      "display": "Truk",
+      "category": "kendaraan",
+      "image": "assets/images/truk.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "becak",
+      "word": "becak",
+      "display": "Becak",
+      "category": "kendaraan",
+      "image": "assets/images/becak.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "perahu",
+      "word": "perahu",
+      "display": "Perahu",
+      "category": "kendaraan",
+      "image": "assets/images/perahu.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "merah",
+      "word": "merah",
+      "display": "Merah",
+      "category": "warna",
+      "image": "assets/images/merah.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "biru",
+      "word": "biru",
+      "display": "Biru",
+      "category": "warna",
+      "image": "assets/images/biru.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "hijau",
+      "word": "hijau",
+      "display": "Hijau",
+      "category": "warna",
+      "image": "assets/images/hijau.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "kuning",
+      "word": "kuning",
+      "display": "Kuning",
+      "category": "warna",
+      "image": "assets/images/kuning.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "putih",
+      "word": "putih",
+      "display": "Putih",
+      "category": "warna",
+      "image": "assets/images/putih.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "hitam",
+      "word": "hitam",
+      "display": "Hitam",
+      "category": "warna",
+      "image": "assets/images/hitam.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "ungu",
+      "word": "ungu",
+      "display": "Ungu",
+      "category": "warna",
+      "image": "assets/images/ungu.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "pink",
+      "word": "pink",
+      "display": "Pink",
+      "category": "warna",
+      "image": "assets/images/pink.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "oranye",
+      "word": "oranye",
+      "display": "Oranye",
+      "category": "warna",
+      "image": "assets/images/oranye.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "coklat",
+      "word": "coklat",
+      "display": "Coklat",
+      "category": "warna",
+      "image": "assets/images/coklat.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "nasi",
+      "word": "nasi",
+      "display": "Nasi",
+      "category": "makanan",
+      "image": "assets/images/nasi.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "roti",
+      "word": "roti",
+      "display": "Roti",
+      "category": "makanan",
+      "image": "assets/images/roti.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "susu",
+      "word": "susu",
+      "display": "Susu",
+      "category": "makanan",
+      "image": "assets/images/susu.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "telur",
+      "word": "telur",
+      "display": "Telur",
+      "category": "makanan",
+      "image": "assets/images/telur.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "keju",
+      "word": "keju",
+      "display": "Keju",
+      "category": "makanan",
+      "image": "assets/images/keju.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "mie",
+      "word": "mie",
+      "display": "Mie",
+      "category": "makanan",
+      "image": "assets/images/mie.svg?v=3",
+      "audio": null,
+      "letters": 3
+    },
+    {
+      "id": "sup",
+      "word": "sup",
+      "display": "Sup",
+      "category": "makanan",
+      "image": "assets/images/sup.svg?v=3",
+      "audio": null,
+      "letters": 3
+    },
+    {
+      "id": "madu",
+      "word": "madu",
+      "display": "Madu",
+      "category": "makanan",
+      "image": "assets/images/madu.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "air",
+      "word": "air",
+      "display": "Air",
+      "category": "makanan",
+      "image": "assets/images/air.svg?v=3",
+      "audio": null,
+      "letters": 3
+    },
+    {
+      "id": "jus",
+      "word": "jus",
+      "display": "Jus",
+      "category": "makanan",
+      "image": "assets/images/jus.svg?v=3",
+      "audio": null,
+      "letters": 3
+    },
+    {
+      "id": "mata",
+      "word": "mata",
+      "display": "Mata",
+      "category": "tubuh",
+      "image": "assets/images/mata.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "hidung",
+      "word": "hidung",
+      "display": "Hidung",
+      "category": "tubuh",
+      "image": "assets/images/hidung.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "mulut",
+      "word": "mulut",
+      "display": "Mulut",
+      "category": "tubuh",
+      "image": "assets/images/mulut.svg?v=3",
+      "audio": null,
+      "letters": 5
+    },
+    {
+      "id": "tangan",
+      "word": "tangan",
+      "display": "Tangan",
+      "category": "tubuh",
+      "image": "assets/images/tangan.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "kaki",
+      "word": "kaki",
+      "display": "Kaki",
+      "category": "tubuh",
+      "image": "assets/images/kaki.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "kepala",
+      "word": "kepala",
+      "display": "Kepala",
+      "category": "tubuh",
+      "image": "assets/images/kepala.svg?v=3",
+      "audio": null,
+      "letters": 6
+    },
+    {
+      "id": "gigi",
+      "word": "gigi",
+      "display": "Gigi",
+      "category": "tubuh",
+      "image": "assets/images/gigi.svg?v=3",
+      "audio": null,
+      "letters": 4
+    },
+    {
+      "id": "telinga",
+      "word": "telinga",
+      "display": "Telinga",
+      "category": "tubuh",
+      "image": "assets/images/telinga.svg?v=3",
+      "audio": null,
+      "letters": 7
+    },
+    {
+      "id": "sekolah",
+      "word": "sekolah",
+      "display": "Sekolah",
+      "category": "tubuh",
+      "image": "assets/images/sekolah.svg?v=3",
+      "audio": null,
+      "letters": 7
+    },
+    {
+      "id": "guru",
+      "word": "guru",
+      "display": "Guru",
+      "category": "tubuh",
+      "image": "assets/images/guru.svg?v=3",
+      "audio": null,
+      "letters": 4
+    }
+  ],
+  "praise": [
+    "Hebat!",
+    "Bagus!",
+    "Pintar!",
+    "Wah keren!",
+    "Ayo lagi!",
+    "Luar biasa!",
+    "Mantap!",
+    "Asyik!",
+    "Cerdas!",
+    "Top!"
+  ],
+  "encouragements": [
+    "Kamu hebat!",
+    "Terus coba ya!",
+    "Ayo, kamu bisa!",
+    "Pelan-pelan saja~",
+    "Huruf demi huruf!",
+    "Semangat!",
+    "Dengar katanya ya!",
+    "Lihat huruf besarnya!"
+  ]
+}

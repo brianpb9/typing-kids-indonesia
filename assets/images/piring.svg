@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Piring">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <ellipse cx="100" cy="110" rx="70" ry="50" fill="#ECEFF1" filter="url(#s)"/><ellipse cx="100" cy="110" rx="55" ry="38" fill="#FAFAFA"/><ellipse cx="100" cy="110" rx="40" ry="28" fill="#E3F2FD"/><ellipse cx="90" cy="100" rx="15" ry="10" fill="#fff" opacity="0.5"/>
+</svg>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Harimau">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <ellipse cx="100" cy="140" rx="52" ry="36" fill="#E67E22" filter="url(#s)"/><circle cx="100" cy="95" r="42" fill="#E67E22"/><path d="M65 68 L55 30 L90 60 Z" fill="#E67E22"/><path d="M135 68 L145 30 L110 60 Z" fill="#E67E22"/><path d="M75 75 Q85 85 80 100" stroke="#1A1A1A" stroke-width="5" fill="none"/><path d="M125 75 Q115 85 120 100" stroke="#1A1A1A" stroke-width="5" fill="none"/><path d="M95 55 Q100 68 105 55" stroke="#1A1A1A" stroke-width="4" fill="none"/><ellipse cx="82" cy="92" rx="7" ry="9" fill="#1A1A1A"/><ellipse cx="118" cy="92" rx="7" ry="9" fill="#1A1A1A"/><ellipse cx="100" cy="112" rx="16" ry="12" fill="#FFECB3"/><path d="M150 135 Q175 110 170 155" stroke="#E67E22" stroke-width="14" fill="none" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Bebek">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <ellipse cx="100" cy="135" rx="50" ry="36" fill="#F4D03F" filter="url(#s)"/><circle cx="100" cy="90" r="38" fill="#F4D03F"/><circle cx="88" cy="85" r="6" fill="#2C3E50"/><circle cx="112" cy="85" r="6" fill="#2C3E50"/><ellipse cx="100" cy="105" rx="22" ry="10" fill="#E67E22"/><ellipse cx="75" cy="168" rx="16" ry="8" fill="#E67E22"/><ellipse cx="125" cy="168" rx="16" ry="8" fill="#E67E22"/>
+</svg>

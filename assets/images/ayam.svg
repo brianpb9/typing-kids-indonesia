@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Ayam">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <ellipse cx="100" cy="130" rx="48" ry="38" fill="#FCF3CF" filter="url(#s)"/><circle cx="100" cy="85" r="36" fill="#FCF3CF"/><path d="M78 58 Q85 30 95 52 Q100 28 105 52 Q115 30 122 58 Q100 48 78 58Z" fill="#E74C3C"/><circle cx="88" cy="82" r="5" fill="#2C3E50"/><circle cx="112" cy="82" r="5" fill="#2C3E50"/><path d="M100 92 L122 98 L100 104 Z" fill="#F39C12"/><ellipse cx="55" cy="125" rx="20" ry="14" fill="#F9E79F" transform="rotate(-25 55 125)"/>
+</svg>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Typing Kids Indonesia — Belajar mengetik sambil bermain untuk anak usia 5–6 tahun."
+    />
+    <meta name="theme-color" content="#FFF8F0" />
+    <title>Typing Kids Indonesia — Belajar Mengetik Sambil Bermain</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/animations.css" />
+
+    <!-- Favicon: simple apple mark as data SVG -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23FFE566'/%3E%3Ccircle cx='50' cy='55' r='28' fill='%23FF6B6B'/%3E%3Cpath d='M50 30 Q54 18 64 22' stroke='%235B8C5A' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <!-- Soft sky atmosphere -->
+    <div class="sky" aria-hidden="true">
+      <div class="cloud cloud-1"></div>
+      <div class="cloud cloud-2"></div>
+      <div class="cloud cloud-3"></div>
+      <div class="bird"></div>
+      <div class="bird bird-2"></div>
+    </div>
+
+    <!-- Confetti / sparkle layer -->
+    <canvas id="fx-canvas" aria-hidden="true"></canvas>
+
+    <div class="app">
+      <!-- ========== START ========== -->
+      <section
+        id="start-screen"
+        class="start-screen"
+        aria-label="Layar mulai"
+        aria-hidden="false"
+      >
+        <div class="logo-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="36" r="20" fill="#FF6B6B" />
+            <ellipse cx="24" cy="30" rx="6" ry="7" fill="#FF8E8E" opacity="0.6" />
+            <path
+              d="M32 18 Q36 8 44 12"
+              stroke="#5B8C5A"
+              stroke-width="4"
+              fill="none"
+              stroke-linecap="round"
+            />
+            <ellipse
+              cx="42"
+              cy="14"
+              rx="8"
+              ry="4"
+              fill="#7CB87C"
+              transform="rotate(-25 42 14)"
+            />
+          </svg>
+        </div>
+
+        <h1>Typing Kids Indonesia</h1>
+        <p class="subtitle">Belajar Mengetik Sambil Bermain</p>
+
+        <div class="start-card">
+          <p>Lihat gambar, dengar kata, lalu ketik di keyboard laptopmu!</p>
+          <p class="hint">✨ Tidak ada yang salah — coba saja terus ✨</p>
+        </div>
+
+        <button type="button" id="start-btn" class="btn-start" autofocus>
+          Mulai Main!
+        </button>
+
+        <p class="start-footer">Untuk anak usia 5–6 tahun · Keyboard QWERTY</p>
+      </section>
+
+      <!-- ========== GAME ========== -->
+      <section
+        id="game-screen"
+        class="game-screen hidden"
+        aria-label="Permainan mengetik"
+        aria-hidden="true"
+      >
+        <div class="top-bar">
+          <div class="progress-wrap">
+            <div class="progress-meta">
+              <span>Huruf</span>
+              <span id="progress-label">0 / 0</span>
+            </div>
+            <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+              <div id="progress-fill" class="progress-fill"></div>
+            </div>
+          </div>
+          <div class="score-chip" title="Kata selesai">
+            <span class="star-icon" aria-hidden="true">★</span>
+            <span id="completed-count">0</span>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <!-- Hidden input: keeps reliable keyboard focus for typing games -->
+          <input
+            id="key-catcher"
+            class="key-catcher"
+            type="text"
+            inputmode="text"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+            aria-label="Ketik huruf di sini dengan keyboard"
+            tabindex="0"
+          />
+
+          <div id="image-wrap" class="image-wrap">
+            <img
+              id="word-image"
+              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"
+              alt=""
+              width="200"
+              height="200"
+              decoding="async"
+              draggable="false"
+            />
+            <p id="word-label" class="word-label" aria-live="polite"></p>
+
+            <button
+              type="button"
+              id="speak-btn"
+              class="speak-btn"
+              title="Dengar lagi"
+              aria-label="Dengar kata lagi"
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M3 10v4h4l5 4V6L7 10H3z"
+                  fill="currentColor"
+                />
+                <path
+                  d="M16.5 8.5a5 5 0 010 7"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M19 6a8.5 8.5 0 010 12"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Big letter to type — essential for ages 5–6 -->
+          <div class="target-block">
+            <p id="target-hint" class="target-hint">Ketik huruf ini</p>
+            <div
+              id="target-letter"
+              class="target-letter"
+              aria-live="polite"
+              title="Huruf yang harus diketik di keyboard"
+            >
+              ?
+            </div>
+          </div>
+
+          <div
+            id="word-slots"
+            class="word-slots"
+            role="group"
+            aria-label="Huruf yang diketik"
+          ></div>
+
+          <p id="encouragement" class="encouragement">Ayo, kamu bisa!</p>
+
+          <div id="praise-overlay" class="praise-overlay" aria-live="polite">
+            <span id="praise-text" class="praise-text">Hebat!</span>
+          </div>
+        </div>
+
+        <p class="kb-hint">
+          <span>Tekan tombol</span>
+          <kbd id="hint-key">A</kbd>
+          <span>di keyboard laptop</span>
+        </p>
+      </section>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

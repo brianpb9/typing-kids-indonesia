@@ -1,0 +1,23 @@
+{
+  "name": "typing-kids-indonesia",
+  "version": "1.0.0",
+  "description": "Typing Kids Indonesia — Belajar mengetik sambil bermain untuk anak usia 5–6 tahun",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes serve . -l 3000",
+    "start": "npx --yes serve . -l 3000",
+    "preview": "npx --yes serve . -l 3000"
+  },
+  "keywords": [
+    "education",
+    "typing",
+    "kids",
+    "indonesia",
+    "game"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Pepaya">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <ellipse cx="100" cy="115" rx="42" ry="62" fill="#E67E22" filter="url(#s)"/><ellipse cx="100" cy="115" rx="34" ry="52" fill="#F39C12" opacity="0.55"/><path d="M100 58 Q108 115 100 172" stroke="#D35400" stroke-width="2" opacity="0.35" fill="none"/><path d="M100 55 Q105 30 120 38" stroke="#6D4C41" stroke-width="5" fill="none" stroke-linecap="round"/><ellipse cx="118" cy="36" rx="16" ry="9" fill="#27AE60"/>
+</svg>

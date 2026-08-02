@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Kaki">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <rect x="75" y="40" width="50" height="90" rx="18" fill="#FFDAB9" filter="url(#s)"/><ellipse cx="100" cy="145" rx="45" ry="28" fill="#FFDAB9"/><ellipse cx="70" cy="150" rx="12" ry="16" fill="#FFDAB9"/><ellipse cx="90" cy="155" rx="10" ry="14" fill="#FFDAB9"/><ellipse cx="110" cy="155" rx="10" ry="14" fill="#FFDAB9"/><ellipse cx="130" cy="150" rx="12" ry="16" fill="#FFDAB9"/>
+</svg>

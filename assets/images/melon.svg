@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Melon">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <circle cx="100" cy="110" r="62" fill="#58D68D" filter="url(#s)"/><circle cx="100" cy="110" r="56" fill="#82E0AA"/><path d="M100 54 Q125 110 100 166" stroke="#1E8449" stroke-width="8" fill="none" opacity="0.45"/><path d="M68 62 Q90 110 68 158" stroke="#1E8449" stroke-width="7" fill="none" opacity="0.4"/><path d="M132 62 Q110 110 132 158" stroke="#1E8449" stroke-width="7" fill="none" opacity="0.4"/>
+</svg>

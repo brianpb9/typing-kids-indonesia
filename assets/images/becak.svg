@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Becak">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <circle cx="50" cy="140" r="20" fill="none" stroke="#2C3E50" stroke-width="5" filter="url(#s)"/><circle cx="130" cy="140" r="18" fill="none" stroke="#2C3E50" stroke-width="5"/><circle cx="165" cy="140" r="18" fill="none" stroke="#2C3E50" stroke-width="5"/><path d="M50 140 L90 90 L130 140 M130 140 L165 140" stroke="#E74C3C" stroke-width="5" fill="none"/><rect x="95" y="85" width="45" height="35" rx="6" fill="#F4D03F"/><path d="M90 90 L80 70" stroke="#2C3E50" stroke-width="4"/>
+</svg>

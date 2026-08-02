@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Sepatu">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <path d="M40 120 Q40 95 70 90 L140 90 Q165 90 170 115 Q172 140 150 145 L55 145 Q40 145 40 120Z" fill="#6C5CE7" filter="url(#s)"/><path d="M70 90 L75 70 Q100 60 130 70 L135 90" fill="#A29BFE"/><circle cx="100" cy="100" r="4" fill="#F4D03F"/><circle cx="115" cy="100" r="4" fill="#F4D03F"/><circle cx="130" cy="100" r="4" fill="#F4D03F"/>
+</svg>

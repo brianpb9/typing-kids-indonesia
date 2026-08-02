@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Kiwi">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <circle cx="100" cy="110" r="55" fill="#8D6E63" filter="url(#s)"/><circle cx="100" cy="110" r="45" fill="#F9E79F"/><circle cx="100" cy="110" r="28" fill="#F4D03F" opacity="0.5"/><circle cx="100" cy="110" r="12" fill="#F5B041"/><g fill="#5D4037"><circle cx="85" cy="100" r="3"/><circle cx="115" cy="100" r="3"/><circle cx="90" cy="120" r="3"/><circle cx="110" cy="120" r="3"/><circle cx="100" cy="95" r="2.5"/><circle cx="100" cy="125" r="2.5"/></g>
+</svg>

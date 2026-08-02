@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Jendela">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <rect x="40" y="40" width="120" height="120" rx="6" fill="#74B9FF" filter="url(#s)"/><rect x="48" y="48" width="48" height="48" fill="#81ECEC"/><rect x="104" y="48" width="48" height="48" fill="#81ECEC"/><rect x="48" y="104" width="48" height="48" fill="#81ECEC"/><rect x="104" y="104" width="48" height="48" fill="#81ECEC"/><line x1="100" y1="40" x2="100" y2="160" stroke="#fff" stroke-width="6"/><line x1="40" y1="100" x2="160" y2="100" stroke="#fff" stroke-width="6"/>
+</svg>

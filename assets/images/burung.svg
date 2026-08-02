@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Burung">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <ellipse cx="100" cy="115" rx="45" ry="35" fill="#5DADE2" filter="url(#s)"/><circle cx="130" cy="90" r="28" fill="#5DADE2"/><circle cx="138" cy="85" r="5" fill="#2C3E50"/><path d="M150 92 L175 95 L150 102 Z" fill="#F39C12"/><path d="M70 110 Q40 80 55 115 Q40 140 70 120" fill="#3498DB"/><path d="M90 145 L85 170 M100 148 L100 172 M110 145 L115 170" stroke="#F39C12" stroke-width="3" stroke-linecap="round"/><ellipse cx="85" cy="100" rx="8" ry="6" fill="#fff" opacity="0.3"/>
+</svg>

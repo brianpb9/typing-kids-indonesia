@@ -1,0 +1,3 @@
+# Place custom audio files here for future voice packs.
+# Example: correct.mp3, celebrate.mp3
+# Wire them in js/audio.js when features.voicePacks is enabled.

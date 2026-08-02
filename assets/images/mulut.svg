@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Mulut">
+  <defs>
+    <filter id="s" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <path d="M50 90 Q100 160 150 90" fill="#E74C3C" filter="url(#s)"/><path d="M60 95 Q100 145 140 95" fill="#C0392B"/><path d="M70 100 Q100 90 130 100" fill="#FF8A80" opacity="0.5"/><rect x="75" y="95" width="12" height="16" rx="2" fill="#FAFAFA"/><rect x="113" y="95" width="12" height="16" rx="2" fill="#FAFAFA"/>
+</svg>
