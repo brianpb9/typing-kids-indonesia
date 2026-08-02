@@ -1,5 +1,5 @@
 /**
- * Words — load, filter, shuffle by mode letter range
+ * Words — load, filter by mode + category, shuffle
  */
 import { CONFIG, getMode } from './config.js';
 
@@ -15,25 +15,32 @@ export class WordBank {
     this.loaded = false;
     /** @type {'easy'|'medium'|'hard'} */
     this.difficulty = CONFIG.gameplay.defaultDifficulty;
+    /** @type {string} 'all' or category id */
+    this.category = CONFIG.gameplay.defaultCategory || 'all';
   }
 
+  /**
+   * @param {string} [url]
+   */
   async load(url = CONFIG.paths.wordsData) {
     const res = await fetch(url);
-    if (!res.ok) throw new Error(`Gagal memuat data kata: ${res.status}`);
+    if (!res.ok) throw new Error(`Failed to load words: ${res.status}`);
     const data = await res.json();
 
     this.categories = data.categories || {};
-    this.praise = data.praise || ['Hebat!', 'Bagus!', 'Pintar!'];
+    this.praise = data.praise || ['Great!', 'Awesome!', 'Super!'];
     this.encouragements =
-      data.encouragements || ['Kamu hebat!', 'Ayo, kamu bisa!'];
+      data.encouragements || ['You can do it!', 'Keep going!'];
     this.words = (data.words || []).map((w) => ({
       ...w,
-      word: String(w.word).toLowerCase(),
+      word: String(w.word).toLowerCase().replace(/[^a-z]/g, ''),
       display: w.display || this._capitalize(w.word),
-      letters: w.letters || String(w.word).length,
+      letters: w.letters || String(w.word).replace(/[^a-z]/gi, '').length,
     }));
 
     this.loaded = true;
+    this._queue = [];
+    this._lastId = null;
     this._refillQueue();
     return this;
   }
@@ -42,30 +49,60 @@ export class WordBank {
    * @param {'easy'|'medium'|'hard'|string} mode
    */
   setDifficulty(mode) {
-    const m = getMode(mode);
-    this.difficulty = m.id;
+    this.difficulty = getMode(mode).id;
+    this._queue = [];
+    this._refillQueue();
+  }
+
+  /**
+   * @param {string} categoryId 'all' or category key
+   */
+  setCategory(categoryId) {
+    this.category = categoryId || 'all';
     this._queue = [];
     this._refillQueue();
   }
 
   getPool() {
     let pool = [...this.words];
-    const { activeCategories } = CONFIG.gameplay;
     const mode = getMode(this.difficulty);
 
-    if (activeCategories && activeCategories.length) {
-      pool = pool.filter((w) => activeCategories.includes(w.category));
+    if (this.category && this.category !== 'all') {
+      pool = pool.filter((w) => w.category === this.category);
     }
 
     pool = pool.filter(
       (w) => w.letters >= mode.minLetters && w.letters <= mode.maxLetters
     );
 
+    // Fallback if filter too tight
+    if (!pool.length) {
+      pool = [...this.words].filter(
+        (w) => w.letters >= mode.minLetters && w.letters <= mode.maxLetters
+      );
+    }
     return pool.length ? pool : [...this.words];
   }
 
   poolSize() {
     return this.getPool().length;
+  }
+
+  /**
+   * Image URLs for preloading (current pool, shuffled sample)
+   * @param {number} [limit]
+   */
+  imageUrls(limit = 40) {
+    const pool = this.getPool();
+    const urls = [];
+    const seen = new Set();
+    for (const w of pool) {
+      if (!w.image || seen.has(w.image)) continue;
+      seen.add(w.image);
+      urls.push(w.image.split('?')[0]);
+      if (urls.length >= limit) break;
+    }
+    return urls;
   }
 
   next() {

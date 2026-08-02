@@ -1,11 +1,14 @@
 /**
- * UI — screens, word display, session stars, victory, mute, 3 modes
+ * UI — screens, i18n, modes, categories, language
  */
 import { CONFIG, getMode } from './config.js';
 import { getRank, remainingCopy } from './storage.js';
+import { getStrings } from './i18n.js';
 
 export class UI {
   constructor() {
+    /** @type {ReturnType<typeof getStrings>} */
+    this.t = getStrings('id');
     this.els = {
       startScreen: document.getElementById('start-screen'),
       gameScreen: document.getElementById('game-screen'),
@@ -16,6 +19,7 @@ export class UI {
       muteBtn: document.getElementById('mute-btn'),
       wordImage: document.getElementById('word-image'),
       wordLabel: document.getElementById('word-label'),
+      wordFull: document.getElementById('word-full'),
       wordSlots: document.getElementById('word-slots'),
       progressFill: document.getElementById('progress-fill'),
       progressLabel: document.getElementById('progress-label'),
@@ -35,10 +39,20 @@ export class UI {
       sessionStars: document.getElementById('session-stars'),
       sessionTarget: document.getElementById('session-target'),
       goalRemaining: document.getElementById('goal-remaining'),
+      timerWrap: document.getElementById('timer-wrap'),
+      timerValue: document.getElementById('timer-value'),
       lifetimeStars: document.getElementById('lifetime-stars'),
       collectionRank: document.getElementById('collection-rank'),
       missionPreview: document.getElementById('mission-preview'),
       missionTargetLabel: document.getElementById('mission-target-label'),
+      catPick: document.getElementById('cat-pick'),
+      tutorial: document.getElementById('tutorial'),
+      tutorialEmoji: document.getElementById('tutorial-emoji'),
+      tutorialTitle: document.getElementById('tutorial-title'),
+      tutorialBody: document.getElementById('tutorial-body'),
+      tutorialDots: document.getElementById('tutorial-dots'),
+      tutorialNext: document.getElementById('tutorial-next'),
+      tutorialSkip: document.getElementById('tutorial-skip'),
       milestoneToast: document.getElementById('milestone-toast'),
       milestoneTrophy: document.getElementById('milestone-trophy'),
       milestoneTitle: document.getElementById('milestone-title'),
@@ -54,19 +68,120 @@ export class UI {
       modeEasy: document.getElementById('mode-easy'),
       modeMedium: document.getElementById('mode-medium'),
       modeHard: document.getElementById('mode-hard'),
+      langId: document.getElementById('lang-id'),
+      langEn: document.getElementById('lang-en'),
+      appTitle: document.getElementById('app-title'),
+      appSubtitle: document.getElementById('app-subtitle'),
+      starsWord: document.getElementById('stars-word'),
+      missionTitle: document.getElementById('mission-title'),
+      missionGoalBefore: document.getElementById('mission-goal-before'),
+      missionGoalAfter: document.getElementById('mission-goal-after'),
+      startHint: document.getElementById('start-hint'),
+      pickThemeLabel: document.getElementById('pick-theme-label'),
+      startFooter: document.getElementById('start-footer'),
+      goalLabel: document.getElementById('goal-label'),
+      progressMetaLabel: document.getElementById('progress-meta-label'),
+      kbHintBefore: document.getElementById('kb-hint-before'),
+      kbHintAfter: document.getElementById('kb-hint-after'),
+      victorySessionLbl: document.getElementById('victory-session-lbl'),
+      victoryTotalLbl: document.getElementById('victory-total-lbl'),
+      timerUnit: document.querySelector('.timer-unit'),
     };
 
     /** @type {ReturnType<typeof getMode>} */
     this.mode = getMode('easy');
+    this.category = 'all';
+    this.language = 'id';
 
     this._sessionTarget = CONFIG.goals.sessionTarget;
     this._buildStarTrack(this._sessionTarget);
     this._buildMissionPreview(this._sessionTarget);
+    this._buildCategoryChips();
     if (this.els.sessionTarget) {
       this.els.sessionTarget.textContent = String(this._sessionTarget);
     }
     if (this.els.missionTargetLabel) {
       this.els.missionTargetLabel.textContent = String(this._sessionTarget);
+    }
+  }
+
+  /**
+   * Apply UI language pack to static DOM
+   * @param {'id'|'en'|string} lang
+   */
+  applyLanguage(lang) {
+    this.language = lang === 'en' ? 'en' : 'id';
+    this.t = getStrings(this.language);
+    const t = this.t;
+
+    document.documentElement.lang = this.language === 'en' ? 'en' : 'id';
+    document.title = `${t.appName} — ${t.subtitle}`;
+
+    if (this.els.appTitle) this.els.appTitle.textContent = t.appName;
+    if (this.els.appSubtitle) this.els.appSubtitle.textContent = t.subtitle;
+    if (this.els.starsWord) this.els.starsWord.textContent = t.starsWord;
+    if (this.els.missionTitle) this.els.missionTitle.textContent = t.missionTitle;
+    if (this.els.missionGoalBefore)
+      this.els.missionGoalBefore.textContent = t.missionGoalBefore;
+    if (this.els.missionGoalAfter)
+      this.els.missionGoalAfter.textContent = t.missionGoalAfter;
+    if (this.els.startHint) this.els.startHint.textContent = t.hint;
+    if (this.els.pickThemeLabel) this.els.pickThemeLabel.textContent = t.pickTheme;
+    if (this.els.startBtn) this.els.startBtn.textContent = t.startBtn;
+    if (this.els.startFooter) this.els.startFooter.textContent = t.footer;
+    if (this.els.goalLabel) this.els.goalLabel.textContent = t.goalLabel;
+    if (this.els.progressMetaLabel)
+      this.els.progressMetaLabel.textContent = t.letterProgress;
+    if (this.els.targetHint) this.els.targetHint.textContent = t.typeThisLetter;
+    if (this.els.kbHintBefore) this.els.kbHintBefore.textContent = t.kbHintBefore;
+    if (this.els.kbHintAfter) this.els.kbHintAfter.textContent = t.kbHintAfter;
+    if (this.els.kbHintHard) this.els.kbHintHard.textContent = t.kbHintHard;
+    if (this.els.timerUnit) this.els.timerUnit.textContent = t.timerUnit;
+    if (this.els.encouragement)
+      this.els.encouragement.textContent = t.encouragementDefault;
+    if (this.els.speakBtn) this.els.speakBtn.setAttribute('aria-label', t.speakAria);
+    if (this.els.muteBtn) this.els.muteBtn.setAttribute('aria-label', t.muteAria);
+    if (this.els.victorySessionLbl)
+      this.els.victorySessionLbl.textContent = t.victorySession;
+    if (this.els.victoryTotalLbl)
+      this.els.victoryTotalLbl.textContent = t.victoryTotal;
+    if (this.els.replayBtn) this.els.replayBtn.textContent = t.replay;
+    if (this.els.homeBtn) this.els.homeBtn.textContent = t.home;
+    if (this.els.tutorialSkip) this.els.tutorialSkip.textContent = t.tutorialSkip;
+
+    // Modes
+    const setMode = (nameId, descId, key) => {
+      const n = document.getElementById(nameId);
+      const d = document.getElementById(descId);
+      if (n) n.textContent = t.modes[key].name;
+      if (d) d.textContent = t.modes[key].desc;
+    };
+    setMode('mode-easy-name', 'mode-easy-desc', 'easy');
+    setMode('mode-medium-name', 'mode-medium-desc', 'medium');
+    setMode('mode-hard-name', 'mode-hard-desc', 'hard');
+
+    // Lang buttons
+    this.els.langId?.classList.toggle('is-active', this.language === 'id');
+    this.els.langEn?.classList.toggle('is-active', this.language === 'en');
+
+    this._buildCategoryChips();
+    this.setCategoryUI(this.category);
+  }
+
+  _buildCategoryChips() {
+    const host = this.els.catPick;
+    if (!host) return;
+    const t = this.t;
+    const active = this.category || 'all';
+    host.innerHTML = '';
+    for (const c of CONFIG.categoryOptions) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'cat-btn' + (c.id === active ? ' is-active' : '');
+      btn.dataset.cat = c.id;
+      const label = t.categories[c.id] || c.label;
+      btn.innerHTML = `<span class="cat-emoji">${c.emoji}</span><span class="cat-name">${label}</span>`;
+      host.appendChild(btn);
     }
   }
 
@@ -101,7 +216,7 @@ export class UI {
    * @param {{ totalStars: number, muted?: boolean, difficulty?: string }} save
    */
   renderCollection(save) {
-    const rank = getRank(save.totalStars || 0);
+    const rank = getRank(save.totalStars || 0, this.t.ranks);
     if (this.els.lifetimeStars) {
       this.els.lifetimeStars.textContent = String(save.totalStars || 0);
     }
@@ -122,19 +237,54 @@ export class UI {
     this.applyModeLayout();
   }
 
-  /** Show/hide big letter, slots, progress, hints based on mode */
+  /**
+   * @param {string} categoryId
+   */
+  setCategoryUI(categoryId) {
+    this.category = categoryId || 'all';
+    this.els.catPick?.querySelectorAll('.cat-btn').forEach((btn) => {
+      btn.classList.toggle('is-active', btn.dataset.cat === this.category);
+    });
+  }
+
+  /** Show/hide big letter, slots, full word, timer, hints based on mode */
   applyModeLayout() {
     const m = this.mode;
-    this.els.targetBlock?.classList.toggle('hidden', !m.showBigLetter);
+    // Medium & Hard: NO big single letter ("U", "A", …)
+    const showBig = Boolean(m.showBigLetter);
+    this.els.targetBlock?.classList.toggle('hidden', !showBig);
+    if (this.els.targetBlock) {
+      this.els.targetBlock.setAttribute('aria-hidden', showBig ? 'false' : 'true');
+      this.els.targetBlock.hidden = !showBig;
+    }
     this.els.wordSlots?.classList.toggle('hidden', !m.showSlots);
     this.els.letterProgressBar?.classList.toggle('hidden', !m.showLetterProgress);
     this.els.kbHint?.classList.toggle('hidden', !m.showKbHint);
     this.els.kbHintHard?.classList.toggle('hidden', m.id !== 'hard');
+    // Easy + Medium: full word; Hard: hide
+    this.els.wordFull?.classList.toggle('hidden', !m.showFullWord);
+    const hasTimer = (m.timerSeconds || 0) > 0;
+    this.els.timerWrap?.classList.toggle('hidden', !hasTimer);
 
-    // Hard: larger image focus
     this.els.gameScreen?.classList.toggle('mode-hard', m.id === 'hard');
     this.els.gameScreen?.classList.toggle('mode-medium', m.id === 'medium');
     this.els.gameScreen?.classList.toggle('mode-easy', m.id === 'easy');
+  }
+
+  /**
+   * @param {number} seconds
+   * @param {{ urgent?: boolean }} [opts]
+   */
+  setTimer(seconds, opts = {}) {
+    if (this.els.timerValue) {
+      this.els.timerValue.textContent = String(Math.max(0, Math.ceil(seconds)));
+    }
+    this.els.timerWrap?.classList.toggle('is-urgent', Boolean(opts.urgent));
+  }
+
+  hideTimer() {
+    this.els.timerWrap?.classList.add('hidden');
+    this.els.timerWrap?.classList.remove('is-urgent');
   }
 
   /**
@@ -195,7 +345,12 @@ export class UI {
       this.els.sessionTarget.textContent = String(target);
     }
     if (this.els.goalRemaining) {
-      this.els.goalRemaining.textContent = remainingCopy(have, target);
+      this.els.goalRemaining.textContent = remainingCopy(have, target, {
+        chaseStars: this.t.chaseStars,
+        oneStarLeft: this.t.oneStarLeft,
+        nStarsLeft: this.t.nStarsLeft,
+        done: this.t.done,
+      });
     }
     const track = this.els.starTrack;
     if (track) {
@@ -215,25 +370,51 @@ export class UI {
   /**
    * @param {{ image: string, display: string, word: string }} word
    * @param {number} sessionStars
-   * @param {{ showLabel: boolean }} labelOpts
+   * @param {{ showFullWord?: boolean }} [opts]
    */
-  setWord(word, sessionStars, labelOpts = { showLabel: false }) {
+  setWord(word, sessionStars, opts = {}) {
+    const showFull =
+      opts.showFullWord !== undefined
+        ? opts.showFullWord
+        : Boolean(this.mode.showFullWord);
+
     const img = this.els.wordImage;
     if (img) {
       img.classList.remove('image-enter', 'float-idle');
       void img.offsetWidth;
       img.src = word.image;
-      img.alt = labelOpts.showLabel ? word.display : 'Gambar kata';
+      img.alt = showFull ? word.display : 'Gambar kata';
       img.classList.add('image-enter');
       setTimeout(() => img.classList.add('float-idle'), 450);
     }
 
-    this.setWordLabel(word.display, labelOpts.showLabel);
+    this.setFullWord(word.display, showFull);
+    this.setWordLabel(word.display, false);
     this.renderSlots(word.word, 0);
     this.setProgress(0, word.word.length);
     this.setSessionStars(sessionStars, this._sessionTarget);
     this.hidePraise();
-    this.setTargetLetter(word.word[0] || '');
+    // Only Easy updates the big single-letter tile
+    if (this.mode.showBigLetter) {
+      this.setTargetLetter(word.word[0] || '');
+    }
+  }
+
+  /**
+   * Full word text for Easy + Medium (always visible in those modes)
+   * @param {string} display
+   * @param {boolean} visible
+   */
+  setFullWord(display, visible) {
+    const el = this.els.wordFull;
+    if (!el) return;
+    el.textContent = display || '';
+    el.classList.toggle('hidden', !visible);
+    if (visible) {
+      el.classList.remove('word-full-pop');
+      void el.offsetWidth;
+      el.classList.add('word-full-pop');
+    }
   }
 
   /**
@@ -245,11 +426,33 @@ export class UI {
     if (!el) return;
     el.textContent = display || '';
     el.classList.toggle('is-hidden', !visible);
-    if (visible) {
-      el.classList.remove('label-reveal');
-      void el.offsetWidth;
-      el.classList.add('label-reveal');
+  }
+
+  // ——— Tutorial ———
+  /**
+   * @param {{ emoji: string, title: string, body: string, step: number, total: number, nextLabel: string }} s
+   */
+  showTutorialStep(s) {
+    if (this.els.tutorialEmoji) this.els.tutorialEmoji.textContent = s.emoji;
+    if (this.els.tutorialTitle) this.els.tutorialTitle.textContent = s.title;
+    if (this.els.tutorialBody) this.els.tutorialBody.textContent = s.body;
+    if (this.els.tutorialNext) this.els.tutorialNext.textContent = s.nextLabel;
+    const dots = this.els.tutorialDots;
+    if (dots) {
+      dots.innerHTML = '';
+      for (let i = 0; i < s.total; i++) {
+        const d = document.createElement('span');
+        d.className = 'tut-dot' + (i === s.step ? ' is-on' : '');
+        dots.appendChild(d);
+      }
     }
+    this.els.tutorial?.classList.remove('hidden');
+    this.els.tutorial?.setAttribute('aria-hidden', 'false');
+  }
+
+  hideTutorial() {
+    this.els.tutorial?.classList.add('hidden');
+    this.els.tutorial?.setAttribute('aria-hidden', 'true');
   }
 
   setTargetLetter(letter) {
@@ -261,7 +464,7 @@ export class UI {
     if (!letter) {
       el.textContent = '★';
       el.classList.add('done');
-      if (hint) hint.textContent = 'Selesai!';
+      if (hint) hint.textContent = this.t.done;
       return;
     }
 
@@ -271,7 +474,7 @@ export class UI {
     el.classList.remove('target-pop');
     void el.offsetWidth;
     el.classList.add('target-pop');
-    if (hint) hint.textContent = 'Ketik huruf ini';
+    if (hint) hint.textContent = this.t.typeThisLetter;
     if (hintKey) hintKey.textContent = up;
   }
 
@@ -303,10 +506,13 @@ export class UI {
       container.appendChild(slot);
     });
 
-    if (filledCount < word.length) {
-      this.setTargetLetter(word[filledCount]);
-    } else {
-      this.setTargetLetter('');
+    // Big letter tile only in Easy — never Medium/Hard
+    if (this.mode.showBigLetter) {
+      if (filledCount < word.length) {
+        this.setTargetLetter(word[filledCount]);
+      } else {
+        this.setTargetLetter('');
+      }
     }
   }
 
@@ -392,10 +598,11 @@ export class UI {
    * @param {{ sessionStars: number, totalStars: number, target: number }} data
    */
   renderVictory(data) {
-    const rank = getRank(data.totalStars);
-    if (this.els.victoryTitle) this.els.victoryTitle.textContent = 'JUARA!';
+    const rank = getRank(data.totalStars, this.t.ranks);
+    if (this.els.victoryTitle)
+      this.els.victoryTitle.textContent = this.t.victoryTitle;
     if (this.els.victorySub) {
-      this.els.victorySub.textContent = `Kamu kumpulkan ${data.sessionStars} bintang!`;
+      this.els.victorySub.textContent = this.t.victorySub(data.sessionStars);
     }
     if (this.els.victorySession) {
       this.els.victorySession.textContent = String(data.sessionStars);
@@ -409,9 +616,13 @@ export class UI {
     }
     if (this.els.victoryNext) {
       if (rank.next) {
-        this.els.victoryNext.textContent = `${rank.starsToNext} bintang lagi jadi ${rank.next.emoji} ${rank.next.label}!`;
+        this.els.victoryNext.textContent = this.t.victoryNextRank(
+          rank.starsToNext,
+          rank.next.emoji,
+          rank.next.label
+        );
       } else {
-        this.els.victoryNext.textContent = 'Kamu sudah Legenda! Main lagi yuk~';
+        this.els.victoryNext.textContent = this.t.victoryLegend;
       }
     }
 
@@ -435,12 +646,14 @@ export class UI {
     });
     window.addEventListener('keydown', (e) => {
       if (this.els.startScreen?.classList.contains('hidden')) return;
+      if (!this.els.tutorial?.classList.contains('hidden')) return;
       if (e.key !== 'Enter' && e.key !== ' ') return;
-      // Don't auto-start when toggling mode / mute with keyboard
       const t = e.target;
       if (
         t instanceof HTMLElement &&
-        (t.classList.contains('mode-btn') || t.id === 'mute-btn')
+        (t.classList.contains('mode-btn') ||
+          t.classList.contains('cat-btn') ||
+          t.id === 'mute-btn')
       ) {
         return;
       }
@@ -484,6 +697,50 @@ export class UI {
     bind(this.els.modeEasy, 'easy');
     bind(this.els.modeMedium, 'medium');
     bind(this.els.modeHard, 'hard');
+  }
+
+  /**
+   * @param {(lang: 'id'|'en') => void} handler
+   */
+  onLanguage(handler) {
+    const bind = (btn, lang) => {
+      btn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handler(lang);
+      });
+    };
+    bind(this.els.langId, 'id');
+    bind(this.els.langEn, 'en');
+  }
+
+  /**
+   * @param {(categoryId: string) => void} handler
+   */
+  onCategory(handler) {
+    this.els.catPick?.addEventListener('click', (e) => {
+      const t = e.target;
+      if (!(t instanceof Element)) return;
+      const btn = t.closest('.cat-btn');
+      if (!(btn instanceof HTMLElement) || !btn.dataset.cat) return;
+      e.preventDefault();
+      handler(btn.dataset.cat);
+    });
+  }
+
+  /**
+   * @param {() => void} onNext
+   * @param {() => void} onSkip
+   */
+  onTutorial(onNext, onSkip) {
+    this.els.tutorialNext?.addEventListener('click', (e) => {
+      e.preventDefault();
+      onNext();
+    });
+    this.els.tutorialSkip?.addEventListener('click', (e) => {
+      e.preventDefault();
+      onSkip();
+    });
   }
 
   onSpeak(handler) {

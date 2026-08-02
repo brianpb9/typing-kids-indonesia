@@ -314,6 +314,221 @@ body {
   line-height: 1.2;
 }
 
+/* Language toggle */
+.lang-pick {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.lang-btn {
+  appearance: none;
+  border: 2px solid transparent;
+  background: var(--card);
+  border-radius: 999px;
+  box-shadow: var(--shadow-soft);
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+  font-family: var(--font);
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--text);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.lang-btn:hover {
+  transform: translateY(-1px);
+}
+
+.lang-btn.is-active {
+  border-color: var(--primary);
+  background: linear-gradient(145deg, #E8F4FC, #fff);
+  color: var(--primary-deep);
+}
+
+.pick-label {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-soft);
+  margin: 0 0 0.5rem;
+  width: 100%;
+  text-align: left;
+}
+
+.cat-pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  width: 100%;
+  margin-bottom: 1.25rem;
+  justify-content: center;
+}
+
+.cat-btn {
+  appearance: none;
+  border: 2px solid transparent;
+  background: var(--card);
+  border-radius: 999px;
+  box-shadow: var(--shadow-soft);
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  font-family: var(--font);
+  font-weight: 800;
+  font-size: 0.8rem;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.cat-btn:hover {
+  transform: translateY(-1px);
+}
+
+.cat-btn.is-active {
+  border-color: var(--primary);
+  background: linear-gradient(145deg, #E8F4FC, #fff);
+  color: var(--primary-deep);
+}
+
+.cat-emoji {
+  font-size: 1rem;
+}
+
+/* Full word (Easy + Medium) — whole word, not one letter */
+.word-full {
+  font-size: clamp(1.5rem, 5vw, 2.25rem);
+  font-weight: 900;
+  color: var(--text);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0.25rem 0 0.85rem;
+  text-align: center;
+  min-height: 1.2em;
+}
+
+.word-full.hidden {
+  display: none !important;
+}
+
+.word-full.word-full-pop {
+  animation: letter-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Big single letter — Easy only; force-hide if mode-medium/hard */
+.game-screen.mode-medium #target-block,
+.game-screen.mode-hard #target-block {
+  display: none !important;
+}
+
+.game-screen.mode-medium #kb-hint {
+  display: none !important;
+}
+
+/* Hard timer */
+.timer-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+  font-weight: 800;
+  color: var(--primary-deep);
+  font-size: 1rem;
+}
+
+.timer-wrap.is-urgent {
+  color: #e17055;
+  animation: glow-pulse 0.8s ease-in-out infinite;
+}
+
+.timer-value {
+  font-size: 1.35rem;
+  font-weight: 900;
+  min-width: 1.5em;
+  text-align: center;
+}
+
+.timer-unit {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+/* Tutorial overlay */
+.tutorial {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 248, 240, 0.88);
+  backdrop-filter: blur(6px);
+  padding: 1.25rem;
+}
+
+.tutorial.hidden {
+  display: none;
+}
+
+.tutorial-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2rem 1.75rem;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  animation: fade-up 0.4s ease both;
+}
+
+.tutorial-step {
+  font-size: 3rem;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.tutorial-card h2 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.tutorial-body {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-soft);
+  margin-bottom: 1.25rem;
+  line-height: 1.45;
+}
+
+.tutorial-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.tut-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e0d8cc;
+}
+
+.tut-dot.is-on {
+  background: var(--primary);
+  transform: scale(1.2);
+}
+
+.tutorial-skip {
+  margin-top: 0.65rem;
+  min-height: 44px;
+  font-size: 0.95rem;
+}
+
 .mode-btn {
   flex: 1;
   appearance: none;

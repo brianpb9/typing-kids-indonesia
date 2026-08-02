@@ -6,7 +6,7 @@ export const CONFIG = {
   app: {
     name: 'Typing Kids Indonesia',
     subtitle: 'Belajar Mengetik Sambil Bermain',
-    version: '1.2.0',
+    version: '1.4.0',
     language: 'id',
   },
 
@@ -18,6 +18,12 @@ export const CONFIG = {
     fallbackLangs: ['id-ID', 'id', 'ms-MY', 'en-US'],
   },
 
+  /** Word data paths per language */
+  languages: {
+    id: { wordsPath: 'data/words.json', speechLang: 'id-ID' },
+    en: { wordsPath: 'data/words-en.json', speechLang: 'en-US' },
+  },
+
   timing: {
     celebrationMs: 2000,
     nextWordDelayMs: 350,
@@ -26,61 +32,83 @@ export const CONFIG = {
     speakDelayAfterLoadMs: 350,
     milestoneMs: 1800,
     victoryHoldMs: 0,
+    /** Hard mode: seconds per word (no-fail: timeout → soft skip, no star) */
+    hardTimerSeconds: 35,
   },
 
   /**
-   * Three play modes (UI + word length)
+   * Three play modes
    *
-   * easy   — big letter hint + slots + label after wrongs (kids 5–6)
-   * medium — slots only, NO big single-letter cheat
-   * hard   — image + TTS only (no slots, no letter hints)
+   * easy   — full word + big letter + slots
+   * medium — full word + slots (no big letter cheat)
+   * hard   — image + TTS only + timer (no full word, no slots)
    */
   modes: {
     easy: {
       id: 'easy',
       label: 'Mudah',
       emoji: '🌱',
-      desc: 'Huruf besar + kotak',
+      desc: 'Kata full + huruf besar',
       minLetters: 3,
       maxLetters: 6,
       showBigLetter: true,
       showSlots: true,
       showKbHint: true,
       showLetterProgress: true,
-      /** Reveal word name after N wrongs (0 = never in this mode helper) */
-      showLabelAfterWrongs: 4,
-      /** Tell child which letter to find after wrongs */
+      /** Always show full word (Apel, Kucing, …) */
+      showFullWord: true,
+      showLabelAfterWrongs: 0,
       hintLetterAfterWrongs: 3,
+      timerSeconds: 0,
     },
     medium: {
       id: 'medium',
       label: 'Sedang',
       emoji: '⚡',
-      desc: 'Tanpa huruf besar',
+      desc: 'Kata full · tanpa huruf satuan',
       minLetters: 4,
       maxLetters: 8,
+      /** No big single-letter cheat tile */
       showBigLetter: false,
       showSlots: true,
       showKbHint: false,
       showLetterProgress: true,
-      showLabelAfterWrongs: 6,
-      hintLetterAfterWrongs: 0, // never name the letter
+      /** Full word always visible (e.g. APEL) */
+      showFullWord: true,
+      showLabelAfterWrongs: 0,
+      hintLetterAfterWrongs: 0,
+      timerSeconds: 0,
     },
     hard: {
       id: 'hard',
       label: 'Sulit',
       emoji: '🔥',
-      desc: 'Gambar + suara saja',
+      desc: 'Gambar + suara + waktu',
       minLetters: 3,
       maxLetters: 10,
       showBigLetter: false,
       showSlots: false,
       showKbHint: false,
       showLetterProgress: false,
-      showLabelAfterWrongs: 0, // never show word name
+      showFullWord: false,
+      showLabelAfterWrongs: 0,
       hintLetterAfterWrongs: 0,
+      /** Per-word countdown; 0 = off */
+      timerSeconds: 35,
     },
   },
+
+  /** Category chips on start screen */
+  categoryOptions: [
+    { id: 'all', label: 'Campur', emoji: '🎲' },
+    { id: 'buah', label: 'Buah', emoji: '🍎' },
+    { id: 'hewan', label: 'Hewan', emoji: '🐱' },
+    { id: 'sehari-hari', label: 'Sehari-hari', emoji: '🏠' },
+    { id: 'kendaraan', label: 'Kendaraan', emoji: '🚗' },
+    { id: 'warna', label: 'Warna', emoji: '🎨' },
+    { id: 'makanan', label: 'Makanan', emoji: '🍚' },
+    { id: 'tubuh', label: 'Tubuh', emoji: '👀' },
+  ],
 
   gameplay: {
     shuffleWords: true,
@@ -88,7 +116,7 @@ export const CONFIG = {
     minLetters: 3,
     maxLetters: 10,
     defaultDifficulty: 'easy',
-    activeCategories: null,
+    defaultCategory: 'all',
   },
 
   goals: {

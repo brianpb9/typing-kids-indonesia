@@ -15,6 +15,8 @@ export class AudioManager {
       typeof window !== 'undefined' && 'speechSynthesis' in window;
     this._voices = [];
     this._preferredVoice = null;
+    this._speechLang = CONFIG.speech.lang;
+    this._fallbackLangs = CONFIG.speech.fallbackLangs;
     this._unlocked = false;
     /** Keep utterance ref so browser GC doesn't kill speech mid-sentence */
     this._currentUtterance = null;
@@ -82,19 +84,42 @@ export class AudioManager {
     return this.ctx;
   }
 
+  /**
+   * Switch TTS language (id-ID / en-US)
+   * @param {string} langBcp47
+   * @param {string[]} [fallbackLangs]
+   */
+  setSpeechLang(langBcp47, fallbackLangs = null) {
+    this._speechLang = langBcp47 || CONFIG.speech.lang;
+    this._fallbackLangs = fallbackLangs || CONFIG.speech.fallbackLangs;
+    this._loadVoices();
+  }
+
   _loadVoices() {
     if (!this._speechReady) return;
     this._voices = window.speechSynthesis.getVoices() || [];
     if (!this._voices.length) return;
 
+    const prefer = (this._speechLang || CONFIG.speech.lang || 'id-ID').toLowerCase();
+    const preferRoot = prefer.slice(0, 2);
+    const fallbacks = (this._fallbackLangs || CONFIG.speech.fallbackLangs || []).map(
+      (l) => l.toLowerCase()
+    );
+
     const score = (v) => {
       let s = 0;
       const lang = (v.lang || '').toLowerCase();
       const name = (v.name || '').toLowerCase();
-      if (lang === 'id-id' || lang === 'id_id') s += 100;
-      if (lang.startsWith('id')) s += 80;
-      if (/indonesia|indonesian|bahasa/.test(name)) s += 70;
-      if (lang.startsWith('ms')) s += 40; // Malay close enough for kids
+      if (lang === prefer) s += 120;
+      if (lang.startsWith(preferRoot)) s += 90;
+      if (fallbacks.some((f) => lang === f || lang.startsWith(f.slice(0, 2)))) s += 40;
+      if (preferRoot === 'id') {
+        if (/indonesia|indonesian|bahasa/.test(name)) s += 70;
+        if (lang.startsWith('ms')) s += 30;
+      }
+      if (preferRoot === 'en') {
+        if (/english|us english|uk english|samantha|daniel|karen/.test(name)) s += 20;
+      }
       if (v.localService) s += 10;
       if (/google|premium|enhanced|natural/.test(name)) s += 5;
       return s;
@@ -102,14 +127,6 @@ export class AudioManager {
 
     const ranked = [...this._voices].sort((a, b) => score(b) - score(a));
     this._preferredVoice = ranked[0] && score(ranked[0]) > 0 ? ranked[0] : null;
-
-    // Prefer any Indonesian if ranked fell through
-    if (!this._preferredVoice) {
-      this._preferredVoice =
-        this._voices.find((v) => (v.lang || '').toLowerCase().startsWith('id')) ||
-        this._voices.find((v) => /indonesia|indonesian|bahasa/i.test(v.name)) ||
-        null;
-    }
   }
 
   /**
@@ -168,7 +185,8 @@ export class AudioManager {
             this._currentUtterance = u;
 
             const voice = this._preferredVoice;
-            u.lang = voice?.lang || CONFIG.speech.lang || 'id-ID';
+            u.lang =
+              voice?.lang || this._speechLang || CONFIG.speech.lang || 'id-ID';
             u.rate = opts.rate ?? CONFIG.speech.rate ?? 0.85;
             u.pitch = opts.pitch ?? CONFIG.speech.pitch ?? 1.1;
             u.volume = CONFIG.speech.volume ?? 1;

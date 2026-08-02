@@ -79,51 +79,80 @@
           </svg>
         </div>
 
-        <h1>Typing Kids Indonesia</h1>
-        <p class="subtitle">Belajar Mengetik Sambil Bermain</p>
+        <!-- Language: Bahasa / English -->
+        <div class="lang-pick" id="lang-pick" role="group" aria-label="Language">
+          <button type="button" class="lang-btn is-active" data-lang="id" id="lang-id">
+            🇮🇩 Bahasa
+          </button>
+          <button type="button" class="lang-btn" data-lang="en" id="lang-en">
+            🇬🇧 English
+          </button>
+        </div>
+
+        <h1 id="app-title">Typing Kids Indonesia</h1>
+        <p class="subtitle" id="app-subtitle">Belajar Mengetik Sambil Bermain</p>
 
         <!-- Lifetime collection — motivates return play -->
         <div class="collection-bar" id="collection-bar">
           <span class="collection-rank" id="collection-rank">🌱 Pemula</span>
           <span class="collection-stars">
-            ★ <span id="lifetime-stars">0</span> bintang
+            ★ <span id="lifetime-stars">0</span>
+            <span id="stars-word">bintang</span>
           </span>
         </div>
 
         <div class="start-card">
-          <p class="mission-title">🎯 Misi hari ini</p>
-          <p class="mission-goal">
-            Kumpulkan <strong id="mission-target-label">10</strong> bintang!
+          <p class="mission-title" id="mission-title">🎯 Misi hari ini</p>
+          <p class="mission-goal" id="mission-goal">
+            <span id="mission-goal-before">Kumpulkan</span>
+            <strong id="mission-target-label">10</strong>
+            <span id="mission-goal-after">bintang!</span>
           </p>
           <div class="mission-preview" id="mission-preview" aria-hidden="true"></div>
-          <p class="hint">✨ Tidak ada yang salah — coba saja terus ✨</p>
+          <p class="hint" id="start-hint">✨ Tidak ada yang salah — coba saja terus ✨</p>
         </div>
 
-        <!-- 3 modes: easy / medium / hard -->
-        <div class="mode-pick mode-pick-3" role="group" aria-label="Tingkat kesulitan">
+        <!-- 3 modes -->
+        <div class="mode-pick mode-pick-3" role="group" aria-label="Difficulty" id="mode-pick">
           <button type="button" class="mode-btn is-active" data-mode="easy" id="mode-easy">
             <span class="mode-emoji">🌱</span>
-            <span class="mode-name">Mudah</span>
-            <span class="mode-desc">Ada huruf besar</span>
+            <span class="mode-name" id="mode-easy-name">Mudah</span>
+            <span class="mode-desc" id="mode-easy-desc">Kata full + huruf</span>
           </button>
           <button type="button" class="mode-btn" data-mode="medium" id="mode-medium">
             <span class="mode-emoji">⚡</span>
-            <span class="mode-name">Sedang</span>
-            <span class="mode-desc">Tanpa huruf besar</span>
+            <span class="mode-name" id="mode-medium-name">Sedang</span>
+            <span class="mode-desc" id="mode-medium-desc">Kata full · tanpa huruf satuan</span>
           </button>
           <button type="button" class="mode-btn" data-mode="hard" id="mode-hard">
             <span class="mode-emoji">🔥</span>
-            <span class="mode-name">Sulit</span>
-            <span class="mode-desc">Gambar + suara</span>
+            <span class="mode-name" id="mode-hard-name">Sulit</span>
+            <span class="mode-desc" id="mode-hard-desc">Gambar + suara + waktu</span>
           </button>
         </div>
+
+        <!-- Category pick -->
+        <p class="pick-label" id="pick-theme-label">Pilih tema</p>
+        <div class="cat-pick" id="cat-pick" role="group" aria-label="Theme"></div>
 
         <button type="button" id="start-btn" class="btn-start" autofocus>
           Mulai Misi!
         </button>
 
-        <p class="start-footer">Untuk anak usia 5–6 tahun · Keyboard QWERTY</p>
+        <p class="start-footer" id="start-footer">Untuk anak usia 5–6 tahun · Keyboard QWERTY</p>
       </section>
+
+      <!-- Tutorial first-run -->
+      <div id="tutorial" class="tutorial hidden" aria-hidden="true">
+        <div class="tutorial-card">
+          <p class="tutorial-step" id="tutorial-emoji" aria-hidden="true">👀</p>
+          <h2 id="tutorial-title">Cara main</h2>
+          <p id="tutorial-body" class="tutorial-body">Lihat gambar, dengar kata, lalu ketik di keyboard!</p>
+          <div class="tutorial-dots" id="tutorial-dots" aria-hidden="true"></div>
+          <button type="button" id="tutorial-next" class="btn-start">Lanjut</button>
+          <button type="button" id="tutorial-skip" class="btn-secondary tutorial-skip">Lewati</button>
+        </div>
+      </div>
 
       <!-- ========== GAME ========== -->
       <section
@@ -135,7 +164,7 @@
         <!-- Session goal track -->
         <div class="goal-banner">
           <div class="goal-text">
-            <span class="goal-label">Target misi</span>
+            <span class="goal-label" id="goal-label">Target misi</span>
             <span id="goal-remaining" class="goal-remaining">Kejar 10 bintang ya!</span>
           </div>
           <div
@@ -149,6 +178,12 @@
           ></div>
           <div class="goal-count">
             <span id="session-stars">0</span>/<span id="session-target">10</span>
+          </div>
+          <!-- Hard mode timer -->
+          <div id="timer-wrap" class="timer-wrap hidden" aria-live="polite">
+            <span class="timer-icon" aria-hidden="true">⏱️</span>
+            <span id="timer-value" class="timer-value">35</span>
+            <span class="timer-unit">detik</span>
           </div>
         </div>
 
@@ -188,9 +223,6 @@
               decoding="async"
               draggable="false"
             />
-            <!-- Hidden by default; revealed after wrong streak (Sprint A) -->
-            <p id="word-label" class="word-label is-hidden" aria-live="polite"></p>
-
             <button
               type="button"
               id="speak-btn"
@@ -216,6 +248,9 @@
             </button>
           </div>
 
+          <!-- Full word (Easy + Medium always) -->
+          <p id="word-full" class="word-full" aria-live="polite"></p>
+
           <div id="target-block" class="target-block">
             <p id="target-hint" class="target-hint">Ketik huruf ini</p>
             <div
@@ -235,6 +270,9 @@
             aria-label="Huruf yang diketik"
           ></div>
 
+          <!-- Legacy label hook (hidden; full word uses #word-full) -->
+          <p id="word-label" class="word-label is-hidden" hidden></p>
+
           <p id="encouragement" class="encouragement">Ayo, kamu bisa!</p>
 
           <div id="praise-overlay" class="praise-overlay" aria-live="polite">
@@ -243,9 +281,9 @@
         </div>
 
         <p id="kb-hint" class="kb-hint">
-          <span>Tekan tombol</span>
+          <span id="kb-hint-before">Tekan tombol</span>
           <kbd id="hint-key">A</kbd>
-          <span>di keyboard laptop</span>
+          <span id="kb-hint-after">di keyboard laptop</span>
         </p>
         <p id="kb-hint-hard" class="kb-hint kb-hint-hard hidden">
           Dengar kata, lalu ketik di keyboard~
@@ -278,11 +316,11 @@
           <div class="victory-stats">
             <div class="stat">
               <span class="stat-val" id="victory-session">10</span>
-              <span class="stat-lbl">Misi ini</span>
+              <span class="stat-lbl" id="victory-session-lbl">Misi ini</span>
             </div>
             <div class="stat">
               <span class="stat-val" id="victory-total">0</span>
-              <span class="stat-lbl">Total ★</span>
+              <span class="stat-lbl" id="victory-total-lbl">Total ★</span>
             </div>
             <div class="stat">
               <span class="stat-val" id="victory-rank">🌱</span>
