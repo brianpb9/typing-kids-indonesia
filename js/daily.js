@@ -3,9 +3,10 @@
  */
 import { CONFIG } from './config.js';
 
+/** Exclude specialty filters that thin the pool (huruf-susah, synthetic huruf) */
 const CATS = (CONFIG.categoryOptions || [])
   .map((c) => c.id)
-  .filter((id) => id !== 'all');
+  .filter((id) => id !== 'all' && id !== 'huruf-susah' && id !== 'huruf');
 
 /**
  * @param {Date} [date]

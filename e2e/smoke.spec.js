@@ -125,4 +125,66 @@ test.describe('Typing Kids smoke', () => {
     await expect(page.locator('.osk-key').first()).toBeVisible();
     await expect(page.locator('#game-screen')).toHaveClass(/mode-letters/);
   });
+
+  test('class code does not override free start; play class is separate', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await page.evaluate(() => {
+      localStorage.setItem(
+        'typingKidsID_v1',
+        JSON.stringify({
+          totalStars: 0,
+          missionsWon: 0,
+          muted: true,
+          difficulty: 'easy',
+          category: 'all',
+          language: 'id',
+          tutorialDone: true,
+          tutorialDoneEn: true,
+          classCode: 'ABCD',
+        })
+      );
+    });
+    await page.reload();
+    await page.locator('#mode-letters').click();
+    await page.locator('#start-btn').click();
+    await expect(page.locator('#game-screen')).toBeVisible({ timeout: 10_000 });
+    // Free start keeps letters mode, not class-forced mode
+    await expect(page.locator('#game-screen')).toHaveClass(/mode-letters/);
+  });
+
+  test('hard mode shows timer', async ({ page }) => {
+    await page.goto('/');
+    await page.evaluate(() => {
+      localStorage.setItem(
+        'typingKidsID_v1',
+        JSON.stringify({
+          totalStars: 0,
+          missionsWon: 0,
+          muted: true,
+          difficulty: 'hard',
+          category: 'all',
+          language: 'id',
+          tutorialDone: true,
+          tutorialDoneEn: true,
+        })
+      );
+    });
+    await page.reload();
+    await page.locator('#mode-hard').click();
+    await page.locator('#start-btn').click();
+    await expect(page.locator('#game-screen')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('#timer-wrap')).toBeVisible();
+    await expect(page.locator('#word-full')).toBeHidden();
+  });
+
+  test('parent dash a11y toggles apply classes', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#parent-dash').locator('summary').click();
+    await page.locator('#a11y-contrast').check();
+    await expect(page.locator('html')).toHaveClass(/a11y-contrast/);
+    await page.locator('#a11y-large').check();
+    await expect(page.locator('html')).toHaveClass(/a11y-large/);
+  });
 });

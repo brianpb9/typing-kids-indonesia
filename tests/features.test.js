@@ -55,6 +55,16 @@ describe('daily mission', () => {
     assert.ok(a.target >= 5 && a.target <= 8);
     assert.ok(['easy', 'medium'].includes(a.mode));
   });
+
+  it('never seeds huruf-susah specialty category', () => {
+    for (let i = 0; i < 400; i++) {
+      const d = new Date(Date.UTC(2024, 0, 1 + (i % 365)));
+      const m = getDailyMission(d);
+      assert.notEqual(m.category, 'huruf-susah');
+      assert.notEqual(m.category, 'huruf');
+      assert.notEqual(m.category, 'all');
+    }
+  });
 });
 
 describe('classroom codes', () => {
@@ -140,13 +150,18 @@ describe('i18n new keys', () => {
 });
 
 describe('weekly + letters + achievements', () => {
-  it('weekly mission is deterministic', () => {
+  it('weekly mission is deterministic and kid-safe (no hard)', () => {
     const d = new Date('2026-03-15T12:00:00');
     const a = getWeeklyMission(d);
     const b = getWeeklyMission(d);
     assert.equal(a.key, b.key);
     assert.equal(a.key, weekKey(d));
     assert.ok(a.target >= 8);
+    for (let i = 0; i < 200; i++) {
+      const w = getWeeklyMission(new Date(Date.UTC(2024, 0, 1 + i * 7)));
+      assert.ok(['easy', 'medium'].includes(w.mode), w.mode);
+      assert.notEqual(w.category, 'huruf-susah');
+    }
   });
 
   it('letter bank has 26 letters', () => {

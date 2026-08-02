@@ -139,12 +139,16 @@ export class UI {
       certBtn: document.getElementById('cert-btn'),
       classNameInput: document.getElementById('class-name-input'),
       classExportBtn: document.getElementById('class-export-btn'),
+      classPlayBtn: document.getElementById('class-play-btn'),
       classBoard: document.getElementById('class-board'),
       classBoardTitle: document.getElementById('class-board-title'),
     };
 
     this._oskBuilt = false;
     this._oskTarget = '';
+    this._onOskLayout = () => {
+      if (this._oskTarget) this._positionOskFinger();
+    };
 
     /** @type {ReturnType<typeof getMode>} */
     this.mode = getMode('easy');
@@ -156,6 +160,8 @@ export class UI {
     this._buildMissionPreview(this._sessionTarget);
     this._buildCategoryChips();
     this._buildOsk();
+    window.addEventListener('resize', this._onOskLayout, { passive: true });
+    window.addEventListener('scroll', this._onOskLayout, { passive: true });
     if (this.els.sessionTarget) {
       this.els.sessionTarget.textContent = String(this._sessionTarget);
     }
@@ -235,6 +241,7 @@ export class UI {
       this.els.a11yLargeLabel.textContent = t.a11yLarge;
     if (this.els.classExportBtn)
       this.els.classExportBtn.textContent = t.classExport;
+    if (this.els.classPlayBtn) this.els.classPlayBtn.textContent = t.classPlay;
     if (this.els.classBoardTitle)
       this.els.classBoardTitle.textContent = t.classBoardTitle;
     if (this.els.classNameInput)
@@ -335,10 +342,11 @@ export class UI {
     this.els.dailyBadge?.classList.toggle('hidden', !daily.done);
     this.els.dailyCard?.classList.toggle('is-done', Boolean(daily.done));
     if (this.els.dailyBtn) {
+      // Allow replay after complete
       this.els.dailyBtn.textContent = daily.done
-        ? this.t.dailyDone
+        ? this.t.dailyReplay || this.t.dailyBtn
         : daily.btnLabel || this.t.dailyBtn;
-      this.els.dailyBtn.disabled = Boolean(daily.done);
+      this.els.dailyBtn.disabled = false;
     }
   }
 
@@ -354,6 +362,8 @@ export class UI {
     }
     this.els.classShareBtn?.classList.toggle('hidden', !active);
     this.els.classClearBtn?.classList.toggle('hidden', !active);
+    this.els.classPlayBtn?.classList.toggle('hidden', !active);
+    this.els.classExportBtn?.classList.toggle('hidden', !active);
     if (this.els.classCodeInput && cls.code) {
       this.els.classCodeInput.value = cls.code;
     }
@@ -948,8 +958,21 @@ export class UI {
   }
 
   /**
+   * Escape text for safe HTML insertion
+   * @param {string} s
+   */
+  _esc(s) {
+    return String(s ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  /**
    * Parent summary card on victory
-   * @param {{ words: number, mode: string, theme: string, lang: string, rank: string, total: number }} data
+   * @param {{ words: number, mode: string, theme: string, lang: string, rank: string, total: number, accuracy?: number }} data
    */
   renderParentSummary(data) {
     const t = this.t;
@@ -964,10 +987,13 @@ export class UI {
       [t.parentRank, data.rank],
       [t.parentTotal, String(data.total)],
     ];
+    if (data.accuracy != null) {
+      rows.push([t.parentAccuracy, `${data.accuracy}%`]);
+    }
     list.innerHTML = rows
       .map(
         ([k, v]) =>
-          `<li><span class="parent-k">${k}</span><span class="parent-v">${v}</span></li>`
+          `<li><span class="parent-k">${this._esc(k)}</span><span class="parent-v">${this._esc(v)}</span></li>`
       )
       .join('');
   }
@@ -1111,10 +1137,18 @@ export class UI {
    */
   setOskTarget(letter) {
     this._oskTarget = String(letter || '').toLowerCase();
+    this._positionOskFinger();
+  }
+
+  _positionOskFinger() {
+    let found = false;
     this.els.oskRows?.querySelectorAll('.osk-key').forEach((btn) => {
       const on = btn.dataset.key === this._oskTarget;
       btn.classList.toggle('is-target', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.setAttribute('aria-current', on ? 'true' : 'false');
       if (on && this.els.oskFinger) {
+        found = true;
         const r = btn.getBoundingClientRect();
         const host = this.els.osk?.getBoundingClientRect();
         if (host) {
@@ -1124,7 +1158,7 @@ export class UI {
         }
       }
     });
-    if (!this._oskTarget) {
+    if (!this._oskTarget || !found) {
       this.els.oskFinger?.classList.remove('is-on');
     }
   }
@@ -1156,9 +1190,9 @@ export class UI {
     this.els.weeklyCard?.classList.toggle('is-done', Boolean(weekly.done));
     if (this.els.weeklyBtn) {
       this.els.weeklyBtn.textContent = weekly.done
-        ? this.t.weeklyDone
+        ? this.t.weeklyReplay || this.t.weeklyBtn
         : weekly.btnLabel || this.t.weeklyBtn;
-      this.els.weeklyBtn.disabled = Boolean(weekly.done);
+      this.els.weeklyBtn.disabled = false;
     }
   }
 
@@ -1204,12 +1238,18 @@ export class UI {
     }
     const grid = this.els.badgesGrid;
     if (grid) {
-      grid.innerHTML = (data.badgeLabels || [])
-        .map(
-          (b) =>
-            `<span class="badge-chip ${b.unlocked ? 'is-on' : 'is-off'}" title="${b.title}">${b.emoji}<span class="badge-name">${b.title}</span></span>`
-        )
-        .join('');
+      grid.innerHTML = '';
+      for (const b of data.badgeLabels || []) {
+        const span = document.createElement('span');
+        span.className = `badge-chip ${b.unlocked ? 'is-on' : 'is-off'}`;
+        span.title = b.title;
+        span.textContent = `${b.emoji} `;
+        const name = document.createElement('span');
+        name.className = 'badge-name';
+        name.textContent = b.title;
+        span.appendChild(name);
+        grid.appendChild(span);
+      }
     }
   }
 
@@ -1249,12 +1289,20 @@ export class UI {
     const has = rows && rows.length;
     this.els.classBoardTitle?.classList.toggle('hidden', !has);
     this.els.classExportBtn?.classList.toggle('hidden', !has);
+    this.els.classPlayBtn?.classList.toggle('hidden', !this.els.classActive || this.els.classActive.classList.contains('hidden'));
     const el = this.els.classBoard;
     if (!el) return;
-    el.innerHTML = (rows || [])
-      .slice(0, 8)
-      .map((r) => `<li><span>${r.name}</span><span>★ ${r.stars}</span></li>`)
-      .join('');
+    el.innerHTML = '';
+    for (const r of (rows || []).slice(0, 8)) {
+      const li = document.createElement('li');
+      const name = document.createElement('span');
+      name.textContent = r.name || '';
+      const stars = document.createElement('span');
+      stars.textContent = `★ ${r.stars}`;
+      li.appendChild(name);
+      li.appendChild(stars);
+      el.appendChild(li);
+    }
   }
 
   onWeekly(handler) {
@@ -1309,7 +1357,7 @@ export class UI {
   }
 
   /**
-   * @param {{ onJoin: Function, onCreate: Function, onShare: Function, onClear: Function, onExport?: Function }} handlers
+   * @param {{ onJoin: Function, onCreate: Function, onShare: Function, onClear: Function, onExport?: Function, onPlay?: Function }} handlers
    */
   onClassroom(handlers) {
     this.els.classJoinBtn?.addEventListener('click', (e) => {
@@ -1335,6 +1383,10 @@ export class UI {
     this.els.classExportBtn?.addEventListener('click', (e) => {
       e.preventDefault();
       handlers.onExport?.();
+    });
+    this.els.classPlayBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      handlers.onPlay?.();
     });
     this.els.classCodeInput?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {

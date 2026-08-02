@@ -17,7 +17,21 @@
  * }} data
  * @returns {Promise<Blob>}
  */
-export function renderCertificate(data) {
+export async function renderCertificate(data) {
+  // Ensure web fonts are ready so canvas uses Nunito when available
+  try {
+    if (document.fonts?.ready) await document.fonts.ready;
+    if (document.fonts?.load) {
+      await Promise.all([
+        document.fonts.load('bold 28px Nunito'),
+        document.fonts.load('900 56px Nunito'),
+        document.fonts.load('800 26px Nunito'),
+      ]);
+    }
+  } catch {
+    /* system font fallback ok */
+  }
+
   const w = 900;
   const h = 640;
   const canvas = document.createElement('canvas');
@@ -26,7 +40,8 @@ export function renderCertificate(data) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return Promise.reject(new Error('no canvas'));
 
-  // Background
+  const font = '"Nunito", system-ui, -apple-system, sans-serif';
+
   const grad = ctx.createLinearGradient(0, 0, w, h);
   grad.addColorStop(0, '#FFF8F0');
   grad.addColorStop(0.5, '#E8F4FC');
@@ -34,7 +49,6 @@ export function renderCertificate(data) {
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, w, h);
 
-  // Border
   ctx.strokeStyle = '#6CB4EE';
   ctx.lineWidth = 10;
   ctx.strokeRect(28, 28, w - 56, h - 56);
@@ -44,18 +58,22 @@ export function renderCertificate(data) {
 
   ctx.textAlign = 'center';
   ctx.fillStyle = '#3D3A35';
-  ctx.font = 'bold 28px Nunito, system-ui, sans-serif';
+  ctx.font = `bold 28px ${font}`;
   ctx.fillText(data.title || 'Typing Kids', w / 2, 110);
 
-  ctx.font = '900 56px Nunito, system-ui, sans-serif';
+  ctx.font = `900 56px ${font}`;
   ctx.fillStyle = '#4A9FD8';
-  ctx.fillText('★  ' + (data.lang === 'en' ? 'CHAMPION' : 'JUARA') + '  ★', w / 2, 190);
+  ctx.fillText(
+    '★  ' + (data.lang === 'en' ? 'CHAMPION' : 'JUARA') + '  ★',
+    w / 2,
+    190
+  );
 
-  ctx.font = 'bold 32px Nunito, system-ui, sans-serif';
+  ctx.font = `bold 32px ${font}`;
   ctx.fillStyle = '#3D3A35';
   ctx.fillText(data.subtitle || '', w / 2, 250);
 
-  ctx.font = '800 26px Nunito, system-ui, sans-serif';
+  ctx.font = `800 26px ${font}`;
   ctx.fillStyle = '#7A756C';
   const lines = [
     `★ ${data.stars}`,
@@ -68,7 +86,7 @@ export function renderCertificate(data) {
     ctx.fillText(String(line), w / 2, 320 + i * 40);
   });
 
-  ctx.font = '700 18px Nunito, system-ui, sans-serif';
+  ctx.font = `700 18px ${font}`;
   ctx.fillStyle = '#5B8C5A';
   ctx.fillText(data.footer || '', w / 2, h - 70);
 

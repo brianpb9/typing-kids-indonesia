@@ -1,5 +1,5 @@
-/* Typing Kids — offline shell + runtime cache for voice/images */
-const CACHE = 'typing-kids-v17';
+/* Typing Kids — offline shell + resilient precache + runtime voice cache */
+const CACHE = 'typing-kids-v18';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -34,11 +34,25 @@ const PRECACHE = [
   '/manifest.webmanifest',
 ];
 
+/** addAll fails entirely on one 404 — cache individually instead */
+async function precacheAll(cache, urls) {
+  await Promise.all(
+    urls.map(async (url) => {
+      try {
+        const res = await fetch(url, { cache: 'reload' });
+        if (res && res.ok) await cache.put(url, res);
+      } catch {
+        /* skip missing */
+      }
+    })
+  );
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(CACHE)
-      .then((cache) => cache.addAll(PRECACHE))
+      .then((cache) => precacheAll(cache, PRECACHE))
       .then(() => self.skipWaiting())
   );
 });
@@ -76,8 +90,10 @@ self.addEventListener('fetch', (event) => {
           return res;
         })
         .catch(() => cached);
-      // Cache-first for voice pack & images; network-first-ish for html
-      if (req.url.includes('/assets/audio/voice/') || req.url.includes('/assets/images/')) {
+      if (
+        req.url.includes('/assets/audio/voice/') ||
+        req.url.includes('/assets/images/')
+      ) {
         return cached || fetchPromise;
       }
       return cached || fetchPromise;

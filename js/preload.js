@@ -35,6 +35,10 @@ export function preloadImages(urls, concurrency = 6) {
   return Promise.all(Array.from({ length: n }, () => worker())).then(() => {});
 }
 
+/** Reuse a small pool of Audio elements to avoid leaks */
+const _audioPool = [];
+const POOL_MAX = 4;
+
 /**
  * Warm audio URLs (does not wait for full decode)
  * @param {string[]} urls
@@ -42,25 +46,28 @@ export function preloadImages(urls, concurrency = 6) {
  */
 export function preloadAudio(urls) {
   if (!urls?.length) return Promise.resolve();
-  const list = [...new Set(urls.filter(Boolean))].slice(0, 12);
+  const list = [...new Set(urls.filter(Boolean))].slice(0, 8);
   return Promise.all(
     list.map(
-      (src) =>
+      (src, idx) =>
         new Promise((resolve) => {
           try {
-            const a = new Audio();
-            a.preload = 'auto';
+            let a = _audioPool[idx % POOL_MAX];
+            if (!a) {
+              a = new Audio();
+              a.preload = 'auto';
+              _audioPool[idx % POOL_MAX] = a;
+            }
             const done = () => resolve();
             a.addEventListener('canplaythrough', done, { once: true });
             a.addEventListener('error', done, { once: true });
             a.src = src;
-            // Safari sometimes needs load()
             try {
               a.load();
             } catch {
               /* ignore */
             }
-            setTimeout(done, 2500);
+            setTimeout(done, 2000);
           } catch {
             resolve();
           }

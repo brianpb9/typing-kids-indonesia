@@ -163,6 +163,7 @@ export class Game {
       onShare: () => this._shareClass(),
       onClear: () => this._clearClass(),
       onExport: () => this._exportClassCsv(),
+      onPlay: () => this.startClassMission(),
     });
 
     this.ui.onSpeak(() => {
@@ -377,30 +378,15 @@ export class Game {
       return;
     }
 
-    if (this._classCode && CONFIG.features.multiplayer) {
-      const cls = resolveClassroom(this._classCode);
-      if (cls) {
-        this._missionKind = 'class';
-        this.difficulty = cls.mode;
-        this.category = cls.category;
-        this._sessionTarget = cls.target;
-        this.ui.setSessionTarget(cls.target);
-        this.ui.setDifficultyUI(this.difficulty);
-        this.ui.setCategoryUI(this.category);
-        this.words.setDifficulty(this.difficulty);
-        this.words.setCategory(this.category);
-        patchSave({ difficulty: this.difficulty, category: this.category });
-      }
-    } else if (this.difficulty === 'letters') {
-      this._missionKind = 'normal';
+    // Free play — never auto-override with class code (use "Main kelas")
+    this._missionKind = 'normal';
+    if (this.difficulty === 'letters') {
       this._sessionTarget =
         CONFIG.gameplay.lettersTarget || CONFIG.goals.sessionTarget;
-      this.ui.setSessionTarget(this._sessionTarget);
     } else {
-      this._missionKind = 'normal';
       this._sessionTarget = CONFIG.goals.sessionTarget;
-      this.ui.setSessionTarget(this._sessionTarget);
     }
+    this.ui.setSessionTarget(this._sessionTarget);
 
     const save = loadSave();
     const done =
@@ -412,14 +398,26 @@ export class Game {
     this.startMission();
   }
 
+  /** Explicit class mission (does not run on free "Mulai Misi") */
+  startClassMission() {
+    if (!this._canStartMission()) return;
+    if (!this._classCode) {
+      this.ui.setClassMsg(this._t().classNeedCode || '');
+      return;
+    }
+    const cls = resolveClassroom(this._classCode);
+    if (!cls) return;
+    this._missionKind = 'class';
+    this._applyMissionParams(cls.mode, cls.category, cls.target);
+    const save = loadSave();
+    this._maybeTutorialThenStart(save);
+  }
+
   startDailyMission() {
     if (!this._canStartMission()) return;
     const mission = getDailyMission();
     const save = loadSave();
-    if (save.daily?.key === mission.key && save.daily.completed) {
-      this.ui.setEncouragement(this._t().dailyDone);
-      return;
-    }
+    // Allow replay after complete (still marks daily done once)
     this._missionKind = 'daily';
     this._applyMissionParams(mission.mode, mission.category, mission.target);
     this._maybeTutorialThenStart(save);
@@ -429,10 +427,7 @@ export class Game {
     if (!this._canStartMission()) return;
     const mission = getWeeklyMission();
     const save = loadSave();
-    if (save.weekly?.key === mission.key && save.weekly.completed) {
-      this.ui.setEncouragement(this._t().weeklyDone);
-      return;
-    }
+    // Allow replay after complete
     this._missionKind = 'weekly';
     this._applyMissionParams(mission.mode, mission.category, mission.target);
     this._maybeTutorialThenStart(save);
@@ -996,12 +991,8 @@ export class Game {
     this.anim.celebrate();
     this.audio.playCelebration();
     this.audio.playSparkle();
-    // After letter speak, say full word again on complete (non-letter modes)
-    if (!this.current?.isLetter) {
-      this.audio.speakPraise(praise);
-    } else {
-      this.audio.speakPraise(praise);
-    }
+    // Delay praise so last letter TTS (if any) can finish first
+    this.audio.speakPraise(praise, { delayMs: 320 });
 
     const hitMissionEnd = this.sessionStars >= this._sessionTarget;
     const milestone = this._checkMilestone();
@@ -1150,6 +1141,7 @@ export class Game {
       lang: this.language === 'en' ? 'English' : 'Bahasa Indonesia',
       rank: `${rank.emoji} ${rank.label}`,
       total: updated.totalStars,
+      accuracy: acc,
     });
 
     this._lastShareText = buildShareText(

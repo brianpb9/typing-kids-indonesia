@@ -36,8 +36,9 @@ export function getWeeklyMission(date = new Date()) {
   const key = weekKey(date);
   const h = hash(key + '|typing-kids-weekly');
   const category = CATS[h % CATS.length] || 'buah';
-  const modes = /** @type {const} */ (['easy', 'medium', 'hard']);
-  const mode = modes[h % 3];
+  // Age 5–6: weekly stays easy/medium only (no hard timer)
+  const modes = /** @type {const} */ (['easy', 'medium']);
+  const mode = modes[h % 2];
   const target = 8 + (h % 3); // 8–10
   return { key, category, mode, target };
 }

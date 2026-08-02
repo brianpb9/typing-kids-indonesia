@@ -34,6 +34,9 @@ export class AudioManager {
     this._packToken = 0;
     /** @type {((playing:boolean)=>void)|null} */
     this.onSpeakingChange = null;
+    /** Guard: don't cut word pack with letter TTS mid-play */
+    this._wordPlayUntil = 0;
+    this._letterQueue = Promise.resolve();
 
     if (this._speechReady) {
       this._loadVoices();
@@ -217,14 +220,24 @@ export class AudioManager {
    * @param {string} key word id or _phrase
    * @returns {Promise<boolean>} true if played from pack
    */
-  playPacked(key) {
+  /**
+   * True while a word pack clip should not be interrupted by letter TTS
+   */
+  isWordPlaying() {
+    return (
+      performance.now() < this._wordPlayUntil ||
+      (this._packAudio && !this._packAudio.paused)
+    );
+  }
+
+  playPacked(key, opts = {}) {
     if (this.muted) return Promise.resolve(false);
     const src = this._packPath(key);
     if (!src) return Promise.resolve(false);
 
     const token = ++this._packToken;
-    // Stop TTS so they don't overlap
-    if (this._speechReady) {
+    // Stop TTS so they don't overlap pack (unless soft letter mode)
+    if (this._speechReady && !opts.keepTts) {
       try {
         window.speechSynthesis.cancel();
       } catch {
@@ -245,12 +258,18 @@ export class AudioManager {
         a.volume = Math.min(1, this.masterVolume * 1.35);
         this._packAudio = a;
         this._setSpeaking(true);
+        if (opts.protectWord) {
+          this._wordPlayUntil = performance.now() + 3500;
+        }
         const finish = (ok) => {
           if (token !== this._packToken) {
             resolve(false);
             return;
           }
           if (this._packAudio === a) this._packAudio = null;
+          if (opts.protectWord) {
+            this._wordPlayUntil = Math.min(this._wordPlayUntil, performance.now());
+          }
           this._setSpeaking(false);
           resolve(ok);
         };
@@ -277,6 +296,11 @@ export class AudioManager {
     if (this.muted && !opts.force) return Promise.resolve();
     if (!this._speechReady || !text) return Promise.resolve();
 
+    // Soft letter feedback: never cut word pack mid-play
+    if (opts.soft && this.isWordPlaying()) {
+      return Promise.resolve();
+    }
+
     this._loadVoices();
     const token = ++this._speakToken;
     const clean = String(text).trim();
@@ -290,7 +314,9 @@ export class AudioManager {
         }
 
         try {
-          window.speechSynthesis.cancel();
+          if (!opts.soft) {
+            window.speechSynthesis.cancel();
+          }
 
           setTimeout(() => {
             if (token !== this._speakToken) {
@@ -306,14 +332,16 @@ export class AudioManager {
 
             const u = new SpeechSynthesisUtterance(clean);
             this._currentUtterance = u;
-            this._setSpeaking(true);
+            if (!opts.soft) this._setSpeaking(true);
 
             const voice = this._preferredVoice;
             u.lang =
               voice?.lang || this._speechLang || CONFIG.speech.lang || 'id-ID';
             u.rate = opts.rate ?? CONFIG.speech.rate ?? 0.85;
             u.pitch = opts.pitch ?? CONFIG.speech.pitch ?? 1.1;
-            u.volume = CONFIG.speech.volume ?? 1;
+            u.volume = opts.soft
+              ? Math.min(1, (CONFIG.speech.volume ?? 1) * 0.85)
+              : CONFIG.speech.volume ?? 1;
             if (voice) u.voice = voice;
 
             let done = false;
@@ -321,7 +349,7 @@ export class AudioManager {
               if (done) return;
               done = true;
               if (this._currentUtterance === u) this._currentUtterance = null;
-              this._setSpeaking(false);
+              if (!opts.soft) this._setSpeaking(false);
               resolve();
             };
 
@@ -329,8 +357,8 @@ export class AudioManager {
             u.onerror = finish;
 
             window.speechSynthesis.speak(u);
-            setTimeout(finish, Math.max(4000, clean.length * 500));
-          }, 60);
+            setTimeout(finish, Math.max(2500, clean.length * 400));
+          }, opts.soft ? 40 : 60);
         } catch {
           resolve();
         }
@@ -341,35 +369,55 @@ export class AudioManager {
   }
 
   /**
-   * Speak a game word — pack first, then TTS.
+   * Speak a game word — pack first, then TTS. Protects from letter TTS cut-off.
    * @param {string} wordDisplay e.g. "Apel"
    * @param {string} [wordId] e.g. "apel"
    */
   async speakWord(wordDisplay, wordId = '') {
     if (this.muted) return;
     const id = wordId || String(wordDisplay || '').toLowerCase().replace(/\s+/g, '');
-    const played = await this.playPacked(id);
+    this._wordPlayUntil = performance.now() + 4000;
+    const played = await this.playPacked(id, { protectWord: true });
     if (played) return;
     return this.speak(wordDisplay, {
       rate: CONFIG.speech.rate ?? 0.85,
       pitch: CONFIG.speech.pitch ?? 1.1,
+    }).finally(() => {
+      this._wordPlayUntil = performance.now();
     });
   }
 
   /**
-   * Speak a single letter name (for Easy letter feedback / letters mode)
+   * Soft letter name — skipped while word pack is playing; does not cancel pack.
    * @param {string} spokenName e.g. "be" or "B"
    */
   speakLetter(spokenName) {
     if (this.muted || !spokenName) return Promise.resolve();
-    return this.speak(spokenName, { rate: 1.05, pitch: 1.15 });
+    if (this.isWordPlaying()) return Promise.resolve();
+    // Chain soft letters so they don't stampede cancel each other too hard
+    this._letterQueue = this._letterQueue
+      .then(() =>
+        this.speak(spokenName, {
+          rate: 1.05,
+          pitch: 1.15,
+          soft: true,
+        })
+      )
+      .catch(() => {});
+    return this._letterQueue;
   }
 
   /**
-   * Speak praise cheerfully — try common pack phrases when text matches.
+   * Praise after a short delay so last letter TTS can finish.
    * @param {string} text
+   * @param {{ delayMs?: number }} [opts]
    */
-  async speakPraise(text) {
+  async speakPraise(text, opts = {}) {
+    if (this.muted) return;
+    const delay = opts.delayMs ?? 280;
+    if (delay > 0) {
+      await new Promise((r) => setTimeout(r, delay));
+    }
     if (this.muted) return;
     const t = String(text || '').toLowerCase();
     let key = null;
