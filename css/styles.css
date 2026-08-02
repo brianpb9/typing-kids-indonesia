@@ -325,6 +325,209 @@ body {
   color: var(--primary-deep);
 }
 
+.collection-streak {
+  color: #e17055;
+  font-size: 0.85rem;
+}
+
+/* Daily mission card */
+.daily-card {
+  width: 100%;
+  max-width: 420px;
+  background: linear-gradient(145deg, #fff9e8, #fff);
+  border: 2px solid #ffe566;
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem 1rem;
+  margin: 0.75rem 0 0.5rem;
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+}
+
+.daily-card.is-done {
+  border-color: var(--accent-green);
+  background: linear-gradient(145deg, #f0faf0, #fff);
+}
+
+.daily-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.daily-title {
+  font-weight: 900;
+  font-size: 1rem;
+  color: var(--primary-deep);
+  margin: 0;
+}
+
+.daily-badge {
+  font-size: 1rem;
+}
+
+.daily-desc {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-soft);
+  margin: 0.35rem 0 0.65rem;
+}
+
+.btn-daily {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #3d3a35;
+  background: linear-gradient(145deg, #ffe566, #ffd43b);
+  padding: 0.55rem 1.25rem;
+  border-radius: 999px;
+  min-height: 44px;
+  box-shadow: 0 4px 12px rgba(244, 196, 48, 0.35);
+  transition: transform 0.15s ease;
+}
+
+.btn-daily:hover:not(:disabled) {
+  transform: scale(1.04);
+}
+
+.btn-daily:disabled {
+  opacity: 0.75;
+  cursor: default;
+  background: var(--accent-green);
+  box-shadow: none;
+}
+
+/* Classroom panel */
+.class-panel {
+  width: 100%;
+  max-width: 420px;
+  margin: 0.5rem 0 0.75rem;
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-soft);
+  text-align: left;
+  padding: 0.35rem 0.85rem 0.65rem;
+}
+
+.class-panel summary {
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--primary-deep);
+  padding: 0.4rem 0;
+  list-style: none;
+}
+
+.class-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.class-body {
+  padding-bottom: 0.35rem;
+}
+
+.class-active {
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--text);
+  margin: 0.25rem 0 0.5rem;
+}
+
+.class-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.class-input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font);
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+  border: 2px solid #e8e0d5;
+  border-radius: 12px;
+  padding: 0.45rem 0.6rem;
+  background: var(--bg-soft);
+  color: var(--text);
+}
+
+.class-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.class-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+}
+
+.btn-sm {
+  min-height: 40px !important;
+  padding: 0.45rem 0.9rem !important;
+  font-size: 0.85rem !important;
+}
+
+.class-msg {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary-deep);
+  min-height: 1.2em;
+  margin-top: 0.4rem;
+  text-align: center;
+}
+
+/* Combo badge */
+.combo-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: linear-gradient(145deg, #ff9f7a, #ff6b6b);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 900;
+  vertical-align: middle;
+}
+
+.combo-badge.combo-pop {
+  animation: letter-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Easy: dim typed letters in full word */
+.word-full .wf-letter {
+  display: inline-block;
+  transition: opacity 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  min-width: 0.55em;
+}
+
+.word-full .wf-letter.is-done {
+  opacity: 0.35;
+  color: var(--text-soft);
+}
+
+.word-full .wf-letter.is-current {
+  color: var(--primary-deep);
+  transform: scale(1.12);
+  text-shadow: 0 2px 0 rgba(74, 159, 216, 0.2);
+}
+
+.share-msg {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary-deep);
+  min-height: 1.2em;
+  margin-top: 0.5rem;
+}
+
 .mission-title {
   font-size: 0.95rem !important;
   font-weight: 800 !important;

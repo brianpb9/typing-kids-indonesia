@@ -90,6 +90,25 @@ export class UI {
       victorySessionLbl: document.getElementById('victory-session-lbl'),
       victoryTotalLbl: document.getElementById('victory-total-lbl'),
       timerUnit: document.querySelector('.timer-unit'),
+      // Daily / streak / class / combo / share
+      collectionStreak: document.getElementById('collection-streak'),
+      dailyCard: document.getElementById('daily-card'),
+      dailyTitle: document.getElementById('daily-title'),
+      dailyDesc: document.getElementById('daily-desc'),
+      dailyBtn: document.getElementById('daily-btn'),
+      dailyBadge: document.getElementById('daily-badge'),
+      classPanel: document.getElementById('class-panel'),
+      classTitle: document.getElementById('class-title'),
+      classActive: document.getElementById('class-active'),
+      classCodeInput: document.getElementById('class-code-input'),
+      classJoinBtn: document.getElementById('class-join-btn'),
+      classCreateBtn: document.getElementById('class-create-btn'),
+      classShareBtn: document.getElementById('class-share-btn'),
+      classClearBtn: document.getElementById('class-clear-btn'),
+      classMsg: document.getElementById('class-msg'),
+      comboBadge: document.getElementById('combo-badge'),
+      shareBtn: document.getElementById('share-btn'),
+      shareMsg: document.getElementById('share-msg'),
     };
 
     /** @type {ReturnType<typeof getMode>} */
@@ -154,6 +173,16 @@ export class UI {
     if (this.els.replayBtn) this.els.replayBtn.textContent = t.replay;
     if (this.els.homeBtn) this.els.homeBtn.textContent = t.home;
     if (this.els.tutorialSkip) this.els.tutorialSkip.textContent = t.tutorialSkip;
+    if (this.els.dailyTitle) this.els.dailyTitle.textContent = t.dailyTitle;
+    if (this.els.dailyBtn) this.els.dailyBtn.textContent = t.dailyBtn;
+    if (this.els.classTitle) this.els.classTitle.textContent = t.classTitle;
+    if (this.els.classJoinBtn) this.els.classJoinBtn.textContent = t.classJoin;
+    if (this.els.classCreateBtn) this.els.classCreateBtn.textContent = t.classCreate;
+    if (this.els.classShareBtn) this.els.classShareBtn.textContent = t.classShare;
+    if (this.els.classClearBtn) this.els.classClearBtn.textContent = t.classClear;
+    if (this.els.classCodeInput)
+      this.els.classCodeInput.placeholder = t.classCodePh;
+    if (this.els.shareBtn) this.els.shareBtn.textContent = t.shareBtn;
 
     // Modes
     const setMode = (nameId, descId, key) => {
@@ -219,7 +248,7 @@ export class UI {
   }
 
   /**
-   * @param {{ totalStars: number, muted?: boolean, difficulty?: string }} save
+   * @param {{ totalStars: number, muted?: boolean, difficulty?: string, streak?: { current?: number, best?: number } }} save
    */
   renderCollection(save) {
     const rank = getRank(save.totalStars || 0, this.t.ranks);
@@ -228,6 +257,88 @@ export class UI {
     }
     if (this.els.collectionRank) {
       this.els.collectionRank.textContent = `${rank.emoji} ${rank.label}`;
+    }
+    if (this.els.collectionStreak) {
+      const n = save.streak?.current || 0;
+      this.els.collectionStreak.textContent = this.t.streakLabel(n);
+      if (save.streak?.best > 1) {
+        this.els.collectionStreak.title = this.t.streakBest(save.streak.best);
+      }
+    }
+  }
+
+  /**
+   * @param {{ desc: string, done: boolean, btnLabel?: string }} daily
+   */
+  renderDaily(daily) {
+    if (this.els.dailyDesc) this.els.dailyDesc.textContent = daily.desc;
+    this.els.dailyBadge?.classList.toggle('hidden', !daily.done);
+    this.els.dailyCard?.classList.toggle('is-done', Boolean(daily.done));
+    if (this.els.dailyBtn) {
+      this.els.dailyBtn.textContent = daily.done
+        ? this.t.dailyDone
+        : daily.btnLabel || this.t.dailyBtn;
+      this.els.dailyBtn.disabled = Boolean(daily.done);
+    }
+  }
+
+  /**
+   * @param {{ code: string|null, label?: string }} cls
+   */
+  renderClassroom(cls) {
+    const active = Boolean(cls.code);
+    this.els.classActive?.classList.toggle('hidden', !active);
+    if (this.els.classActive && active) {
+      this.els.classActive.textContent =
+        cls.label || this.t.classActive(cls.code);
+    }
+    this.els.classShareBtn?.classList.toggle('hidden', !active);
+    this.els.classClearBtn?.classList.toggle('hidden', !active);
+    if (this.els.classCodeInput && cls.code) {
+      this.els.classCodeInput.value = cls.code;
+    }
+  }
+
+  setClassMsg(text) {
+    if (this.els.classMsg) this.els.classMsg.textContent = text || '';
+  }
+
+  /**
+   * Combo badge in game HUD
+   * @param {number} n
+   */
+  setCombo(n) {
+    const el = this.els.comboBadge;
+    if (!el) return;
+    if (n < 2) {
+      el.classList.add('hidden');
+      el.classList.remove('combo-pop');
+      return;
+    }
+    el.textContent = this.t.comboLabel(n);
+    el.classList.remove('hidden');
+    el.classList.remove('combo-pop');
+    void el.offsetWidth;
+    el.classList.add('combo-pop');
+  }
+
+  setShareMsg(text) {
+    if (this.els.shareMsg) this.els.shareMsg.textContent = text || '';
+  }
+
+  /**
+   * Rebuild mission star preview when target changes (daily / classroom)
+   * @param {number} n
+   */
+  setSessionTarget(n) {
+    this._sessionTarget = Math.max(1, n || CONFIG.goals.sessionTarget);
+    this._buildStarTrack(this._sessionTarget);
+    this._buildMissionPreview(this._sessionTarget);
+    if (this.els.sessionTarget) {
+      this.els.sessionTarget.textContent = String(this._sessionTarget);
+    }
+    if (this.els.missionTargetLabel) {
+      this.els.missionTargetLabel.textContent = String(this._sessionTarget);
     }
   }
 
@@ -376,13 +487,18 @@ export class UI {
   /**
    * @param {{ image: string, display: string, word: string }} word
    * @param {number} sessionStars
-   * @param {{ showFullWord?: boolean }} [opts]
+   * @param {{ showFullWord?: boolean, dimTypedLetters?: boolean }} [opts]
    */
   setWord(word, sessionStars, opts = {}) {
     const showFull =
       opts.showFullWord !== undefined
         ? opts.showFullWord
         : Boolean(this.mode.showFullWord);
+    this._dimTyped = Boolean(
+      opts.dimTypedLetters ?? this.mode.dimTypedLetters
+    );
+    this._currentDisplay = word.display || '';
+    this._currentWord = word.word || '';
 
     const img = this.els.wordImage;
     if (img) {
@@ -394,7 +510,7 @@ export class UI {
       setTimeout(() => img.classList.add('float-idle'), 450);
     }
 
-    this.setFullWord(word.display, showFull);
+    this.setFullWord(word.display, showFull, 0);
     this.setWordLabel(word.display, false);
     this.renderSlots(word.word, 0);
     this.setProgress(0, word.word.length);
@@ -407,20 +523,51 @@ export class UI {
   }
 
   /**
-   * Full word text for Easy + Medium (always visible in those modes)
+   * Full word text for Easy + Medium.
+   * Easy: typed letters dim so the child focuses on remaining letters.
    * @param {string} display
    * @param {boolean} visible
+   * @param {number} [filledCount]
    */
-  setFullWord(display, visible) {
+  setFullWord(display, visible, filledCount = 0) {
     const el = this.els.wordFull;
     if (!el) return;
-    el.textContent = display || '';
     el.classList.toggle('hidden', !visible);
-    if (visible) {
+    if (!visible) {
+      el.textContent = '';
+      return;
+    }
+
+    const text = (display || '').toUpperCase();
+    if (this._dimTyped && text) {
+      el.innerHTML = '';
+      const letters = text.split('');
+      letters.forEach((ch, i) => {
+        const span = document.createElement('span');
+        span.className = 'wf-letter';
+        span.textContent = ch;
+        if (i < filledCount) span.classList.add('is-done');
+        else if (i === filledCount) span.classList.add('is-current');
+        el.appendChild(span);
+      });
+    } else {
+      el.textContent = display || '';
+    }
+
+    if (filledCount === 0) {
       el.classList.remove('word-full-pop');
       void el.offsetWidth;
       el.classList.add('word-full-pop');
     }
+  }
+
+  /**
+   * Update dim state of full word letters (Easy)
+   * @param {number} filledCount
+   */
+  updateFullWordProgress(filledCount) {
+    if (!this._dimTyped || !this.mode.showFullWord) return;
+    this.setFullWord(this._currentDisplay || '', true, filledCount);
   }
 
   /**
@@ -519,6 +666,11 @@ export class UI {
       } else {
         this.setTargetLetter('');
       }
+    }
+
+    // Easy dim-typed full word
+    if (this._dimTyped && this.mode.showFullWord) {
+      this.updateFullWordProgress(filledCount);
     }
   }
 
@@ -659,12 +811,67 @@ export class UI {
         t instanceof HTMLElement &&
         (t.classList.contains('mode-btn') ||
           t.classList.contains('cat-btn') ||
-          t.id === 'mute-btn')
+          t.id === 'mute-btn' ||
+          t.id === 'class-code-input' ||
+          t.id === 'daily-btn' ||
+          t.closest?.('.class-panel') ||
+          t.closest?.('.daily-card'))
       ) {
         return;
       }
       e.preventDefault();
       handler();
+    });
+  }
+
+  onDaily(handler) {
+    this.els.dailyBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      handler();
+    });
+  }
+
+  onShare(handler) {
+    this.els.shareBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      handler();
+    });
+  }
+
+  /**
+   * @param {{ onJoin: (code:string)=>void, onCreate: ()=>void, onShare: ()=>void, onClear: ()=>void }} handlers
+   */
+  onClassroom(handlers) {
+    this.els.classJoinBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const code =
+        this.els.classCodeInput instanceof HTMLInputElement
+          ? this.els.classCodeInput.value
+          : '';
+      handlers.onJoin?.(code);
+    });
+    this.els.classCreateBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      handlers.onCreate?.();
+    });
+    this.els.classShareBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      handlers.onShare?.();
+    });
+    this.els.classClearBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      handlers.onClear?.();
+    });
+    this.els.classCodeInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        e.stopPropagation();
+        const code =
+          this.els.classCodeInput instanceof HTMLInputElement
+            ? this.els.classCodeInput.value
+            : '';
+        handlers.onJoin?.(code);
+      }
     });
   }
 

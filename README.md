@@ -147,20 +147,14 @@ Aset bawaan: **OpenMoji** (CC BY-SA) + solid color + SVG custom Indonesia.
 
 ### Voice (kata & pujian)
 
-Default: **Web Speech API** (`speechSynthesis`), bahasa `id-ID` bila tersedia.
+1. **Voice pack MP3** (`assets/audio/voice/`) — preferensi utama (ID: Damayanti, EN: Samantha)  
+2. Fallback **Web Speech API** (`speechSynthesis`) jika pack gagal dimuat  
 
-- Tidak butuh API eksternal  
-- Jika suara Indonesia tidak ada di OS, browser memakai voice terdekat  
+Feature flag: `features.voicePacks` di `config.js`.
 
-### SFX (klik, pop, celebration)
+### SFX (klik, pop, celebration, combo)
 
 Dihasilkan di `js/audio.js` lewat **Web Audio API** (tanpa file).
-
-Untuk file audio kustom di masa depan:
-
-1. Taruh file di `assets/audio/` (mis. `correct.mp3`)  
-2. Set `audio` di entry kata, atau extend `AudioManager`  
-3. Feature flag `features.voicePacks` di `config.js` sudah disiapkan
 
 ---
 
@@ -176,16 +170,16 @@ Tidak ada mouse wajib di mode bermain (kecuali tombol speaker opsional).
 
 ---
 
-## Arsitektur siap masa depan
+## Fitur v1.6
 
-Di `js/config.js` → `features` & `gameplay`:
-
-- Difficulty (3–8 huruf) lewat `minLetters` / `maxLetters`
-- Filter kategori lewat `activeCategories`
-- Parent dashboard, progress, achievements, daily challenge
-- English mode, multiplayer kelas, voice packs, PWA offline
-
-**Jangan aktifkan dulu** — deliverable awal tetap fokus: game mengetik no-fail yang menyenangkan.
+- 3 mode (Mudah / Sedang / Sulit) + Bahasa ID/EN  
+- Voice pack offline 100 kata × 2 bahasa  
+- Misi harian (deterministik per tanggal) + streak hari  
+- Combo kata beruntun + badge HUD  
+- Easy: huruf yang sudah diketik redup di kata full  
+- Classroom: kode 4 huruf → misi sama (tanpa server)  
+- Bagikan ringkasan ke orang tua (Web Share / clipboard)  
+- PWA + unit test + Playwright smoke (`npm test` / `npm run test:e2e`)
 
 ---
 

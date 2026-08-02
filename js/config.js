@@ -6,7 +6,7 @@ export const CONFIG = {
   app: {
     name: 'Typing Kids Indonesia',
     subtitle: 'Belajar Mengetik Sambil Bermain',
-    version: '1.5.0',
+    version: '1.6.0',
     language: 'id',
   },
 
@@ -57,6 +57,8 @@ export const CONFIG = {
       showLetterProgress: true,
       /** Always show full word (Apel, Kucing, …) */
       showFullWord: true,
+      /** Dim completed letters in the full word as the child types */
+      dimTypedLetters: true,
       showLabelAfterWrongs: 0,
       hintLetterAfterWrongs: 3,
       timerSeconds: 0,
@@ -75,6 +77,7 @@ export const CONFIG = {
       showLetterProgress: true,
       /** Full word always visible (e.g. APEL) */
       showFullWord: true,
+      dimTypedLetters: false,
       showLabelAfterWrongs: 0,
       hintLetterAfterWrongs: 0,
       timerSeconds: 0,
@@ -91,6 +94,7 @@ export const CONFIG = {
       showKbHint: false,
       showLetterProgress: false,
       showFullWord: false,
+      dimTypedLetters: false,
       showLabelAfterWrongs: 0,
       hintLetterAfterWrongs: 0,
       /** Per-word countdown; 0 = off */
@@ -165,11 +169,13 @@ export const CONFIG = {
     parentDashboard: true,
     progressTracking: true,
     achievements: true,
-    dailyChallenge: false,
+    dailyChallenge: true,
     englishMode: true,
-    multiplayer: false,
-    voicePacks: false,
+    multiplayer: true,
+    voicePacks: true,
     pwa: true,
+    combo: true,
+    parentShare: true,
   },
 };
 

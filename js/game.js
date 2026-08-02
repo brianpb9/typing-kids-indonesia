@@ -1,5 +1,5 @@
 /**
- * Game — modes, full word (easy/medium), hard timer, tutorial, categories
+ * Game — modes, full word (easy/medium), hard timer, tutorial, daily, combo, classroom
  */
 import { CONFIG, getMode } from './config.js';
 import { WordBank } from './words.js';
@@ -7,9 +7,23 @@ import { AudioManager } from './audio.js';
 import { AnimationManager } from './animation.js';
 import { InputManager } from './input.js';
 import { UI } from './ui.js';
-import { loadSave, patchSave, getRank } from './storage.js';
+import {
+  loadSave,
+  patchSave,
+  getRank,
+  recordPlayDay,
+  buildShareText,
+} from './storage.js';
 import { preloadImages } from './preload.js';
 import { getStrings } from './i18n.js';
+import { getDailyMission, dateKey, applyDailyToSave } from './daily.js';
+import {
+  generateClassCode,
+  normalizeCode,
+  resolveClassroom,
+  classShareUrl,
+  classCodeFromUrl,
+} from './classroom.js';
 
 export class Game {
   constructor() {
@@ -39,9 +53,17 @@ export class Game {
     this._timerLeft = 0;
     this._timerActive = false;
     this._hardBonusUsed = false;
-    this._sessionWordsDone = 0; // successful words this mission
+    this._sessionWordsDone = 0;
     this._sessionModeLabel = '';
     this._sessionThemeLabel = '';
+
+    /** Word-complete combo (consecutive successes without wrong mid-word) */
+    this._combo = 0;
+    this._sessionBestCombo = 0;
+    /** @type {'normal'|'daily'|'class'} */
+    this._missionKind = 'normal';
+    this._classCode = '';
+    this._lastShareText = '';
 
     this.input = new InputManager({
       onLetter: (letter) => this.handleLetter(letter),
@@ -67,6 +89,7 @@ export class Game {
     this.difficulty = getMode(save.difficulty).id;
     this.category = save.category || 'all';
     this.language = save.language === 'en' ? 'en' : 'id';
+    this._classCode = save.classCode || '';
     this.audio.setMuted(save.muted);
     this.ui.setMuteUI(save.muted);
     this.ui.applyLanguage(this.language);
@@ -74,6 +97,17 @@ export class Game {
     this.ui.setCategoryUI(this.category);
     this.ui.renderCollection(save);
     this._applySpeechLang();
+    this._refreshDailyUI();
+    this._refreshClassUI();
+
+    // Voice pack (non-blocking if offline)
+    this.audio.loadVoicePack().catch(() => {});
+
+    // URL class code wins
+    const urlCode = classCodeFromUrl();
+    if (urlCode) {
+      this._joinClass(urlCode, { silent: true });
+    }
 
     try {
       await this._loadWordsForLanguage();
@@ -95,6 +129,14 @@ export class Game {
       () => this._tutorialFinish(true)
     );
     this.ui.onHelp(() => this.openHelp());
+    this.ui.onDaily(() => this.startDailyMission());
+    this.ui.onShare(() => this.shareParentSummary());
+    this.ui.onClassroom({
+      onJoin: (code) => this._joinClass(code),
+      onCreate: () => this._createClass(),
+      onShare: () => this._shareClass(),
+      onClear: () => this._clearClass(),
+    });
 
     this.ui.onSpeak(() => {
       this.audio.unlock();
@@ -123,10 +165,37 @@ export class Game {
   _applySpeechLang() {
     const pack = CONFIG.languages?.[this.language];
     const t = getStrings(this.language);
+    this.audio.setLangCode(this.language);
     this.audio.setSpeechLang(
       pack?.speechLang || t.speechLang,
       t.speechFallback
     );
+  }
+
+  _refreshDailyUI() {
+    if (!CONFIG.features.dailyChallenge) {
+      this.ui.els.dailyCard?.classList.add('hidden');
+      return;
+    }
+    const mission = getDailyMission();
+    const save = loadSave();
+    const day = mission.key;
+    const daily = save.daily?.key === day ? save.daily : { key: day, completed: false, stars: 0 };
+    const t = this._t();
+    const catLabel = t.categories[mission.category] || mission.category;
+    const modeLabel = t.modes[mission.mode]?.name || mission.mode;
+    this.ui.renderDaily({
+      desc: t.dailyDesc(catLabel, modeLabel, mission.target),
+      done: Boolean(daily.completed),
+    });
+  }
+
+  _refreshClassUI() {
+    if (!CONFIG.features.multiplayer) {
+      this.ui.els.classPanel?.classList.add('hidden');
+      return;
+    }
+    this.ui.renderClassroom({ code: this._classCode || null });
   }
 
   async _loadWordsForLanguage() {
@@ -152,6 +221,8 @@ export class Game {
     this.ui.setCategoryUI(this.category);
     this.ui.renderCollection(loadSave());
     this._applySpeechLang();
+    this._refreshDailyUI();
+    this._refreshClassUI();
     patchSave({ language: this.language });
     this.audio.playClick();
 
@@ -204,7 +275,10 @@ export class Game {
     this._transitionLock = false;
     this.state = 'start';
     this.ui.hideTimer();
+    this.ui.setCombo(0);
     this.ui.renderCollection(loadSave());
+    this._refreshDailyUI();
+    this._refreshClassUI();
     this.ui.showStart();
   }
 
@@ -218,6 +292,27 @@ export class Game {
     ) {
       return;
     }
+    // If class active, use class mission params
+    if (this._classCode && CONFIG.features.multiplayer) {
+      const cls = resolveClassroom(this._classCode);
+      if (cls) {
+        this._missionKind = 'class';
+        this.difficulty = cls.mode;
+        this.category = cls.category;
+        this._sessionTarget = cls.target;
+        this.ui.setSessionTarget(cls.target);
+        this.ui.setDifficultyUI(this.difficulty);
+        this.ui.setCategoryUI(this.category);
+        this.words.setDifficulty(this.difficulty);
+        this.words.setCategory(this.category);
+        patchSave({ difficulty: this.difficulty, category: this.category });
+      }
+    } else {
+      this._missionKind = 'normal';
+      this._sessionTarget = CONFIG.goals.sessionTarget;
+      this.ui.setSessionTarget(this._sessionTarget);
+    }
+
     const save = loadSave();
     const done =
       this.language === 'en' ? save.tutorialDoneEn : save.tutorialDone;
@@ -228,10 +323,111 @@ export class Game {
     this.startMission();
   }
 
+  /** Daily mission — fixed category/mode/target for today */
+  startDailyMission() {
+    if (
+      this.state === 'playing' ||
+      this.state === 'celebrating' ||
+      this.state === 'milestone' ||
+      this.state === 'tutorial'
+    ) {
+      return;
+    }
+    const mission = getDailyMission();
+    const save = loadSave();
+    if (save.daily?.key === mission.key && save.daily.completed) {
+      this.ui.setEncouragement(this._t().dailyDone);
+      return;
+    }
+
+    this._missionKind = 'daily';
+    this.difficulty = mission.mode;
+    this.category = mission.category;
+    this._sessionTarget = mission.target;
+    this.ui.setSessionTarget(mission.target);
+    this.ui.setDifficultyUI(this.difficulty);
+    this.ui.setCategoryUI(this.category);
+    this.words.setDifficulty(this.difficulty);
+    this.words.setCategory(this.category);
+    patchSave({ difficulty: this.difficulty, category: this.category });
+
+    const done =
+      this.language === 'en' ? save.tutorialDoneEn : save.tutorialDone;
+    if (!done) {
+      this._openTutorial(false);
+      return;
+    }
+    this.startMission();
+  }
+
+  _joinClass(raw, opts = {}) {
+    const code = normalizeCode(raw);
+    const cls = resolveClassroom(code);
+    if (!cls) {
+      if (!opts.silent) this.ui.setClassMsg('');
+      return;
+    }
+    this._classCode = cls.code;
+    patchSave({ classCode: cls.code });
+    this.difficulty = cls.mode;
+    this.category = cls.category;
+    this._sessionTarget = cls.target;
+    this.ui.setSessionTarget(cls.target);
+    this.ui.setDifficultyUI(this.difficulty);
+    this.ui.setCategoryUI(this.category);
+    this.words.setDifficulty(this.difficulty);
+    this.words.setCategory(this.category);
+    this._refreshClassUI();
+    if (!opts.silent) {
+      this.audio.playClick();
+      this.ui.setClassMsg(this._t().classActive(cls.code));
+    }
+  }
+
+  _createClass() {
+    const code = generateClassCode();
+    this._joinClass(code);
+    this.ui.setClassMsg(this._t().classActive(code));
+  }
+
+  async _shareClass() {
+    if (!this._classCode) return;
+    const url = classShareUrl(this._classCode);
+    const text = `${this._t().classActive(this._classCode)}\n${url}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: this._t().classTitle, text, url });
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        this.ui.setClassMsg(this._t().classCopied);
+      } else {
+        this.ui.setClassMsg(url);
+      }
+    } catch {
+      try {
+        await navigator.clipboard?.writeText(text);
+        this.ui.setClassMsg(this._t().classCopied);
+      } catch {
+        this.ui.setClassMsg(url);
+      }
+    }
+    this.audio.playClick();
+  }
+
+  _clearClass() {
+    this._classCode = '';
+    this._missionKind = 'normal';
+    this._sessionTarget = CONFIG.goals.sessionTarget;
+    this.ui.setSessionTarget(this._sessionTarget);
+    patchSave({ classCode: '' });
+    this._refreshClassUI();
+    this.ui.setClassMsg('');
+    this.audio.playClick();
+  }
+
   /** Help button — re-open tutorial without forcing start */
   openHelp() {
     if (this.state === 'playing' || this.state === 'celebrating') {
-      // Pause soft: stop timer, show help
       this._stopTimer();
     }
     this._openTutorial(true);
@@ -294,7 +490,6 @@ export class Game {
 
     if (this._tutorialHelpOnly) {
       this._tutorialHelpOnly = false;
-      // Resume game screen if we were playing
       if (this._prevState === 'playing' && this.current) {
         this.state = 'playing';
         this.ui.showGame();
@@ -328,13 +523,22 @@ export class Game {
     this._sessionWordsDone = 0;
     this._milestonesHit = new Set();
     this._wrongStreak = 0;
+    this._combo = 0;
+    this._sessionBestCombo = 0;
     this._transitionLock = false;
     this._hardBonusUsed = false;
     this._stopTimer();
 
+    if (!this._sessionTarget || this._missionKind === 'normal') {
+      if (this._missionKind === 'normal' && !this._classCode) {
+        this._sessionTarget = CONFIG.goals.sessionTarget;
+      }
+    }
+    this.ui.setSessionTarget(this._sessionTarget);
+    this.ui.setCombo(0);
+
     this.words.setDifficulty(this.difficulty);
     this.words.setCategory(this.category);
-    // Progressive: start with shorter words
     if (CONFIG.gameplay.progressiveDifficulty) {
       const mode = this._mode();
       const startMax = Math.min(mode.minLetters + 1, mode.maxLetters);
@@ -369,7 +573,6 @@ export class Game {
   _preferMaxLetters() {
     const mode = this._mode();
     if (!CONFIG.gameplay.progressiveDifficulty) return mode.maxLetters;
-    // Ramp: +1 letter length every 2 stars
     const ramp = mode.minLetters + Math.floor(this.sessionStars / 2) + 1;
     return Math.min(Math.max(ramp, mode.minLetters), mode.maxLetters);
   }
@@ -392,6 +595,7 @@ export class Game {
     this.ui.applyModeLayout();
     this.ui.setWord(this.current, this.sessionStars, {
       showFullWord: Boolean(mode.showFullWord),
+      dimTypedLetters: Boolean(mode.dimTypedLetters),
     });
     this.ui.setEncouragement(this._goalEncouragement());
     this.state = 'playing';
@@ -421,7 +625,6 @@ export class Game {
       if (!this._timerActive || this.state !== 'playing') return;
       this._timerLeft -= 1;
 
-      // One-time bonus near end if child has progress
       const bonusAt = CONFIG.gameplay.hardBonusTriggerAt ?? 5;
       const bonusSec = CONFIG.gameplay.hardBonusSeconds ?? 10;
       if (
@@ -433,6 +636,7 @@ export class Game {
         this._timerLeft += bonusSec;
         this.ui.setEncouragement(this._t().bonusTime);
         this.audio.playSparkle();
+        this.audio.speakPhrase('bonus', this._t().bonusTime);
       }
 
       const urgent = this._timerLeft <= 8;
@@ -457,9 +661,12 @@ export class Game {
     this._stopTimer();
     this._transitionLock = true;
     this.state = 'celebrating';
+    this._combo = 0;
+    this.ui.setCombo(0);
 
     this.ui.setEncouragement(this._t().timeout);
     this.audio.playWrong();
+    this.audio.speakPhrase('timeout', this._t().timeout);
     this.ui.shakeWord();
 
     setTimeout(() => {
@@ -487,7 +694,7 @@ export class Game {
   speakCurrentWord() {
     if (!this.current) return;
     this.audio.unlock();
-    this.audio.speakWord(this.current.display);
+    this.audio.speakWord(this.current.display, this.current.id);
   }
 
   /**
@@ -517,6 +724,8 @@ export class Game {
     const mode = this._mode();
     if (mode.showSlots) {
       this.ui.renderSlots(this.current.word, this.cursor);
+    } else if (mode.dimTypedLetters) {
+      this.ui.updateFullWordProgress(this.cursor);
     }
     if (mode.showLetterProgress) {
       this.ui.setProgress(this.cursor, this.current.word.length);
@@ -544,6 +753,11 @@ export class Game {
 
   _onWrong() {
     this._wrongStreak += 1;
+    // Break combo on any wrong key
+    if (this._combo > 0) {
+      this._combo = 0;
+      this.ui.setCombo(0);
+    }
     this.ui.shakeWord();
     this.audio.playWrong();
 
@@ -571,7 +785,6 @@ export class Game {
       return;
     }
 
-    // Easy / medium: full word already visible — gentle nudge
     this.ui.setEncouragement(this.words.randomEncouragement());
     if (this._wrongStreak >= 4 && this._wrongStreak % 3 === 0) {
       this.speakCurrentWord();
@@ -585,9 +798,28 @@ export class Game {
     this.sessionStars += 1;
     this._sessionWordsDone += 1;
 
+    // Combo: consecutive words without wrong key mid-word
+    if (CONFIG.features.combo) {
+      this._combo += 1;
+      this._sessionBestCombo = Math.max(this._sessionBestCombo, this._combo);
+      this.ui.setCombo(this._combo);
+      if (this._combo >= 2) this.audio.playCombo(this._combo);
+    }
+
     const save = patchSave({
       totalStars: loadSave().totalStars + 1,
+      bestCombo: Math.max(loadSave().bestCombo || 0, this._sessionBestCombo),
     });
+
+    // Daily progress
+    if (this._missionKind === 'daily') {
+      const day = dateKey();
+      const daily = applyDailyToSave(save, day, {
+        stars: this.sessionStars,
+        completed: this.sessionStars >= this._sessionTarget,
+      });
+      patchSave({ daily });
+    }
 
     this.ui.setSessionStars(this.sessionStars, this._sessionTarget, {
       pop: true,
@@ -657,10 +889,22 @@ export class Game {
     this.state = 'victory';
     this._transitionLock = true;
 
-    const updated = patchSave({
+    let updated = patchSave({
       missionsWon: (save.missionsWon || 0) + 1,
       totalStars: save.totalStars,
+      bestCombo: Math.max(save.bestCombo || 0, this._sessionBestCombo),
     });
+
+    // Daily complete + streak
+    const day = dateKey();
+    if (this._missionKind === 'daily') {
+      const daily = applyDailyToSave(updated, day, {
+        stars: this.sessionStars,
+        completed: true,
+      });
+      updated = patchSave({ daily });
+    }
+    updated = recordPlayDay(day);
 
     this.anim.celebrate();
     setTimeout(() => this.anim.celebrate(), 400);
@@ -680,8 +924,25 @@ export class Game {
       rank: `${rank.emoji} ${rank.label}`,
       total: updated.totalStars,
     });
+
+    this._lastShareText = buildShareText(
+      {
+        sessionStars: this.sessionStars,
+        totalStars: updated.totalStars,
+        mode: this._sessionModeLabel,
+        theme: this._sessionThemeLabel,
+        lang: this.language === 'en' ? 'English' : 'Bahasa Indonesia',
+        rank: `${rank.emoji} ${rank.label}`,
+        combo: this._sessionBestCombo,
+        daily: this._missionKind === 'daily',
+      },
+      t
+    );
+    this.ui.setShareMsg('');
+
     this.ui.showVictory();
     this.ui.renderCollection(updated);
+    this._refreshDailyUI();
 
     this.audio.playCelebration();
     this.audio.speakPraise(t.victorySpeech);
@@ -692,6 +953,36 @@ export class Game {
         );
       }
     }, 2200);
+  }
+
+  async shareParentSummary() {
+    const text = this._lastShareText || this._t().shareTitle;
+    this.audio.playClick();
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: this._t().shareTitle,
+          text,
+        });
+        this.ui.setShareMsg('');
+        return;
+      }
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        this.ui.setShareMsg(this._t().shareCopied);
+        return;
+      }
+      this.ui.setShareMsg(this._t().shareFail);
+    } catch (err) {
+      // user cancel share — ignore
+      if (err && err.name === 'AbortError') return;
+      try {
+        await navigator.clipboard?.writeText(text);
+        this.ui.setShareMsg(this._t().shareCopied);
+      } catch {
+        this.ui.setShareMsg(this._t().shareFail);
+      }
+    }
   }
 }
 

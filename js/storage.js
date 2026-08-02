@@ -1,5 +1,5 @@
 /**
- * Local progress — stars, mute, mode, category, language, tutorial
+ * Local progress — stars, mute, mode, category, language, tutorial, daily, streak, class
  */
 import { CONFIG, getMode } from './config.js';
 
@@ -15,6 +15,10 @@ const KEY = CONFIG.storage.key;
  *   language: 'id'|'en',
  *   tutorialDone: boolean,
  *   tutorialDoneEn: boolean,
+ *   daily: { key: string, completed: boolean, stars: number },
+ *   streak: { current: number, best: number, lastDay: string },
+ *   classCode: string,
+ *   bestCombo: number,
  * }} SaveData
  */
 
@@ -29,6 +33,10 @@ function defaults() {
     language: 'id',
     tutorialDone: false,
     tutorialDoneEn: false,
+    daily: { key: '', completed: false, stars: 0 },
+    streak: { current: 0, best: 0, lastDay: '' },
+    classCode: '',
+    bestCombo: 0,
   };
 }
 
@@ -60,6 +68,14 @@ export function loadSave() {
     base.difficulty = normalizeDifficulty(base.difficulty);
     base.language = normalizeLang(base.language);
     if (!base.category) base.category = 'all';
+    if (!base.daily || typeof base.daily !== 'object') {
+      base.daily = defaults().daily;
+    }
+    if (!base.streak || typeof base.streak !== 'object') {
+      base.streak = defaults().streak;
+    }
+    if (typeof base.classCode !== 'string') base.classCode = '';
+    if (typeof base.bestCombo !== 'number') base.bestCombo = 0;
     return base;
   } catch {
     return defaults();
@@ -71,12 +87,41 @@ export function patchSave(patch) {
   const next = { ...loadSave(), ...patch };
   if (patch.difficulty) next.difficulty = normalizeDifficulty(patch.difficulty);
   if (patch.language) next.language = normalizeLang(patch.language);
+  if (patch.daily) next.daily = { ...loadSave().daily, ...patch.daily };
+  if (patch.streak) next.streak = { ...loadSave().streak, ...patch.streak };
   try {
     localStorage.setItem(KEY, JSON.stringify(next));
   } catch {
     /* private mode / quota */
   }
   return next;
+}
+
+/**
+ * Update play streak when a mission (or daily) is completed on a calendar day.
+ * @param {string} dayKey YYYY-MM-DD
+ * @returns {SaveData}
+ */
+export function recordPlayDay(dayKey) {
+  const save = loadSave();
+  const streak = { ...(save.streak || defaults().streak) };
+  if (streak.lastDay === dayKey) {
+    return save; // already counted today
+  }
+  // consecutive?
+  const prev = streak.lastDay;
+  let nextCurrent = 1;
+  if (prev) {
+    const dPrev = new Date(prev + 'T12:00:00');
+    const dNow = new Date(dayKey + 'T12:00:00');
+    const diff = Math.round((dNow - dPrev) / 86400000);
+    if (diff === 1) nextCurrent = (streak.current || 0) + 1;
+    else if (diff === 0) nextCurrent = streak.current || 1;
+  }
+  streak.current = nextCurrent;
+  streak.best = Math.max(streak.best || 0, nextCurrent);
+  streak.lastDay = dayKey;
+  return patchSave({ streak });
 }
 
 /**
@@ -128,6 +173,41 @@ export function remainingCopy(have, target, t = null) {
   return `${left} lagi sampai juara~`;
 }
 
+/**
+ * Build parent-share text
+ * @param {{ sessionStars: number, totalStars: number, mode: string, theme: string, lang: string, rank: string, combo?: number, daily?: boolean }} data
+ * @param {ReturnType<import('./i18n.js').getStrings>} t
+ */
+export function buildShareText(data, t) {
+  const lines = [
+    t.shareTitle || 'Typing Kids',
+    `${t.parentWords}: ${data.sessionStars}`,
+    `${t.parentMode}: ${data.mode}`,
+    `${t.parentTheme}: ${data.theme}`,
+    `${t.parentLang}: ${data.lang}`,
+    `${t.parentRank}: ${data.rank}`,
+    `${t.parentTotal}: ${data.totalStars}`,
+  ];
+  if (data.combo && data.combo > 1) {
+    lines.push(`${t.comboBest || 'Combo'}: x${data.combo}`);
+  }
+  if (data.daily) {
+    lines.push(t.dailyDoneShare || 'Daily mission complete!');
+  }
+  if (typeof window !== 'undefined') {
+    lines.push(window.location.origin + window.location.pathname);
+  }
+  return lines.join('\n');
+}
+
 export { getMode };
 
-export default { loadSave, patchSave, getRank, remainingCopy, getMode };
+export default {
+  loadSave,
+  patchSave,
+  getRank,
+  remainingCopy,
+  recordPlayDay,
+  buildShareText,
+  getMode,
+};

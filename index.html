@@ -105,6 +105,7 @@
             ★ <span id="lifetime-stars">0</span>
             <span id="stars-word">bintang</span>
           </span>
+          <span class="collection-streak" id="collection-streak">🔥 Mulai streak</span>
         </div>
 
         <div class="start-card">
@@ -117,6 +118,43 @@
           <div class="mission-preview" id="mission-preview" aria-hidden="true"></div>
           <p class="hint" id="start-hint">✨ Tidak ada yang salah — coba saja terus ✨</p>
         </div>
+
+        <!-- Daily mission -->
+        <div class="daily-card" id="daily-card">
+          <div class="daily-head">
+            <p class="daily-title" id="daily-title">📅 Misi harian</p>
+            <span class="daily-badge hidden" id="daily-badge">✅</span>
+          </div>
+          <p class="daily-desc" id="daily-desc"></p>
+          <button type="button" id="daily-btn" class="btn-daily">Main misi harian</button>
+        </div>
+
+        <!-- Classroom (lightweight shared seed) -->
+        <details class="class-panel" id="class-panel">
+          <summary id="class-title">👩‍🏫 Kelas</summary>
+          <div class="class-body">
+            <p class="class-active hidden" id="class-active"></p>
+            <div class="class-row">
+              <input
+                type="text"
+                id="class-code-input"
+                class="class-input"
+                maxlength="6"
+                placeholder="Kode"
+                autocomplete="off"
+                spellcheck="false"
+                aria-label="Kode kelas"
+              />
+              <button type="button" id="class-join-btn" class="btn-secondary btn-sm">Gabung</button>
+            </div>
+            <div class="class-actions">
+              <button type="button" id="class-create-btn" class="btn-secondary btn-sm">Buat kode kelas</button>
+              <button type="button" id="class-share-btn" class="btn-secondary btn-sm hidden">Bagikan kode kelas</button>
+              <button type="button" id="class-clear-btn" class="btn-secondary btn-sm hidden">Keluar kelas</button>
+            </div>
+            <p class="class-msg" id="class-msg" aria-live="polite"></p>
+          </div>
+        </details>
 
         <!-- 3 modes -->
         <div class="mode-pick mode-pick-3" role="group" aria-label="Difficulty" id="mode-pick">
@@ -184,6 +222,7 @@
           ></div>
           <div class="goal-count">
             <span id="session-stars">0</span>/<span id="session-target">10</span>
+            <span id="combo-badge" class="combo-badge hidden" aria-live="polite">Combo x2!</span>
           </div>
           <!-- Hard mode timer -->
           <div
@@ -349,6 +388,9 @@
           </div>
 
           <div class="victory-actions">
+            <button type="button" id="share-btn" class="btn-secondary">
+              Bagikan ke orang tua
+            </button>
             <button type="button" id="replay-btn" class="btn-start">
               Misi Baru!
             </button>
@@ -356,6 +398,7 @@
               Ke Awal
             </button>
           </div>
+          <p id="share-msg" class="share-msg" aria-live="polite"></p>
         </div>
       </section>
     </div>

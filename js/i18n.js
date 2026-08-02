@@ -111,6 +111,31 @@ export const LANGS = {
     ],
     tutorialSkip: 'Lewati',
     loadError: 'Oops, data kata gagal dimuat. Muat ulang ya!',
+    // Daily
+    dailyTitle: '📅 Misi harian',
+    dailyDesc: (cat, mode, n) => `${cat} · ${mode} · ${n} bintang`,
+    dailyBtn: 'Main misi harian',
+    dailyDone: '✅ Misi harian selesai!',
+    dailyDoneShare: 'Misi harian selesai hari ini!',
+    // Streak / combo
+    streakLabel: (n) => (n > 0 ? `🔥 ${n} hari berturut` : '🔥 Mulai streak'),
+    streakBest: (n) => `Rekor ${n} hari`,
+    comboLabel: (n) => `Combo x${n}!`,
+    comboBest: 'Combo terbaik',
+    // Classroom
+    classTitle: '👩‍🏫 Kelas',
+    classCreate: 'Buat kode kelas',
+    classJoin: 'Gabung',
+    classCodePh: 'Kode',
+    classActive: (code) => `Kelas ${code}`,
+    classClear: 'Keluar kelas',
+    classCopied: 'Link kelas disalin!',
+    classShare: 'Bagikan kode kelas',
+    // Parent share
+    shareBtn: 'Bagikan ke orang tua',
+    shareTitle: 'Typing Kids Indonesia ⭐',
+    shareCopied: 'Ringkasan disalin!',
+    shareFail: 'Tidak bisa membagikan — salin manual ya',
   },
   en: {
     code: 'en',
@@ -221,6 +246,31 @@ export const LANGS = {
     ],
     tutorialSkip: 'Skip',
     loadError: 'Oops, words failed to load. Please refresh!',
+    // Daily
+    dailyTitle: '📅 Daily mission',
+    dailyDesc: (cat, mode, n) => `${cat} · ${mode} · ${n} stars`,
+    dailyBtn: 'Play daily mission',
+    dailyDone: '✅ Daily mission done!',
+    dailyDoneShare: 'Daily mission complete today!',
+    // Streak / combo
+    streakLabel: (n) => (n > 0 ? `🔥 ${n}-day streak` : '🔥 Start a streak'),
+    streakBest: (n) => `Best ${n} days`,
+    comboLabel: (n) => `Combo x${n}!`,
+    comboBest: 'Best combo',
+    // Classroom
+    classTitle: '👩‍🏫 Classroom',
+    classCreate: 'Create class code',
+    classJoin: 'Join',
+    classCodePh: 'Code',
+    classActive: (code) => `Class ${code}`,
+    classClear: 'Leave class',
+    classCopied: 'Class link copied!',
+    classShare: 'Share class code',
+    // Parent share
+    shareBtn: 'Share with parent',
+    shareTitle: 'Typing Kids ⭐',
+    shareCopied: 'Summary copied!',
+    shareFail: 'Could not share — copy manually',
   },
 };
 

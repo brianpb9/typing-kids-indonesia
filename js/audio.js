@@ -1,15 +1,17 @@
 /**
- * Audio — Web Audio SFX + robust Indonesian TTS (SpeechSynthesis)
+ * Audio — Web Audio SFX + voice pack MP3 (preferred) + SpeechSynthesis fallback
  * Handles Chrome cancel/speak race, voice loading, Safari unlock.
  */
 import { CONFIG } from './config.js';
+
+const VOICE_MANIFEST = 'assets/audio/voice/manifest.json';
 
 export class AudioManager {
   constructor() {
     this.ctx = null;
     this.enabled = CONFIG.audio.enabled;
     this.masterVolume = CONFIG.audio.masterVolume;
-    /** Master mute — SFX + TTS */
+    /** Master mute — SFX + TTS + pack */
     this.muted = false;
     this._speechReady =
       typeof window !== 'undefined' && 'speechSynthesis' in window;
@@ -22,13 +24,52 @@ export class AudioManager {
     this._currentUtterance = null;
     this._speakToken = 0;
 
+    /** @type {'id'|'en'} */
+    this._langCode = 'id';
+    /** @type {{ id?: Record<string,string>, en?: Record<string,string>, meta?: object }|null} */
+    this._voiceManifest = null;
+    this._voicePackReady = false;
+    /** @type {HTMLAudioElement|null} */
+    this._packAudio = null;
+    this._packToken = 0;
+
     if (this._speechReady) {
       this._loadVoices();
       window.speechSynthesis.onvoiceschanged = () => this._loadVoices();
-      // Some browsers only populate voices after a tick
       setTimeout(() => this._loadVoices(), 250);
       setTimeout(() => this._loadVoices(), 1000);
     }
+  }
+
+  /**
+   * Load offline voice pack manifest (non-blocking if missing).
+   * @returns {Promise<boolean>}
+   */
+  async loadVoicePack() {
+    if (!CONFIG.features?.voicePacks) {
+      this._voicePackReady = false;
+      return false;
+    }
+    try {
+      const res = await fetch(VOICE_MANIFEST, { cache: 'force-cache' });
+      if (!res.ok) throw new Error(`voice pack ${res.status}`);
+      this._voiceManifest = await res.json();
+      this._voicePackReady = Boolean(
+        this._voiceManifest?.id || this._voiceManifest?.en
+      );
+      return this._voicePackReady;
+    } catch {
+      this._voiceManifest = null;
+      this._voicePackReady = false;
+      return false;
+    }
+  }
+
+  /**
+   * @param {'id'|'en'|string} code
+   */
+  setLangCode(code) {
+    this._langCode = code === 'en' ? 'en' : 'id';
   }
 
   /** Call on first user gesture to unlock audio + speech */
@@ -54,12 +95,11 @@ export class AudioManager {
 
     if (this._speechReady) {
       try {
-        // Unlock speech pipeline (required on many browsers)
         window.speechSynthesis.cancel();
         const warm = new SpeechSynthesisUtterance(' ');
         warm.volume = 0.01;
         warm.rate = 1;
-        warm.lang = CONFIG.speech.lang;
+        warm.lang = this._speechLang || CONFIG.speech.lang;
         window.speechSynthesis.speak(warm);
         window.speechSynthesis.cancel();
         this._loadVoices();
@@ -130,12 +170,6 @@ export class AudioManager {
   }
 
   /**
-   * Speak text with TTS (Indonesian preferred).
-   * @param {string} text
-   * @param {{ rate?: number, pitch?: number, force?: boolean }} [opts]
-   * @returns {Promise<void>}
-   */
-  /**
    * @param {boolean} muted
    */
   setMuted(muted) {
@@ -148,6 +182,77 @@ export class AudioManager {
     return this.muted;
   }
 
+  /**
+   * Resolve packed clip path by key (word id or phrase key like _praise_great)
+   * @param {string} key
+   * @returns {string|null}
+   */
+  _packPath(key) {
+    if (!this._voicePackReady || !this._voiceManifest || !key) return null;
+    const bag = this._voiceManifest[this._langCode] || {};
+    return bag[key] || null;
+  }
+
+  /**
+   * Play a packed MP3 if present.
+   * @param {string} key word id or _phrase
+   * @returns {Promise<boolean>} true if played from pack
+   */
+  playPacked(key) {
+    if (this.muted) return Promise.resolve(false);
+    const src = this._packPath(key);
+    if (!src) return Promise.resolve(false);
+
+    const token = ++this._packToken;
+    // Stop TTS so they don't overlap
+    if (this._speechReady) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch {
+        /* ignore */
+      }
+    }
+
+    return new Promise((resolve) => {
+      try {
+        if (this._packAudio) {
+          try {
+            this._packAudio.pause();
+          } catch {
+            /* ignore */
+          }
+        }
+        const a = new Audio(src);
+        a.volume = Math.min(1, this.masterVolume * 1.35);
+        this._packAudio = a;
+        const finish = (ok) => {
+          if (token !== this._packToken) {
+            resolve(false);
+            return;
+          }
+          if (this._packAudio === a) this._packAudio = null;
+          resolve(ok);
+        };
+        a.onended = () => finish(true);
+        a.onerror = () => finish(false);
+        const p = a.play();
+        if (p && typeof p.then === 'function') {
+          p.catch(() => finish(false));
+        }
+        // Safety timeout
+        setTimeout(() => finish(true), 8000);
+      } catch {
+        resolve(false);
+      }
+    });
+  }
+
+  /**
+   * Speak text with TTS.
+   * @param {string} text
+   * @param {{ rate?: number, pitch?: number, force?: boolean }} [opts]
+   * @returns {Promise<void>}
+   */
   speak(text, opts = {}) {
     if (this.muted && !opts.force) return Promise.resolve();
     if (!this._speechReady || !text) return Promise.resolve();
@@ -165,7 +270,6 @@ export class AudioManager {
         }
 
         try {
-          // Chrome bug: cancel() then immediate speak() often drops audio
           window.speechSynthesis.cancel();
 
           setTimeout(() => {
@@ -174,7 +278,6 @@ export class AudioManager {
               return;
             }
 
-            // Chrome sometimes pauses the whole queue — resume
             try {
               window.speechSynthesis.resume();
             } catch {
@@ -204,8 +307,6 @@ export class AudioManager {
             u.onerror = finish;
 
             window.speechSynthesis.speak(u);
-
-            // Safety timeout (stuck speech on some OS)
             setTimeout(finish, Math.max(4000, clean.length * 500));
           }, 60);
         } catch {
@@ -218,10 +319,15 @@ export class AudioManager {
   }
 
   /**
-   * Speak a game word clearly (slightly slower for kids).
+   * Speak a game word — pack first, then TTS.
    * @param {string} wordDisplay e.g. "Apel"
+   * @param {string} [wordId] e.g. "apel"
    */
-  speakWord(wordDisplay) {
+  async speakWord(wordDisplay, wordId = '') {
+    if (this.muted) return;
+    const id = wordId || String(wordDisplay || '').toLowerCase().replace(/\s+/g, '');
+    const played = await this.playPacked(id);
+    if (played) return;
     return this.speak(wordDisplay, {
       rate: CONFIG.speech.rate ?? 0.85,
       pitch: CONFIG.speech.pitch ?? 1.1,
@@ -229,21 +335,56 @@ export class AudioManager {
   }
 
   /**
-   * Speak praise cheerfully.
+   * Speak praise cheerfully — try common pack phrases when text matches.
    * @param {string} text
    */
-  speakPraise(text) {
+  async speakPraise(text) {
+    if (this.muted) return;
+    const t = String(text || '').toLowerCase();
+    let key = null;
+    if (/juara|champion|hebat sekali|amazing/.test(t)) key = '_praise_win';
+    else if (/hebat|great|bagus|awesome|nice|keren/.test(t)) key = '_praise_great';
+    else if (/mantap|yes|good|wow|super/.test(t)) key = '_praise_good';
+
+    if (key) {
+      const played = await this.playPacked(key);
+      if (played) return;
+    }
     return this.speak(text, { rate: 1.0, pitch: 1.2 });
+  }
+
+  /**
+   * Optional phrase keys: _bonus, _timeout
+   * @param {'bonus'|'timeout'} kind
+   * @param {string} fallbackText
+   */
+  async speakPhrase(kind, fallbackText) {
+    if (this.muted) return;
+    const key = kind === 'bonus' ? '_bonus' : kind === 'timeout' ? '_timeout' : null;
+    if (key) {
+      const played = await this.playPacked(key);
+      if (played) return;
+    }
+    if (fallbackText) return this.speak(fallbackText);
   }
 
   stopSpeech() {
     this._speakToken += 1;
+    this._packToken += 1;
     if (this._speechReady) {
       try {
         window.speechSynthesis.cancel();
       } catch {
         /* ignore */
       }
+    }
+    if (this._packAudio) {
+      try {
+        this._packAudio.pause();
+      } catch {
+        /* ignore */
+      }
+      this._packAudio = null;
     }
     this._currentUtterance = null;
   }
@@ -288,6 +429,24 @@ export class AudioManager {
         this._tone({ freq, duration: 0.2, type: 'sine', vol: 0.2, attack: 0.01, decay: 0.18 });
       }, i * 90);
     });
+  }
+
+  /** Rising combo chime */
+  playCombo(level = 1) {
+    if (this.muted) return;
+    const base = 660 + Math.min(level, 8) * 40;
+    this._tone({ freq: base, duration: 0.08, type: 'sine', vol: 0.16, attack: 0.005, decay: 0.07 });
+    setTimeout(() => {
+      if (this.muted) return;
+      this._tone({
+        freq: base * 1.25,
+        duration: 0.1,
+        type: 'sine',
+        vol: 0.14,
+        attack: 0.005,
+        decay: 0.09,
+      });
+    }, 50);
   }
 
   /**
