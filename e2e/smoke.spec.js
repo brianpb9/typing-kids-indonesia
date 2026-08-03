@@ -17,6 +17,9 @@ test.describe('Typing Kids smoke', () => {
     await expect(page.locator('#length-mini')).toBeVisible();
     await expect(page.locator('#length-full')).toBeVisible();
     await expect(page.locator('#sticker-book')).toBeVisible();
+    await expect(page.locator('#world-map')).toBeVisible();
+    await expect(page.locator('#station-abc')).toBeVisible();
+    await expect(page.locator('#friendship-chip')).toBeVisible();
   });
 
   test('switch to English updates UI', async ({ page }) => {

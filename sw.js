@@ -39,6 +39,7 @@ const PRECACHE_SHELL = [
   '/js/letters.js',
   '/js/certificate.js',
   '/js/analytics.js',
+  '/js/friendship.js',
   '/data/words.json',
   '/data/words-en.json',
   '/assets/audio/voice/manifest.json',

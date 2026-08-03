@@ -117,6 +117,32 @@
             <span id="stars-word">bintang</span>
           </span>
           <span class="collection-streak" id="collection-streak">🔥 Mulai streak</span>
+          <span class="friendship-chip" id="friendship-chip" title="Friendship">
+            <span id="friendship-hearts">🤍</span>
+            <span id="friendship-label">Teman baru</span>
+          </span>
+        </div>
+
+        <!-- Poppu World map — 3 stations -->
+        <div class="world-map" id="world-map" role="group" aria-label="Poppu map">
+          <p class="world-map-title" id="world-map-title">🗺️ Peta Poppu</p>
+          <div class="world-stations">
+            <button type="button" class="station-btn" data-station="abc" id="station-abc">
+              <span class="station-emoji">🏖️</span>
+              <span class="station-name" id="station-abc-name">Pantai ABC</span>
+              <span class="station-desc" id="station-abc-desc">Huruf A–Z</span>
+            </button>
+            <button type="button" class="station-btn is-active" data-station="meadow" id="station-meadow">
+              <span class="station-emoji">🌼</span>
+              <span class="station-name" id="station-meadow-name">Padang Ketik</span>
+              <span class="station-desc" id="station-meadow-desc">Misi kata</span>
+            </button>
+            <button type="button" class="station-btn" data-station="castle" id="station-castle">
+              <span class="station-emoji">🏰</span>
+              <span class="station-name" id="station-castle-name">Istana Bintang</span>
+              <span class="station-desc" id="station-castle-desc">Mode sulit</span>
+            </button>
+          </div>
         </div>
 
         <div class="start-card">
@@ -525,6 +551,7 @@
           </div>
           <div class="victory-trophy" aria-hidden="true">🏆</div>
           <h2 id="victory-title">JUARA!</h2>
+          <p id="victory-friendship" class="victory-friendship"></p>
           <p id="victory-sub" class="victory-sub">Kamu kumpulkan 10 bintang!</p>
 
           <div class="victory-stars" id="victory-stars" aria-hidden="true"></div>

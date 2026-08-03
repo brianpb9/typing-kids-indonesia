@@ -42,6 +42,7 @@ import { BADGES, evaluateAchievements, getBadge } from './achievements.js';
 import { letterSpeakName } from './letters.js';
 import { track } from './analytics.js';
 import { renderCertificate, shareCertificate } from './certificate.js';
+import { getFriendship } from './friendship.js';
 
 export class Game {
   constructor() {
@@ -87,6 +88,9 @@ export class Game {
     /** @type {'mini'|'full'} */
     this._missionLength =
       CONFIG.gameplay.defaultMissionLength === 'mini' ? 'mini' : 'full';
+    /** Wrong keys on current word (for perfect-word bonus) */
+    this._wordWrongs = 0;
+    this._prevFriendshipId = '';
 
     this.input = new InputManager({
       onLetter: (letter) => this.handleLetter(letter),
@@ -155,6 +159,14 @@ export class Game {
     this.ui.setMissionLengthUI(this._missionLength);
     this._applyMissionLengthTarget();
     this._refreshStickerBook();
+    this.ui.setStationUI('meadow');
+    {
+      const s = loadSave();
+      const stickers = Object.values(s.mastery || {}).filter(
+        (m) => (m?.count || 0) >= 1
+      ).length;
+      this._prevFriendshipId = getFriendship(s.totalStars || 0, stickers).id;
+    }
 
     this.ui.onStart(() => this.requestStart());
     this.ui.onReplay(() => this.startMission());
@@ -187,6 +199,7 @@ export class Game {
     this.ui.onWeekly(() => this.startWeeklyMission());
     this.ui.onShare(() => this.shareParentSummary());
     this.ui.onMissionLength((len) => this.setMissionLength(len));
+    this.ui.onStation((st) => this.pickStation(st));
     this.ui.onCert(() => this.shareCertificate());
     this.ui.onOsk((letter) => this.input.virtualKey(letter));
     this.ui.onA11y({
@@ -472,6 +485,33 @@ export class Game {
     const list = this._t().poppuEncourage || [];
     if (!list.length) return this._t().encouragementDefault;
     return list[Math.floor(Math.random() * list.length)];
+  }
+
+  /**
+   * World map station → mode + start
+   * @param {'abc'|'meadow'|'castle'} station
+   */
+  pickStation(station) {
+    if (
+      this.state === 'playing' ||
+      this.state === 'celebrating' ||
+      this.state === 'milestone' ||
+      this.state === 'tutorial'
+    ) {
+      return;
+    }
+    this.ui.setStationUI(station);
+    this.audio.playClick();
+    if (station === 'abc') {
+      this.setDifficulty('letters');
+      this.setMissionLength(this._missionLength === 'full' ? 'full' : 'mini');
+    } else if (station === 'castle') {
+      this.setDifficulty('hard');
+    } else {
+      this.setDifficulty('easy');
+    }
+    // Auto-start for map magic (after optional tutorial)
+    this.requestStart();
   }
 
   requestStart() {
@@ -818,6 +858,7 @@ export class Game {
     if (!this.current) return;
 
     this.cursor = 0;
+    this._wordWrongs = 0;
     const mode = this._mode();
     this.ui.applyModeLayout();
     this.ui.setWord(this.current, this.sessionStars, {
@@ -1004,6 +1045,7 @@ export class Game {
 
   _onWrong(letter) {
     this._wrongStreak += 1;
+    this._wordWrongs += 1;
     this._sessionWrong += 1;
     if (this._combo > 0) {
       this._combo = 0;
@@ -1061,6 +1103,15 @@ export class Game {
       }
     }
 
+    // Perfect word (zero wrongs on this word)
+    const perfect =
+      CONFIG.features.perfectWord && this._wordWrongs === 0 && this.cursor > 0;
+    if (perfect) {
+      this.ui.showPoppuSay(this._t().perfectWord, 2000);
+      this.audio.playCombo(6);
+      this.anim.celebrate();
+    }
+
     // Sticker unlock on first completion of this word
     let firstSticker = false;
     if (this.current?.id) {
@@ -1072,6 +1123,7 @@ export class Game {
     // Lucky star (extra session star, still no-fail fun)
     let lucky = false;
     if (
+      !perfect &&
       CONFIG.features.combo &&
       this._combo >= (CONFIG.gameplay.luckyComboMin || 3) &&
       Math.random() < (CONFIG.gameplay.luckyChance || 0.15)
@@ -1081,6 +1133,9 @@ export class Game {
       this.ui.showPoppuSay(this._t().poppuLucky, 1800);
       this.audio.playSparkle();
     }
+
+    // Perfect also grants a tiny session bonus star chance feel — +0 session, +sparkle only
+    // (keep pacing fair for mini missions)
 
     let save = patchSave({
       totalStars: loadSave().totalStars + 1 + (lucky ? 1 : 0),
@@ -1334,6 +1389,29 @@ export class Game {
 
     this.audio.playCelebration();
     this.ui.showPoppuSay(t.poppuWin || t.victorySpeech, 2800);
+
+    // Friendship level-up check
+    const stickers = Object.values(updated.mastery || {}).filter(
+      (m) => (m?.count || 0) >= 1
+    ).length;
+    const fr = getFriendship(updated.totalStars || 0, stickers);
+    const frLabel =
+      (t.friendshipLabel && t.friendshipLabel[fr.id]) || fr.id;
+    if (this.ui.els.victoryFriendship) {
+      const hearts = t.friendshipHearts
+        ? t.friendshipHearts(fr.hearts)
+        : fr.emoji;
+      this.ui.els.victoryFriendship.textContent = `${hearts} ${frLabel}`;
+    }
+    if (this._prevFriendshipId && this._prevFriendshipId !== fr.id) {
+      this.ui.showPoppuSay(
+        t.friendshipUp ? t.friendshipUp(frLabel) : frLabel,
+        3200
+      );
+      this.audio.playSparkle();
+    }
+    this._prevFriendshipId = fr.id;
+
     this.audio.speakPraise(t.victorySpeech);
     setTimeout(() => {
       if (rank.next) {

@@ -709,6 +709,117 @@ body {
   font-size: 1.1rem;
 }
 
+/* Friendship */
+.friendship-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #e17055;
+  background: #fff5f0;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+}
+
+/* World map */
+.world-map {
+  width: 100%;
+  max-width: 440px;
+  margin: 0.35rem 0 0.85rem;
+  padding: 0.75rem 0.85rem 0.9rem;
+  background: linear-gradient(160deg, #e8f8ff 0%, #fff9e8 55%, #f0fff4 100%);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  border: 2px solid rgba(108, 180, 238, 0.35);
+}
+
+.world-map-title {
+  font-weight: 900;
+  font-size: 0.95rem;
+  color: var(--primary-deep);
+  margin: 0 0 0.55rem;
+  text-align: center;
+}
+
+.world-stations {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.45rem;
+}
+
+.station-btn {
+  appearance: none;
+  border: 2px solid #e8e0d5;
+  background: #fff;
+  border-radius: 16px;
+  padding: 0.55rem 0.35rem;
+  cursor: pointer;
+  font-family: var(--font);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  min-height: 96px;
+  transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.station-btn:hover {
+  transform: translateY(-2px);
+}
+
+.station-btn.is-active {
+  border-color: var(--primary);
+  box-shadow: 0 4px 14px rgba(108, 180, 238, 0.35);
+  background: linear-gradient(160deg, #fff, #e8f4fc);
+}
+
+.station-emoji {
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.station-name {
+  font-weight: 900;
+  font-size: 0.72rem;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.15;
+}
+
+.station-desc {
+  font-weight: 700;
+  font-size: 0.65rem;
+  color: var(--text-soft);
+  text-align: center;
+}
+
+.victory-friendship {
+  font-weight: 800;
+  font-size: 1rem;
+  color: #e17055;
+  margin: 0.15rem 0 0.5rem;
+  min-height: 1.3em;
+}
+
+@media (max-width: 480px) {
+  .world-stations {
+    grid-template-columns: 1fr;
+  }
+  .station-btn {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.65rem;
+    min-height: 56px;
+    padding: 0.5rem 0.85rem;
+    text-align: left;
+  }
+  .station-name,
+  .station-desc {
+    text-align: left;
+  }
+}
+
 .collection-streak {
   color: #e17055;
   font-size: 0.85rem;

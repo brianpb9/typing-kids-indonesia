@@ -34,8 +34,20 @@ describe('features flags', () => {
     assert.equal(CONFIG.features.journey, true);
     assert.equal(CONFIG.features.stickers, true);
     assert.equal(CONFIG.features.miniMission, true);
+    assert.equal(CONFIG.features.worldMap, true);
+    assert.equal(CONFIG.features.friendship, true);
+    assert.equal(CONFIG.features.perfectWord, true);
     assert.equal(CONFIG.gameplay.miniTarget, 5);
     assert.equal(CONFIG.gameplay.fullTarget, 10);
+  });
+});
+
+describe('friendship', () => {
+  it('levels up with stars', async () => {
+    const { getFriendship } = await import('../js/friendship.js');
+    assert.equal(getFriendship(0).id, 'stranger');
+    assert.equal(getFriendship(5).id, 'buddy');
+    assert.equal(getFriendship(70).hearts, 5);
   });
 });
 

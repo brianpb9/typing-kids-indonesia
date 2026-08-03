@@ -169,6 +169,13 @@ test.describe('Deep flows', () => {
     await expect(page.locator('#poppu-bubble, #poppu-bubble-text').first()).toBeAttached();
   });
 
+  test('world map ABC station starts letters mode', async ({ page }) => {
+    await boot(page, seedDone());
+    await page.locator('#station-abc').click();
+    await expect(page.locator('#game-screen')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('#game-screen')).toHaveClass(/mode-letters/);
+  });
+
   test('word images and voice manifest are fetchable offline-ready', async ({
     page,
   }) => {

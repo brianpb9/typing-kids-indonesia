@@ -4,6 +4,7 @@
 import { CONFIG, getMode } from './config.js';
 import { getRank, remainingCopy } from './storage.js';
 import { getStrings } from './i18n.js';
+import { getFriendship } from './friendship.js';
 
 export class UI {
   constructor() {
@@ -36,6 +37,15 @@ export class UI {
       stickerToast: document.getElementById('sticker-toast'),
       stickerToastImg: document.getElementById('sticker-toast-img'),
       stickerToastText: document.getElementById('sticker-toast-text'),
+      friendshipChip: document.getElementById('friendship-chip'),
+      friendshipHearts: document.getElementById('friendship-hearts'),
+      friendshipLabel: document.getElementById('friendship-label'),
+      worldMap: document.getElementById('world-map'),
+      worldMapTitle: document.getElementById('world-map-title'),
+      stationAbc: document.getElementById('station-abc'),
+      stationMeadow: document.getElementById('station-meadow'),
+      stationCastle: document.getElementById('station-castle'),
+      victoryFriendship: document.getElementById('victory-friendship'),
       parentSummary: document.getElementById('parent-summary'),
       parentTitle: document.getElementById('parent-title'),
       parentList: document.getElementById('parent-list'),
@@ -220,6 +230,17 @@ export class UI {
     if (this.els.stickerHint) this.els.stickerHint.textContent = t.stickerHint;
     if (this.els.stickerToastText)
       this.els.stickerToastText.textContent = t.stickerNew;
+    if (this.els.worldMapTitle)
+      this.els.worldMapTitle.textContent = t.worldMapTitle;
+    const setSt = (id, key) => {
+      const n = document.getElementById(`${id}-name`);
+      const d = document.getElementById(`${id}-desc`);
+      if (n && t[key]) n.textContent = t[key].name;
+      if (d && t[key]) d.textContent = t[key].desc;
+    };
+    setSt('station-abc', 'stationAbc');
+    setSt('station-meadow', 'stationMeadow');
+    setSt('station-castle', 'stationCastle');
     if (this.els.starsWord) this.els.starsWord.textContent = t.starsWord;
     if (this.els.missionTitle) this.els.missionTitle.textContent = t.missionTitle;
     if (this.els.missionGoalBefore)
@@ -377,6 +398,51 @@ export class UI {
         this.els.collectionStreak.title = this.t.streakBest(save.streak.best);
       }
     }
+    // Friendship hearts
+    if (CONFIG.features?.friendship) {
+      const stickers = Object.values(save.mastery || {}).filter(
+        (m) => (m?.count || 0) >= 1
+      ).length;
+      const fr = getFriendship(save.totalStars || 0, stickers);
+      const label =
+        (this.t.friendshipLabel && this.t.friendshipLabel[fr.id]) || fr.id;
+      if (this.els.friendshipHearts) {
+        this.els.friendshipHearts.textContent = this.t.friendshipHearts
+          ? this.t.friendshipHearts(fr.hearts)
+          : fr.emoji;
+      }
+      if (this.els.friendshipLabel) {
+        this.els.friendshipLabel.textContent = label;
+      }
+      if (this.els.friendshipChip) {
+        this.els.friendshipChip.title = label;
+      }
+    }
+  }
+
+  /**
+   * @param {'abc'|'meadow'|'castle'} station
+   */
+  setStationUI(station) {
+    this.els.stationAbc?.classList.toggle('is-active', station === 'abc');
+    this.els.stationMeadow?.classList.toggle('is-active', station === 'meadow');
+    this.els.stationCastle?.classList.toggle('is-active', station === 'castle');
+  }
+
+  /**
+   * @param {(station: 'abc'|'meadow'|'castle') => void} handler
+   */
+  onStation(handler) {
+    const bind = (btn, st) => {
+      btn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handler(st);
+      });
+    };
+    bind(this.els.stationAbc, 'abc');
+    bind(this.els.stationMeadow, 'meadow');
+    bind(this.els.stationCastle, 'castle');
   }
 
   /**
