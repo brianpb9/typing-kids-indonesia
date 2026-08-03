@@ -126,8 +126,20 @@ describe('voice pack assets', () => {
     assert.match(sw, /precacheVoicePack|voice\/manifest/);
     assert.match(sw, /precacheWordImages|words\.json/);
     assert.match(sw, /CACHE_URLS/);
-    assert.match(sw, /typing-kids-v20/);
+    assert.match(sw, /typing-kids-v2[01]/);
     assert.ok(fs.existsSync(path.join(root, 'js/cache.js')));
+  });
+
+  it('Poppu brand pack is present', () => {
+    for (const f of [
+      'assets/brand/poppu/poppu-idle.png',
+      'assets/brand/poppu/poppu-happy.png',
+      'assets/brand/poppu/icon-192.png',
+      'assets/brand/poppu/icon-512.png',
+    ]) {
+      assert.ok(fs.existsSync(path.join(root, f)), f);
+    }
+    assert.equal(CONFIG.app.name, 'Poppu Typing Kids');
   });
 });
 

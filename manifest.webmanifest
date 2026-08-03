@@ -1,7 +1,7 @@
 {
-  "name": "Typing Kids Indonesia",
-  "short_name": "Typing Kids",
-  "description": "Learn typing while playing — Indonesian & English for ages 5–6",
+  "name": "Poppu Typing Kids",
+  "short_name": "Poppu Type",
+  "description": "Learn typing while playing with Poppu — ages 5–6. Part of Poppu World.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFF8F0",
@@ -9,16 +9,22 @@
   "lang": "id",
   "icons": [
     {
-      "src": "assets/images/apel.png",
+      "src": "assets/brand/poppu/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/images/apel.png",
+      "src": "assets/brand/poppu/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "assets/brand/poppu/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

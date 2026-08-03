@@ -12,6 +12,8 @@ test.describe('Typing Kids smoke', () => {
     await expect(page.locator('#lang-id')).toBeVisible();
     await expect(page.locator('#lang-en')).toBeVisible();
     await expect(page.locator('#daily-card')).toBeVisible();
+    await expect(page.locator('#app-title')).toHaveText(/Poppu Typing Kids/i);
+    await expect(page.locator('#brand-mascot-start')).toBeVisible();
   });
 
   test('switch to English updates UI', async ({ page }) => {

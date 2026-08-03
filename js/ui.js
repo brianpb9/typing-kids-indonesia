@@ -187,6 +187,10 @@ export class UI {
 
     if (this.els.appTitle) this.els.appTitle.textContent = t.appName;
     if (this.els.appSubtitle) this.els.appSubtitle.textContent = t.subtitle;
+    const brandHost = document.getElementById('brand-host');
+    if (brandHost && t.brandHost) brandHost.textContent = t.brandHost;
+    const brandLine = document.getElementById('brand-line');
+    if (brandLine && t.brandLine) brandLine.textContent = t.brandLine;
     if (this.els.starsWord) this.els.starsWord.textContent = t.starsWord;
     if (this.els.missionTitle) this.els.missionTitle.textContent = t.missionTitle;
     if (this.els.missionGoalBefore)

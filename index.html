@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Typing Kids Indonesia — Belajar mengetik sambil bermain untuk anak usia 5–6 tahun."
+      content="Poppu Typing Kids — Belajar mengetik sambil bermain untuk anak usia 5–6 tahun. Bagian dari Poppu World."
     />
     <meta name="theme-color" content="#FFF8F0" />
-    <title>Typing Kids Indonesia — Belajar Mengetik Sambil Bermain</title>
+    <title>Poppu Typing Kids — Belajar Mengetik Sambil Bermain</title>
 
     <!-- Self-hosted font (offline-friendly) + critical preloads -->
     <link
@@ -30,10 +30,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
 
-    <link
-      rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23FFE566'/%3E%3Ccircle cx='50' cy='55' r='28' fill='%23FF6B6B'/%3E%3Cpath d='M50 30 Q54 18 64 22' stroke='%235B8C5A' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"
-    />
+    <link rel="icon" href="assets/brand/poppu/icon-192.png" type="image/png" />
+    <link rel="apple-touch-icon" href="assets/brand/poppu/icon-192.png" />
   </head>
   <body>
     <div class="sky" aria-hidden="true">
@@ -85,26 +83,16 @@
         aria-label="Layar mulai"
         aria-hidden="false"
       >
-        <div class="logo-mark" aria-hidden="true">
-          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="32" cy="36" r="20" fill="#FF6B6B" />
-            <ellipse cx="24" cy="30" rx="6" ry="7" fill="#FF8E8E" opacity="0.6" />
-            <path
-              d="M32 18 Q36 8 44 12"
-              stroke="#5B8C5A"
-              stroke-width="4"
-              fill="none"
-              stroke-linecap="round"
-            />
-            <ellipse
-              cx="42"
-              cy="14"
-              rx="8"
-              ry="4"
-              fill="#7CB87C"
-              transform="rotate(-25 42 14)"
-            />
-          </svg>
+        <div class="logo-mark brand-mascot" aria-hidden="true">
+          <img
+            id="brand-mascot-start"
+            src="assets/brand/poppu/poppu-idle.png"
+            alt=""
+            width="140"
+            height="188"
+            decoding="async"
+            draggable="false"
+          />
         </div>
 
         <!-- Language: Bahasa / English -->
@@ -117,8 +105,9 @@
           </button>
         </div>
 
-        <h1 id="app-title">Typing Kids Indonesia</h1>
+        <h1 id="app-title">Poppu Typing Kids</h1>
         <p class="subtitle" id="app-subtitle">Belajar Mengetik Sambil Bermain</p>
+        <p class="brand-host" id="brand-host">Yuk ketik bareng Poppu!</p>
 
         <!-- Lifetime collection — motivates return play -->
         <div class="collection-bar" id="collection-bar">
@@ -261,6 +250,15 @@
         </button>
 
         <p class="start-footer" id="start-footer">Untuk anak usia 5–6 tahun · Keyboard QWERTY</p>
+        <p class="brand-line">
+          <a
+            id="brand-line"
+            href="https://www.poppu.world"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Bagian dari Poppu World</a
+          >
+        </p>
       </section>
 
       <!-- Tutorial first-run -->
@@ -460,6 +458,17 @@
         aria-hidden="true"
       >
         <div class="victory-card">
+          <div class="victory-mascot" aria-hidden="true">
+            <img
+              id="brand-mascot-win"
+              src="assets/brand/poppu/poppu-happy.png"
+              alt=""
+              width="120"
+              height="150"
+              decoding="async"
+              draggable="false"
+            />
+          </div>
           <div class="victory-trophy" aria-hidden="true">🏆</div>
           <h2 id="victory-title">JUARA!</h2>
           <p id="victory-sub" class="victory-sub">Kamu kumpulkan 10 bintang!</p>

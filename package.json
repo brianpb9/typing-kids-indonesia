@@ -1,7 +1,7 @@
 {
   "name": "typing-kids-indonesia",
-  "version": "1.7.4",
-  "description": "Typing Kids Indonesia — Belajar mengetik sambil bermain untuk anak usia 5–6 tahun",
+  "version": "1.8.0",
+  "description": "Poppu Typing Kids — Belajar mengetik sambil bermain (Poppu World)",
   "private": true,
   "type": "module",
   "scripts": {

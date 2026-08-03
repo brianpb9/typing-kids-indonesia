@@ -1,5 +1,5 @@
 /* Typing Kids — offline shell: app + voice pack + word images */
-const CACHE = 'typing-kids-v20';
+const CACHE = 'typing-kids-v21';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -10,6 +10,10 @@ const PRECACHE = [
   '/assets/fonts/nunito-700.woff2',
   '/assets/fonts/nunito-800.woff2',
   '/assets/fonts/nunito-900.woff2',
+  '/assets/brand/poppu/poppu-idle.png',
+  '/assets/brand/poppu/poppu-happy.png',
+  '/assets/brand/poppu/icon-192.png',
+  '/assets/brand/poppu/icon-512.png',
   '/js/main.js',
   '/js/config.js',
   '/js/game.js',

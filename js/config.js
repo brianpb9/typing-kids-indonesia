@@ -4,10 +4,18 @@
  */
 export const CONFIG = {
   app: {
-    name: 'Typing Kids Indonesia',
+    name: 'Poppu Typing Kids',
     subtitle: 'Belajar Mengetik Sambil Bermain',
-    version: '1.7.4',
+    version: '1.8.0',
     language: 'id',
+    brand: {
+      line: 'Poppu World',
+      url: 'https://www.poppu.world',
+      mascotIdle: 'assets/brand/poppu/poppu-idle.png',
+      mascotHappy: 'assets/brand/poppu/poppu-happy.png',
+      icon192: 'assets/brand/poppu/icon-192.png',
+      icon512: 'assets/brand/poppu/icon-512.png',
+    },
   },
 
   speech: {
