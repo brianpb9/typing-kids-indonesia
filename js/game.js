@@ -138,11 +138,16 @@ export class Game {
       return;
     }
 
-    // Offline warm: voice + all word images when browser is idle
+    // Offline warm: shell SW already installed; media warmed in background
     whenIdle(() => {
+      try {
+        navigator.serviceWorker?.controller?.postMessage({ type: 'WARM_MEDIA' });
+      } catch {
+        /* ignore */
+      }
       this.audio.warmVoiceCache(0).catch(() => {});
       this._warmAllImages().catch(() => {});
-    }, 1500);
+    }, 1200);
 
     this.ui.onStart(() => this.requestStart());
     this.ui.onReplay(() => this.startMission());
@@ -1030,6 +1035,7 @@ export class Game {
     this.ui.setSessionStars(this.sessionStars, this._sessionTarget, {
       pop: true,
     });
+    this.ui.cheerGameMascot();
 
     const praise = this.words.randomPraise();
     this.ui.showPraise(praise);

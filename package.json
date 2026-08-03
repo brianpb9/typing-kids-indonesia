@@ -1,6 +1,6 @@
 {
   "name": "typing-kids-indonesia",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "Poppu Typing Kids — Belajar mengetik sambil bermain (Poppu World)",
   "private": true,
   "type": "module",
@@ -10,7 +10,8 @@
     "preview": "npx --yes serve . -l 3000",
     "test": "node --test tests/*.test.js",
     "test:e2e": "npx --yes playwright test",
-    "test:e2e:install": "npx --yes playwright install chromium"
+    "test:e2e:install": "npx --yes playwright install chromium",
+    "perf:smoke": "npx --yes playwright test e2e/perf-smoke.spec.js"
   },
   "keywords": [
     "education",

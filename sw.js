@@ -1,6 +1,11 @@
-/* Typing Kids — offline shell: app + voice pack + word images */
-const CACHE = 'typing-kids-v21';
-const PRECACHE = [
+/* Poppu Typing Kids — progressive offline cache
+ * Install: app shell only (fast).
+ * Activate: warm voice + word images in background.
+ */
+const CACHE = 'typing-kids-v22';
+
+/** Critical shell — keep small for fast first install */
+const PRECACHE_SHELL = [
   '/',
   '/index.html',
   '/css/styles.css',
@@ -14,6 +19,7 @@ const PRECACHE = [
   '/assets/brand/poppu/poppu-happy.png',
   '/assets/brand/poppu/icon-192.png',
   '/assets/brand/poppu/icon-512.png',
+  '/assets/brand/poppu/icon-512-maskable.png',
   '/js/main.js',
   '/js/config.js',
   '/js/game.js',
@@ -39,7 +45,6 @@ const PRECACHE = [
   '/manifest.webmanifest',
 ];
 
-/** Cache each URL independently with bounded concurrency */
 async function precacheAll(cache, urls) {
   const list = [...new Set(urls.filter(Boolean))];
   const CONC = 8;
@@ -87,7 +92,6 @@ async function precacheVoicePack(cache) {
   }
 }
 
-/** Cache all unique images referenced by word data (~1MB) */
 async function precacheWordImages(cache) {
   try {
     const paths = new Set();
@@ -106,16 +110,22 @@ async function precacheWordImages(cache) {
   }
 }
 
+/** Background media warm (voice + images) — not blocking install */
+async function warmMedia() {
+  try {
+    const cache = await caches.open(CACHE);
+    await Promise.all([precacheVoicePack(cache), precacheWordImages(cache)]);
+  } catch {
+    /* ignore */
+  }
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE);
-      await precacheAll(cache, PRECACHE);
-      // Voice + images in parallel after shell
-      await Promise.all([
-        precacheVoicePack(cache),
-        precacheWordImages(cache),
-      ]);
+      // Shell only — fast install on slow networks
+      await precacheAll(cache, PRECACHE_SHELL);
       await self.skipWaiting();
     })()
   );
@@ -123,12 +133,22 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) =>
-        Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
-      )
-      .then(() => self.clients.claim())
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(
+        keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))
+      );
+      await self.clients.claim();
+      // Defer heavy media cache so activate returns quickly
+      // eslint-disable-next-line no-undef
+      if (typeof setTimeout !== 'undefined') {
+        setTimeout(() => {
+          warmMedia();
+        }, 500);
+      } else {
+        warmMedia();
+      }
+    })()
   );
 });
 
@@ -138,6 +158,9 @@ self.addEventListener('message', (event) => {
     event.waitUntil(
       caches.open(CACHE).then((cache) => precacheAll(cache, data.urls))
     );
+  }
+  if (data.type === 'WARM_MEDIA') {
+    event.waitUntil(warmMedia());
   }
   if (data.type === 'SKIP_WAITING') {
     self.skipWaiting();
@@ -151,10 +174,12 @@ self.addEventListener('fetch', (event) => {
   const url = req.url;
   const isVoice = url.includes('/assets/audio/voice/');
   const isImage = url.includes('/assets/images/');
+  const isBrand = url.includes('/assets/brand/');
   const isFont = url.includes('/assets/fonts/');
   const isStatic =
     isVoice ||
     isImage ||
+    isBrand ||
     isFont ||
     url.includes('/assets/') ||
     url.includes('/data/') ||
@@ -173,8 +198,7 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => cached);
 
-      // Cache-first for media that makes offline play smooth
-      if (isVoice || isImage || isFont) {
+      if (isVoice || isImage || isBrand || isFont) {
         return cached || fetchPromise;
       }
       return cached || fetchPromise;

@@ -121,12 +121,24 @@ describe('voice pack assets', () => {
     }
   });
 
-  it('service worker precaches voice + word images offline', () => {
+  it('service worker progressive shell + deferred media', () => {
     const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
-    assert.match(sw, /precacheVoicePack|voice\/manifest/);
-    assert.match(sw, /precacheWordImages|words\.json/);
+    assert.match(sw, /PRECACHE_SHELL/);
+    assert.match(sw, /typing-kids-v22/);
+    assert.match(sw, /warmMedia|WARM_MEDIA/);
+    assert.match(sw, /precacheVoicePack/);
+    assert.match(sw, /precacheWordImages/);
     assert.match(sw, /CACHE_URLS/);
-    assert.match(sw, /typing-kids-v2[01]/);
+    // Install caches shell only (PRECACHE_SHELL), not full media lists inline
+    const installBlock = sw.slice(
+      sw.indexOf("addEventListener('install'"),
+      sw.indexOf("addEventListener('activate'")
+    );
+    assert.match(installBlock, /PRECACHE_SHELL/);
+    assert.ok(
+      !installBlock.includes('precacheVoicePack(cache)'),
+      'voice pack should not run inside install'
+    );
     assert.ok(fs.existsSync(path.join(root, 'js/cache.js')));
   });
 
@@ -136,10 +148,13 @@ describe('voice pack assets', () => {
       'assets/brand/poppu/poppu-happy.png',
       'assets/brand/poppu/icon-192.png',
       'assets/brand/poppu/icon-512.png',
+      'assets/brand/poppu/favicon-64.png',
     ]) {
       assert.ok(fs.existsSync(path.join(root, f)), f);
     }
     assert.equal(CONFIG.app.name, 'Poppu Typing Kids');
+    // Unused POPPU PLUS logo should not ship
+    assert.ok(!fs.existsSync(path.join(root, 'assets/brand/poppu/logo.png')));
   });
 });
 

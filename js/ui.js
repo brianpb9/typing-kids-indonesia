@@ -542,6 +542,26 @@ export class UI {
     this.els.backBtn?.setAttribute('aria-hidden', on ? 'false' : 'true');
   }
 
+  /** Brief Poppu cheer on word complete */
+  cheerGameMascot() {
+    const el = document.getElementById('game-mascot');
+    if (!el) return;
+    // Swap to happy briefly if available
+    const happy = 'assets/brand/poppu/poppu-happy.png';
+    const idle = 'assets/brand/poppu/poppu-idle.png';
+    el.classList.remove('is-cheer');
+    void el.offsetWidth;
+    el.classList.add('is-cheer');
+    if (el.getAttribute('src') !== happy) {
+      el.setAttribute('src', happy);
+    }
+    clearTimeout(this._mascotTimer);
+    this._mascotTimer = setTimeout(() => {
+      el.setAttribute('src', idle);
+      el.classList.remove('is-cheer');
+    }, 1200);
+  }
+
   _hideAllScreens() {
     for (const el of [
       this.els.startScreen,
