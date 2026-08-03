@@ -85,6 +85,18 @@ test.describe('Deep flows', () => {
     });
   });
 
+  test('warm-up has back button to home', async ({ page }) => {
+    await boot(page, seedDone({ difficulty: 'letters' }));
+    await page.locator('#mode-letters').click();
+    await page.locator('#start-btn').click();
+    await expect(page.locator('#game-screen')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('#game-home-btn')).toBeVisible();
+    await expect(page.locator('#back-btn')).toBeVisible();
+    await page.locator('#game-home-btn').click();
+    await expect(page.locator('#start-screen')).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator('#game-screen')).toBeHidden();
+  });
+
   test('daily mission starts game', async ({ page }) => {
     await boot(page, seedDone());
     await page.locator('#daily-btn').click();

@@ -147,7 +147,22 @@ export class Game {
     this.ui.onStart(() => this.requestStart());
     this.ui.onReplay(() => this.startMission());
     this.ui.onHome(() => this.goHome());
+    this.ui.onBack(() => this.goHome());
     this.ui.onMute(() => this.toggleMute());
+
+    // Escape / Backspace-long not used — Esc returns home during play
+    window.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (
+        this.state === 'playing' ||
+        this.state === 'celebrating' ||
+        this.state === 'milestone' ||
+        this.state === 'victory'
+      ) {
+        e.preventDefault();
+        this.goHome();
+      }
+    });
     this.ui.onDifficulty((mode) => this.setDifficulty(mode));
     this.ui.onCategory((cat) => this.setCategory(cat));
     this.ui.onLanguage((lang) => this.setLanguage(lang));
@@ -380,15 +395,21 @@ export class Game {
 
   goHome() {
     this._stopTimer();
+    this.audio.stopSpeech();
     this._transitionLock = false;
     this.state = 'start';
+    this.current = null;
+    this.cursor = 0;
     this.ui.hideTimer();
+    this.ui.hidePraise();
+    this.ui.hideMilestone();
     this.ui.setCombo(0);
     this.ui.setOskTarget('');
     this._refreshParentDash();
     this._refreshDailyUI();
     this._refreshWeeklyUI();
     this._refreshClassUI();
+    this.audio.playClick();
     this.ui.showStart();
   }
 

@@ -18,6 +18,9 @@ export class UI {
       homeBtn: document.getElementById('home-btn'),
       muteBtn: document.getElementById('mute-btn'),
       helpBtn: document.getElementById('help-btn'),
+      backBtn: document.getElementById('back-btn'),
+      gameHomeBtn: document.getElementById('game-home-btn'),
+      gameHomeLabel: document.getElementById('game-home-label'),
       parentSummary: document.getElementById('parent-summary'),
       parentTitle: document.getElementById('parent-title'),
       parentList: document.getElementById('parent-list'),
@@ -207,6 +210,15 @@ export class UI {
     if (this.els.speakBtn) this.els.speakBtn.setAttribute('aria-label', t.speakAria);
     if (this.els.muteBtn) this.els.muteBtn.setAttribute('aria-label', t.muteAria);
     if (this.els.helpBtn) this.els.helpBtn.setAttribute('aria-label', t.helpAria);
+    if (this.els.backBtn) {
+      this.els.backBtn.setAttribute('aria-label', t.backAria);
+      this.els.backBtn.title = t.backTitle;
+    }
+    if (this.els.gameHomeLabel) this.els.gameHomeLabel.textContent = t.backLabel;
+    if (this.els.gameHomeBtn) {
+      this.els.gameHomeBtn.setAttribute('aria-label', t.backAria);
+      this.els.gameHomeBtn.title = t.backTitle;
+    }
     if (this.els.parentTitle) this.els.parentTitle.textContent = t.parentTitle;
     if (this.els.victorySessionLbl)
       this.els.victorySessionLbl.textContent = t.victorySession;
@@ -499,18 +511,31 @@ export class UI {
     this._hideAllScreens();
     this.els.startScreen?.classList.remove('hidden');
     this.els.startScreen?.setAttribute('aria-hidden', 'false');
+    this.setBackVisible(false);
   }
 
   showGame() {
     this._hideAllScreens();
     this.els.gameScreen?.classList.remove('hidden');
     this.els.gameScreen?.setAttribute('aria-hidden', 'false');
+    this.setBackVisible(true);
   }
 
   showVictory() {
     this._hideAllScreens();
     this.els.victoryScreen?.classList.remove('hidden');
     this.els.victoryScreen?.setAttribute('aria-hidden', 'false');
+    // Victory already has "Ke Awal" — keep floating back too
+    this.setBackVisible(true);
+  }
+
+  /**
+   * Show floating ← during game / victory
+   * @param {boolean} on
+   */
+  setBackVisible(on) {
+    this.els.backBtn?.classList.toggle('hidden', !on);
+    this.els.backBtn?.setAttribute('aria-hidden', on ? 'false' : 'true');
   }
 
   _hideAllScreens() {
@@ -941,6 +966,22 @@ export class UI {
       e.preventDefault();
       handler();
     });
+  }
+
+  /**
+   * In-game / floating back to start
+   * @param {() => void} handler
+   */
+  onBack(handler) {
+    const bind = (el) => {
+      el?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handler();
+      });
+    };
+    bind(this.els.backBtn);
+    bind(this.els.gameHomeBtn);
   }
 
   onMute(handler) {

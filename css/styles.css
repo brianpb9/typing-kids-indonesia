@@ -205,7 +205,8 @@ body {
 
 /* Floating controls */
 .mute-btn,
-.help-btn {
+.help-btn,
+.back-btn {
   position: fixed;
   top: 1rem;
   z-index: 50;
@@ -226,6 +227,12 @@ body {
   color: var(--primary-deep);
 }
 
+.back-btn {
+  left: 1rem;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
 .mute-btn {
   right: 1rem;
 }
@@ -236,8 +243,47 @@ body {
 }
 
 .mute-btn:hover,
-.help-btn:hover {
+.help-btn:hover,
+.back-btn:hover {
   transform: scale(1.08);
+}
+
+.back-btn:focus-visible {
+  outline: 3px solid var(--accent-yellow);
+  outline-offset: 3px;
+}
+
+/* In-game back (banner) — large tap target for kids */
+.goal-top-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 0.15rem;
+}
+
+.btn-game-back {
+  appearance: none;
+  border: 2px solid #e8e0d5;
+  background: var(--bg-soft);
+  color: var(--primary-deep);
+  font-family: var(--font);
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+  min-height: 44px;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.btn-game-back:hover {
+  background: #e8f4fc;
+  border-color: var(--primary);
+  transform: scale(1.03);
+}
+
+.btn-game-back:focus-visible {
+  outline: 3px solid var(--accent-yellow);
+  outline-offset: 2px;
 }
 
 .mute-btn.is-muted {

@@ -49,6 +49,15 @@
     <!-- Floating controls -->
     <button
       type="button"
+      id="back-btn"
+      class="back-btn hidden"
+      title="Kembali ke awal"
+      aria-label="Kembali ke awal"
+    >
+      ←
+    </button>
+    <button
+      type="button"
       id="help-btn"
       class="help-btn"
       title="Cara main"
@@ -275,6 +284,11 @@
       >
         <!-- Session goal track -->
         <div class="goal-banner">
+          <div class="goal-top-row">
+            <button type="button" id="game-home-btn" class="btn-game-back">
+              ← <span id="game-home-label">Kembali</span>
+            </button>
+          </div>
           <div class="goal-text">
             <span class="goal-label" id="goal-label">Target misi</span>
             <span id="goal-remaining" class="goal-remaining">Kejar 10 bintang ya!</span>
