@@ -156,6 +156,19 @@ test.describe('Deep flows', () => {
     await expect(page.locator('#goal-label')).toHaveText(/Mission target/i);
   });
 
+  test('mini mission 5 stars and journey path exist in game', async ({
+    page,
+  }) => {
+    await boot(page, seedDone());
+    await page.locator('#length-mini').click();
+    await page.locator('#start-btn').click();
+    await expect(page.locator('#game-screen')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('#session-target')).toHaveText('5');
+    await expect(page.locator('#journey')).toBeVisible();
+    await expect(page.locator('#journey-poppu')).toBeVisible();
+    await expect(page.locator('#poppu-bubble, #poppu-bubble-text').first()).toBeAttached();
+  });
+
   test('word images and voice manifest are fetchable offline-ready', async ({
     page,
   }) => {

@@ -6,7 +6,7 @@ export const CONFIG = {
   app: {
     name: 'Poppu Typing Kids',
     subtitle: 'Belajar Mengetik Sambil Bermain',
-    version: '1.8.1',
+    version: '1.9.0',
     language: 'id',
     brand: {
       line: 'Poppu World',
@@ -150,15 +150,24 @@ export const CONFIG = {
     hardBonusSeconds: 10,
     hardBonusTriggerAt: 5,
     progressiveDifficulty: true,
-    /** Letters mode mission length */
+    /** Letters mode mission length (follows mission length pick) */
     lettersTarget: 10,
     /** Preload next N voice clips */
     preloadVoiceCount: 5,
+    /** Mini mission (quick win for ages 5–6) */
+    miniTarget: 5,
+    fullTarget: 10,
+    defaultMissionLength: 'full',
+    /** Rare lucky star after combo ≥ this */
+    luckyComboMin: 3,
+    luckyChance: 0.18,
   },
 
   goals: {
     sessionTarget: 10,
+    miniTarget: 5,
     milestoneAts: [3, 5, 8, 10],
+    miniMilestoneAts: [2, 4, 5],
     ranks: [
       { min: 0, id: 'pemula', label: 'Pemula', emoji: '🌱' },
       { min: 10, id: 'petarung', label: 'Petarung', emoji: '💪' },
@@ -206,6 +215,10 @@ export const CONFIG = {
     letterMode: true,
     certificate: true,
     analytics: true,
+    journey: true,
+    stickers: true,
+    poppuTalk: true,
+    miniMission: true,
   },
 };
 

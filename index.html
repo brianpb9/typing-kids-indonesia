@@ -127,8 +127,26 @@
             <span id="mission-goal-after">bintang!</span>
           </p>
           <div class="mission-preview" id="mission-preview" aria-hidden="true"></div>
+          <!-- Mini vs full mission length -->
+          <div class="length-pick" id="length-pick" role="group" aria-label="Mission length">
+            <button type="button" class="length-btn" data-length="mini" id="length-mini">
+              <span class="length-emoji">⚡</span>
+              <span class="length-name" id="length-mini-name">Mini 5★</span>
+            </button>
+            <button type="button" class="length-btn is-active" data-length="full" id="length-full">
+              <span class="length-emoji">🌟</span>
+              <span class="length-name" id="length-full-name">Penuh 10★</span>
+            </button>
+          </div>
           <p class="hint" id="start-hint">✨ Tidak ada yang salah — coba saja terus ✨</p>
         </div>
+
+        <!-- Sticker book (mastery collection) -->
+        <details class="sticker-book" id="sticker-book">
+          <summary id="sticker-book-title">📒 Buku stiker Poppu</summary>
+          <p class="sticker-hint" id="sticker-hint">Selesaikan kata = stiker baru!</p>
+          <div class="sticker-grid" id="sticker-grid" aria-label="Stickers"></div>
+        </details>
 
         <!-- Daily + weekly -->
         <div class="mission-row">
@@ -312,6 +330,19 @@
             aria-valuenow="0"
             aria-label="Bintang misi"
           ></div>
+          <!-- Poppu journey path -->
+          <div class="journey" id="journey" aria-hidden="true">
+            <div class="journey-track" id="journey-track"></div>
+            <img
+              id="journey-poppu"
+              class="journey-poppu"
+              src="assets/brand/poppu/poppu-idle.png"
+              alt=""
+              width="40"
+              height="54"
+              draggable="false"
+            />
+          </div>
           <div class="goal-count">
             <span id="session-stars">0</span>/<span id="session-target">10</span>
             <span id="combo-badge" class="combo-badge hidden" aria-live="polite">Combo x2!</span>
@@ -355,6 +386,11 @@
             aria-label="Ketik huruf di sini dengan keyboard"
             tabindex="0"
           />
+
+          <!-- Poppu speech bubble -->
+          <div id="poppu-bubble" class="poppu-bubble hidden" aria-live="polite">
+            <span id="poppu-bubble-text" class="poppu-bubble-text"></span>
+          </div>
 
           <div id="image-wrap" class="image-wrap">
             <img
@@ -420,6 +456,12 @@
 
           <div id="praise-overlay" class="praise-overlay" aria-live="polite">
             <span id="praise-text" class="praise-text">Hebat!</span>
+          </div>
+
+          <!-- Sticker unlock flash -->
+          <div id="sticker-toast" class="sticker-toast hidden" aria-live="polite">
+            <img id="sticker-toast-img" alt="" width="64" height="64" />
+            <p id="sticker-toast-text" class="sticker-toast-text">Stiker baru!</p>
           </div>
         </div>
 

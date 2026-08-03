@@ -21,6 +21,21 @@ export class UI {
       backBtn: document.getElementById('back-btn'),
       gameHomeBtn: document.getElementById('game-home-btn'),
       gameHomeLabel: document.getElementById('game-home-label'),
+      lengthMini: document.getElementById('length-mini'),
+      lengthFull: document.getElementById('length-full'),
+      lengthPick: document.getElementById('length-pick'),
+      journey: document.getElementById('journey'),
+      journeyTrack: document.getElementById('journey-track'),
+      journeyPoppu: document.getElementById('journey-poppu'),
+      poppuBubble: document.getElementById('poppu-bubble'),
+      poppuBubbleText: document.getElementById('poppu-bubble-text'),
+      stickerBook: document.getElementById('sticker-book'),
+      stickerBookTitle: document.getElementById('sticker-book-title'),
+      stickerHint: document.getElementById('sticker-hint'),
+      stickerGrid: document.getElementById('sticker-grid'),
+      stickerToast: document.getElementById('sticker-toast'),
+      stickerToastImg: document.getElementById('sticker-toast-img'),
+      stickerToastText: document.getElementById('sticker-toast-text'),
       parentSummary: document.getElementById('parent-summary'),
       parentTitle: document.getElementById('parent-title'),
       parentList: document.getElementById('parent-list'),
@@ -191,6 +206,20 @@ export class UI {
     if (brandHost && t.brandHost) brandHost.textContent = t.brandHost;
     const brandLine = document.getElementById('brand-line');
     if (brandLine && t.brandLine) brandLine.textContent = t.brandLine;
+    if (this.els.lengthMini) {
+      const n = this.els.lengthMini.querySelector('.length-name') || this.els.lengthMini;
+      if (document.getElementById('length-mini-name'))
+        document.getElementById('length-mini-name').textContent = t.lengthMini;
+    }
+    if (document.getElementById('length-full-name'))
+      document.getElementById('length-full-name').textContent = t.lengthFull;
+    if (this.els.lengthPick)
+      this.els.lengthPick.setAttribute('aria-label', t.lengthAria || 'Mission length');
+    if (this.els.stickerBookTitle)
+      this.els.stickerBookTitle.textContent = t.stickerBookTitle;
+    if (this.els.stickerHint) this.els.stickerHint.textContent = t.stickerHint;
+    if (this.els.stickerToastText)
+      this.els.stickerToastText.textContent = t.stickerNew;
     if (this.els.starsWord) this.els.starsWord.textContent = t.starsWord;
     if (this.els.missionTitle) this.els.missionTitle.textContent = t.missionTitle;
     if (this.els.missionGoalBefore)
@@ -413,22 +442,6 @@ export class UI {
   }
 
   /**
-   * Rebuild mission star preview when target changes (daily / classroom)
-   * @param {number} n
-   */
-  setSessionTarget(n) {
-    this._sessionTarget = Math.max(1, n || CONFIG.goals.sessionTarget);
-    this._buildStarTrack(this._sessionTarget);
-    this._buildMissionPreview(this._sessionTarget);
-    if (this.els.sessionTarget) {
-      this.els.sessionTarget.textContent = String(this._sessionTarget);
-    }
-    if (this.els.missionTargetLabel) {
-      this.els.missionTargetLabel.textContent = String(this._sessionTarget);
-    }
-  }
-
-  /**
    * @param {'easy'|'medium'|'hard'|string} modeId
    */
   setDifficultyUI(modeId) {
@@ -546,7 +559,6 @@ export class UI {
   cheerGameMascot() {
     const el = document.getElementById('game-mascot');
     if (!el) return;
-    // Swap to happy briefly if available
     const happy = 'assets/brand/poppu/poppu-happy.png';
     const idle = 'assets/brand/poppu/poppu-idle.png';
     el.classList.remove('is-cheer');
@@ -555,11 +567,171 @@ export class UI {
     if (el.getAttribute('src') !== happy) {
       el.setAttribute('src', happy);
     }
+    if (this.els.journeyPoppu) {
+      this.els.journeyPoppu.setAttribute('src', happy);
+    }
     clearTimeout(this._mascotTimer);
     this._mascotTimer = setTimeout(() => {
       el.setAttribute('src', idle);
       el.classList.remove('is-cheer');
+      if (this.els.journeyPoppu) {
+        this.els.journeyPoppu.setAttribute('src', idle);
+      }
     }, 1200);
+  }
+
+  /**
+   * @param {'mini'|'full'} length
+   */
+  setMissionLengthUI(length) {
+    const isMini = length === 'mini';
+    this.els.lengthMini?.classList.toggle('is-active', isMini);
+    this.els.lengthFull?.classList.toggle('is-active', !isMini);
+  }
+
+  /**
+   * Build Poppu journey nodes under star track
+   * @param {number} target
+   */
+  buildJourney(target) {
+    const track = this.els.journeyTrack;
+    if (!track || !CONFIG.features?.journey) {
+      this.els.journey?.classList.add('hidden');
+      return;
+    }
+    this.els.journey?.classList.remove('hidden');
+    const n = Math.max(1, target || 10);
+    track.innerHTML = '';
+    for (let i = 0; i < n; i++) {
+      const node = document.createElement('span');
+      node.className = 'journey-node';
+      node.dataset.i = String(i);
+      track.appendChild(node);
+    }
+    this.updateJourney(0, n);
+  }
+
+  /**
+   * @param {number} have
+   * @param {number} target
+   */
+  updateJourney(have, target) {
+    const track = this.els.journeyTrack;
+    const pop = this.els.journeyPoppu;
+    if (!track || !CONFIG.features?.journey) return;
+    const n = Math.max(1, target || 10);
+    const filled = Math.min(have, n);
+    track.querySelectorAll('.journey-node').forEach((node, i) => {
+      node.classList.toggle('filled', i < filled);
+    });
+    if (pop) {
+      // Position Poppu above current node (0..n)
+      const pct = n <= 1 ? 0 : (Math.min(have, n) / n) * 100;
+      // clamp so mascot stays on track
+      const left = Math.min(92, Math.max(2, pct * 0.9 + 2));
+      pop.style.left = `calc(${left}% - 18px)`;
+    }
+  }
+
+  /**
+   * Poppu speech bubble
+   * @param {string} text
+   * @param {number} [ms]
+   */
+  showPoppuSay(text, ms = 2200) {
+    if (!CONFIG.features?.poppuTalk || !text) return;
+    const bubble = this.els.poppuBubble;
+    const tEl = this.els.poppuBubbleText;
+    if (!bubble || !tEl) return;
+    tEl.textContent = text;
+    bubble.classList.remove('hidden');
+    clearTimeout(this._bubbleTimer);
+    this._bubbleTimer = setTimeout(() => {
+      bubble.classList.add('hidden');
+    }, ms);
+  }
+
+  hidePoppuSay() {
+    this.els.poppuBubble?.classList.add('hidden');
+  }
+
+  /**
+   * Sticker book from mastery + word list
+   * @param {{
+   *   words: Array<{id:string,display:string,image:string}>,
+   *   mastery: Record<string,{count:number}>,
+   *   onTap?: (word: object) => void
+   * }} data
+   */
+  renderStickerBook(data) {
+    if (!CONFIG.features?.stickers) {
+      this.els.stickerBook?.classList.add('hidden');
+      return;
+    }
+    const grid = this.els.stickerGrid;
+    if (!grid) return;
+    const words = data.words || [];
+    const mastery = data.mastery || {};
+    const unlocked = words.filter((w) => (mastery[w.id]?.count || 0) >= 1);
+    grid.innerHTML = '';
+    if (!unlocked.length) {
+      const empty = document.createElement('p');
+      empty.className = 'sticker-hint';
+      empty.textContent = this.t.stickerEmpty || '';
+      empty.style.gridColumn = '1 / -1';
+      grid.appendChild(empty);
+      return;
+    }
+    // Show unlocked first (max 40 for light UI)
+    for (const w of unlocked.slice(0, 40)) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sticker-cell is-on';
+      btn.dataset.id = w.id;
+      const img = document.createElement('img');
+      img.src = (w.image || '').split('?')[0];
+      img.alt = w.display || w.id;
+      img.loading = 'lazy';
+      const name = document.createElement('span');
+      name.className = 'sticker-name';
+      name.textContent = w.display || w.id;
+      btn.appendChild(img);
+      btn.appendChild(name);
+      btn.addEventListener('click', () => data.onTap?.(w));
+      grid.appendChild(btn);
+    }
+  }
+
+  /**
+   * Flash sticker unlock overlay
+   * @param {{ image: string, display: string }} word
+   */
+  showStickerUnlock(word) {
+    if (!CONFIG.features?.stickers) return;
+    const toast = this.els.stickerToast;
+    if (!toast) return;
+    if (this.els.stickerToastImg) {
+      this.els.stickerToastImg.src = (word.image || '').split('?')[0];
+      this.els.stickerToastImg.alt = word.display || '';
+    }
+    if (this.els.stickerToastText) {
+      this.els.stickerToastText.textContent = `${this.t.stickerNew || 'Stiker!'} ${word.display || ''}`;
+    }
+    toast.classList.remove('hidden');
+    clearTimeout(this._stickerTimer);
+    this._stickerTimer = setTimeout(() => toast.classList.add('hidden'), 1400);
+  }
+
+  onMissionLength(handler) {
+    const bind = (btn, len) => {
+      btn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handler(len);
+      });
+    };
+    bind(this.els.lengthMini, 'mini');
+    bind(this.els.lengthFull, 'full');
   }
 
   _hideAllScreens() {
@@ -598,6 +770,7 @@ export class UI {
     const track = this.els.starTrack;
     if (track) {
       track.setAttribute('aria-valuenow', String(have));
+      track.setAttribute('aria-valuemax', String(target));
       track.querySelectorAll('.star-slot').forEach((slot, i) => {
         const filled = i < have;
         slot.classList.toggle('filled', filled);
@@ -607,6 +780,20 @@ export class UI {
           slot.classList.add('star-pop');
         }
       });
+    }
+    this.updateJourney(have, target);
+  }
+
+  setSessionTarget(n) {
+    this._sessionTarget = Math.max(1, n || CONFIG.goals.sessionTarget);
+    this._buildStarTrack(this._sessionTarget);
+    this._buildMissionPreview(this._sessionTarget);
+    this.buildJourney(this._sessionTarget);
+    if (this.els.sessionTarget) {
+      this.els.sessionTarget.textContent = String(this._sessionTarget);
+    }
+    if (this.els.missionTargetLabel) {
+      this.els.missionTargetLabel.textContent = String(this._sessionTarget);
     }
   }
 

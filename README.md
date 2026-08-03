@@ -170,16 +170,15 @@ Tidak ada mouse wajib di mode bermain (kecuali tombol speaker opsional).
 
 ---
 
-## Fitur v1.8.1 — Poppu Typing Kids
+## Fitur v1.9.0 — Poppu Typing Kids
 
-- Brand ringan **Poppu World** (maskot start / in-game / victory)  
-- 4 mode: Mudah / Sedang / Sulit / **Huruf A–Z** + ID/EN  
-- On-screen QWERTY + finger guide + **tombol Kembali**  
-- Letter TTS · voice pack offline · soft TTS isolation  
-- **PWA progressive**: shell cepat (SW v22), media warm di background  
-- Misi harian / minggu, streak, combo, achievements, mastery  
-- Parent dash, sertifikat, classroom (**Main kelas**)  
-- A11y contrast / large text  
+- Brand **Poppu World** (start / journey / in-game / victory)  
+- **Jalur petualangan** Poppu + bubble bicara  
+- **Mini 5★ / Penuh 10★** + buku stiker mastery  
+- Combo moments + bintang keberuntungan  
+- 4 mode + OSK + Kembali + warm-up A–Z  
+- Voice pack offline · PWA progressive (SW shell-first)  
+- Daily/weekly, streak, achievements, parent, classroom  
 - Tests: `npm test` · `npm run test:e2e` · `npm run perf:smoke`
 
 ---

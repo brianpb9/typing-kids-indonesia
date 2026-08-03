@@ -84,6 +84,9 @@ export class Game {
     this._sessionWrong = 0;
     this._sessionStartMs = 0;
     this._certData = null;
+    /** @type {'mini'|'full'} */
+    this._missionLength =
+      CONFIG.gameplay.defaultMissionLength === 'mini' ? 'mini' : 'full';
 
     this.input = new InputManager({
       onLetter: (letter) => this.handleLetter(letter),
@@ -149,6 +152,10 @@ export class Game {
       this._warmAllImages().catch(() => {});
     }, 1200);
 
+    this.ui.setMissionLengthUI(this._missionLength);
+    this._applyMissionLengthTarget();
+    this._refreshStickerBook();
+
     this.ui.onStart(() => this.requestStart());
     this.ui.onReplay(() => this.startMission());
     this.ui.onHome(() => this.goHome());
@@ -179,6 +186,7 @@ export class Game {
     this.ui.onDaily(() => this.startDailyMission());
     this.ui.onWeekly(() => this.startWeeklyMission());
     this.ui.onShare(() => this.shareParentSummary());
+    this.ui.onMissionLength((len) => this.setMissionLength(len));
     this.ui.onCert(() => this.shareCertificate());
     this.ui.onOsk((letter) => this.input.virtualKey(letter));
     this.ui.onA11y({
@@ -408,14 +416,62 @@ export class Game {
     this.ui.hideTimer();
     this.ui.hidePraise();
     this.ui.hideMilestone();
+    this.ui.hidePoppuSay();
     this.ui.setCombo(0);
     this.ui.setOskTarget('');
     this._refreshParentDash();
     this._refreshDailyUI();
     this._refreshWeeklyUI();
     this._refreshClassUI();
+    this._refreshStickerBook();
     this.audio.playClick();
     this.ui.showStart();
+  }
+
+  /**
+   * @param {'mini'|'full'} length
+   */
+  setMissionLength(length) {
+    if (this.state === 'playing' || this.state === 'celebrating') return;
+    this._missionLength = length === 'mini' ? 'mini' : 'full';
+    this._applyMissionLengthTarget();
+    this.ui.setMissionLengthUI(this._missionLength);
+    this.audio.playClick();
+  }
+
+  _applyMissionLengthTarget() {
+    if (this._missionKind === 'daily' || this._missionKind === 'weekly' || this._missionKind === 'class') {
+      return; // those set their own targets
+    }
+    const mini = CONFIG.gameplay.miniTarget || 5;
+    const full = CONFIG.gameplay.fullTarget || CONFIG.goals.sessionTarget || 10;
+    this._sessionTarget =
+      this._missionLength === 'mini' ? mini : full;
+    if (this.difficulty === 'letters') {
+      this._sessionTarget =
+        this._missionLength === 'mini' ? mini : full;
+    }
+    this.ui.setSessionTarget(this._sessionTarget);
+  }
+
+  _refreshStickerBook() {
+    if (!CONFIG.features.stickers) return;
+    const save = loadSave();
+    this.ui.renderStickerBook({
+      words: this.words.words || [],
+      mastery: save.mastery || {},
+      onTap: (w) => {
+        this.audio.unlock();
+        this.audio.speakWord(w.display, w.id);
+        this.audio.playClick();
+      },
+    });
+  }
+
+  _randomPoppuEncourage() {
+    const list = this._t().poppuEncourage || [];
+    if (!list.length) return this._t().encouragementDefault;
+    return list[Math.floor(Math.random() * list.length)];
   }
 
   requestStart() {
@@ -430,13 +486,7 @@ export class Game {
 
     // Free play — never auto-override with class code (use "Main kelas")
     this._missionKind = 'normal';
-    if (this.difficulty === 'letters') {
-      this._sessionTarget =
-        CONFIG.gameplay.lettersTarget || CONFIG.goals.sessionTarget;
-    } else {
-      this._sessionTarget = CONFIG.goals.sessionTarget;
-    }
-    this.ui.setSessionTarget(this._sessionTarget);
+    this._applyMissionLengthTarget();
 
     const save = loadSave();
     const done =
@@ -683,15 +733,11 @@ export class Game {
     this._hardBonusUsed = false;
     this._stopTimer();
 
-    if (this.difficulty === 'letters' && this._missionKind === 'normal') {
-      this._sessionTarget =
-        CONFIG.gameplay.lettersTarget || CONFIG.goals.sessionTarget;
-    } else if (this._missionKind === 'normal' && !this._classCode) {
-      if (this.difficulty !== 'letters') {
-        this._sessionTarget = CONFIG.goals.sessionTarget;
-      }
+    if (this._missionKind === 'normal') {
+      this._applyMissionLengthTarget();
     }
     this.ui.setSessionTarget(this._sessionTarget);
+    this.ui.buildJourney(this._sessionTarget);
     this.ui.setCombo(0);
 
     this.words.setDifficulty(this.difficulty);
@@ -780,6 +826,12 @@ export class Game {
     });
     this.ui.setOskTarget(this.current.word[0] || '');
     this.ui.setEncouragement(this._goalEncouragement());
+    this.ui.showPoppuSay(
+      this._t().poppuStart
+        ? this._t().poppuStart(this.current.display)
+        : this.current.display,
+      2000
+    );
     this.state = 'playing';
     this.input.focus();
     this._preloadUpcoming();
@@ -1002,14 +1054,36 @@ export class Game {
       this._sessionBestCombo = Math.max(this._sessionBestCombo, this._combo);
       this.ui.setCombo(this._combo);
       if (this._combo >= 2) this.audio.playCombo(this._combo);
+      if (this._combo === 3) {
+        this.ui.showPoppuSay(this._t().poppuCombo3, 2000);
+      } else if (this._combo === 5) {
+        this.ui.showPoppuSay(this._t().poppuCombo5, 2200);
+      }
     }
 
+    // Sticker unlock on first completion of this word
+    let firstSticker = false;
     if (this.current?.id) {
+      const before = loadSave().mastery?.[this.current.id]?.count || 0;
       recordMastery(this.current.id, true);
+      firstSticker = before === 0;
+    }
+
+    // Lucky star (extra session star, still no-fail fun)
+    let lucky = false;
+    if (
+      CONFIG.features.combo &&
+      this._combo >= (CONFIG.gameplay.luckyComboMin || 3) &&
+      Math.random() < (CONFIG.gameplay.luckyChance || 0.15)
+    ) {
+      lucky = true;
+      this.sessionStars += 1;
+      this.ui.showPoppuSay(this._t().poppuLucky, 1800);
+      this.audio.playSparkle();
     }
 
     let save = patchSave({
-      totalStars: loadSave().totalStars + 1,
+      totalStars: loadSave().totalStars + 1 + (lucky ? 1 : 0),
       bestCombo: Math.max(loadSave().bestCombo || 0, this._sessionBestCombo),
     });
 
@@ -1036,6 +1110,9 @@ export class Game {
       pop: true,
     });
     this.ui.cheerGameMascot();
+    if (firstSticker && this.current) {
+      this.ui.showStickerUnlock(this.current);
+    }
 
     const praise = this.words.randomPraise();
     this.ui.showPraise(praise);
@@ -1062,14 +1139,39 @@ export class Game {
         return;
       }
       setTimeout(() => this.loadNextWord(), CONFIG.timing.nextWordDelayMs);
-    }, CONFIG.timing.celebrationMs);
+    }, CONFIG.timing.celebrationMs + (firstSticker ? 200 : 0));
   }
 
   _checkMilestone() {
     const t = this._t();
-    const list = (t.milestones || []).filter(
-      (m) => m.at < this._sessionTarget
-    );
+    const ats =
+      this._sessionTarget <= 5
+        ? CONFIG.goals.miniMilestoneAts || [2, 4, 5]
+        : null;
+    let list = t.milestones || [];
+    if (ats) {
+      // reuse milestone copy for nearest at values under target
+      list = list
+        .filter((m) => m.at < this._sessionTarget)
+        .map((m, i) => ({
+          ...m,
+          at: ats[i] ?? m.at,
+        }))
+        .filter((m) => m.at < this._sessionTarget);
+      // also add synthetic if needed
+      if (!list.length) {
+        list = ats
+          .filter((a) => a < this._sessionTarget)
+          .map((a) => ({
+            at: a,
+            title: t.poppuJourney || 'Poppu!',
+            subtitle: `★ ${a}`,
+            trophy: '⭐',
+          }));
+      }
+    } else {
+      list = list.filter((m) => m.at < this._sessionTarget);
+    }
     for (const m of list) {
       if (this.sessionStars === m.at && !this._milestonesHit.has(m.at)) {
         this._milestonesHit.add(m.at);
@@ -1231,6 +1333,7 @@ export class Game {
     this._refreshParentDash();
 
     this.audio.playCelebration();
+    this.ui.showPoppuSay(t.poppuWin || t.victorySpeech, 2800);
     this.audio.speakPraise(t.victorySpeech);
     setTimeout(() => {
       if (rank.next) {
@@ -1239,6 +1342,7 @@ export class Game {
         );
       }
     }, 2200);
+    this._refreshStickerBook();
   }
 
   async shareParentSummary() {

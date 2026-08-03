@@ -21,7 +21,7 @@ import { getStrings } from '../js/i18n.js';
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 describe('features flags', () => {
-  it('enables voice, daily, classroom, combo, share, OSK, weekly', () => {
+  it('enables voice, daily, classroom, combo, share, OSK, weekly, journey', () => {
     assert.equal(CONFIG.features.voicePacks, true);
     assert.equal(CONFIG.features.dailyChallenge, true);
     assert.equal(CONFIG.features.weeklyChallenge, true);
@@ -31,6 +31,11 @@ describe('features flags', () => {
     assert.equal(CONFIG.features.onScreenKeyboard, true);
     assert.equal(CONFIG.features.letterMode, true);
     assert.equal(CONFIG.features.certificate, true);
+    assert.equal(CONFIG.features.journey, true);
+    assert.equal(CONFIG.features.stickers, true);
+    assert.equal(CONFIG.features.miniMission, true);
+    assert.equal(CONFIG.gameplay.miniTarget, 5);
+    assert.equal(CONFIG.gameplay.fullTarget, 10);
   });
 });
 

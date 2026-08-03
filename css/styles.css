@@ -468,6 +468,247 @@ body {
   }
 }
 
+/* Mission length pick */
+.length-pick {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: 0.65rem 0 0.35rem;
+  flex-wrap: wrap;
+}
+
+.length-btn {
+  appearance: none;
+  border: 2px solid #e8e0d5;
+  background: #fff;
+  border-radius: 999px;
+  padding: 0.45rem 0.95rem;
+  font-family: var(--font);
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: var(--text);
+  min-height: 44px;
+  transition: border-color 0.15s, transform 0.12s, background 0.15s;
+}
+
+.length-btn.is-active {
+  border-color: var(--primary);
+  background: linear-gradient(145deg, #e8f4fc, #fff);
+  color: var(--primary-deep);
+  transform: scale(1.04);
+}
+
+/* Journey path */
+.journey {
+  position: relative;
+  height: 36px;
+  margin: 0.35rem 0 0.15rem;
+}
+
+.journey-track {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  padding: 0 0.35rem;
+  position: relative;
+}
+
+.journey-track::before {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 50%;
+  height: 4px;
+  background: linear-gradient(90deg, #ffe566, #6cb4ee, #b8e6b8);
+  border-radius: 999px;
+  opacity: 0.55;
+  z-index: 0;
+}
+
+.journey-node {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e0d8cc;
+  z-index: 1;
+  position: relative;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.journey-node.filled {
+  background: #f4c430;
+  box-shadow: 0 0 0 3px rgba(244, 196, 48, 0.35);
+  transform: scale(1.15);
+}
+
+.journey-poppu {
+  position: absolute;
+  top: -8px;
+  left: 0;
+  width: 36px;
+  height: auto;
+  z-index: 2;
+  transition: left 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.12));
+  pointer-events: none;
+}
+
+/* Poppu bubble */
+.poppu-bubble {
+  background: #fff;
+  border: 2px solid #ffe566;
+  border-radius: 18px;
+  padding: 0.45rem 0.85rem;
+  margin: 0 0 0.65rem;
+  max-width: 92%;
+  box-shadow: var(--shadow-soft);
+  position: relative;
+  animation: fade-up 0.35s ease both;
+}
+
+.poppu-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 24px;
+  border: 8px solid transparent;
+  border-top-color: #ffe566;
+}
+
+.poppu-bubble.hidden {
+  display: none !important;
+}
+
+.poppu-bubble-text {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--primary-deep);
+}
+
+/* Sticker book */
+.sticker-book {
+  width: 100%;
+  max-width: 420px;
+  margin: 0.5rem 0;
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-soft);
+  padding: 0.35rem 0.85rem 0.75rem;
+  text-align: left;
+}
+
+.sticker-book summary {
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--primary-deep);
+  padding: 0.4rem 0;
+  list-style: none;
+}
+
+.sticker-book summary::-webkit-details-marker {
+  display: none;
+}
+
+.sticker-hint {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-soft);
+  margin: 0 0 0.5rem;
+}
+
+.sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 0.45rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.sticker-cell {
+  appearance: none;
+  border: 2px dashed #e8e0d5;
+  background: var(--bg-soft);
+  border-radius: 14px;
+  padding: 0.25rem;
+  cursor: pointer;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  transition: transform 0.12s, border-color 0.15s;
+}
+
+.sticker-cell.is-on {
+  border-style: solid;
+  border-color: #ffe566;
+  background: #fff;
+}
+
+.sticker-cell.is-on:hover {
+  transform: scale(1.06);
+}
+
+.sticker-cell img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.sticker-cell .sticker-name {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--text-soft);
+  text-align: center;
+  line-height: 1.1;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sticker-cell.is-off {
+  opacity: 0.45;
+  filter: grayscale(0.8);
+  cursor: default;
+}
+
+.sticker-toast {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 248, 240, 0.92);
+  border-radius: var(--radius);
+  z-index: 8;
+  animation: letter-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sticker-toast.hidden {
+  display: none !important;
+}
+
+.sticker-toast img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.12));
+}
+
+.sticker-toast-text {
+  margin-top: 0.5rem;
+  font-weight: 900;
+  color: var(--primary-deep);
+  font-size: 1.1rem;
+}
+
 .collection-streak {
   color: #e17055;
   font-size: 0.85rem;
