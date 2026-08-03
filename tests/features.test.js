@@ -121,11 +121,13 @@ describe('voice pack assets', () => {
     }
   });
 
-  it('service worker precaches voice pack flow', () => {
+  it('service worker precaches voice + word images offline', () => {
     const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
     assert.match(sw, /precacheVoicePack|voice\/manifest/);
+    assert.match(sw, /precacheWordImages|words\.json/);
     assert.match(sw, /CACHE_URLS/);
-    assert.match(sw, /typing-kids-v19/);
+    assert.match(sw, /typing-kids-v20/);
+    assert.ok(fs.existsSync(path.join(root, 'js/cache.js')));
   });
 });
 

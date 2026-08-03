@@ -1,5 +1,5 @@
-/* Typing Kids — offline shell + full voice pack precache + runtime cache */
-const CACHE = 'typing-kids-v19';
+/* Typing Kids — offline shell: app + voice pack + word images */
+const CACHE = 'typing-kids-v20';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -21,6 +21,7 @@ const PRECACHE = [
   '/js/storage.js',
   '/js/i18n.js',
   '/js/preload.js',
+  '/js/cache.js',
   '/js/daily.js',
   '/js/weekly.js',
   '/js/classroom.js',
@@ -34,33 +35,38 @@ const PRECACHE = [
   '/manifest.webmanifest',
 ];
 
-/** Cache each URL independently (one 404 must not fail the rest) */
+/** Cache each URL independently with bounded concurrency */
 async function precacheAll(cache, urls) {
   const list = [...new Set(urls.filter(Boolean))];
-  // Bound concurrency to avoid hammering install
   const CONC = 8;
   let i = 0;
   async function worker() {
     while (i < list.length) {
       const url = list[i++];
       try {
-        const abs = url.startsWith('http')
-          ? url
-          : new URL(url.startsWith('/') ? url : `/${url}`, self.location.origin).pathname;
-        const res = await fetch(abs, { cache: 'reload' });
-        if (res && res.ok) await cache.put(abs, res);
+        const path = url.startsWith('http')
+          ? new URL(url).pathname
+          : url.startsWith('/')
+            ? url
+            : `/${url}`;
+        const res = await fetch(path, { cache: 'reload' });
+        if (res && res.ok) await cache.put(path, res);
       } catch {
         /* skip */
       }
     }
   }
-  await Promise.all(Array.from({ length: Math.min(CONC, list.length) }, () => worker()));
+  if (!list.length) return;
+  await Promise.all(
+    Array.from({ length: Math.min(CONC, list.length) }, () => worker())
+  );
 }
 
-/** Pull every voice pack path from manifest (~0.8MB total) */
 async function precacheVoicePack(cache) {
   try {
-    const res = await fetch('/assets/audio/voice/manifest.json', { cache: 'reload' });
+    const res = await fetch('/assets/audio/voice/manifest.json', {
+      cache: 'reload',
+    });
     if (!res.ok) return;
     await cache.put('/assets/audio/voice/manifest.json', res.clone());
     const m = await res.json();
@@ -73,7 +79,26 @@ async function precacheVoicePack(cache) {
     }
     await precacheAll(cache, paths);
   } catch {
-    /* voice optional on install */
+    /* optional */
+  }
+}
+
+/** Cache all unique images referenced by word data (~1MB) */
+async function precacheWordImages(cache) {
+  try {
+    const paths = new Set();
+    for (const file of ['/data/words.json', '/data/words-en.json']) {
+      const res = await fetch(file, { cache: 'reload' });
+      if (!res.ok) continue;
+      await cache.put(file, res.clone());
+      const data = await res.json();
+      for (const w of data.words || []) {
+        if (w.image) paths.add(String(w.image).split('?')[0]);
+      }
+    }
+    await precacheAll(cache, [...paths]);
+  } catch {
+    /* optional */
   }
 }
 
@@ -82,7 +107,11 @@ self.addEventListener('install', (event) => {
     (async () => {
       const cache = await caches.open(CACHE);
       await precacheAll(cache, PRECACHE);
-      await precacheVoicePack(cache);
+      // Voice + images in parallel after shell
+      await Promise.all([
+        precacheVoicePack(cache),
+        precacheWordImages(cache),
+      ]);
       await self.skipWaiting();
     })()
   );
@@ -99,13 +128,15 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-/** Client can ask SW to warm additional URLs (images / late voice) */
 self.addEventListener('message', (event) => {
   const data = event.data || {};
   if (data.type === 'CACHE_URLS' && Array.isArray(data.urls)) {
     event.waitUntil(
       caches.open(CACHE).then((cache) => precacheAll(cache, data.urls))
     );
+  }
+  if (data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
   }
 });
 
@@ -116,9 +147,11 @@ self.addEventListener('fetch', (event) => {
   const url = req.url;
   const isVoice = url.includes('/assets/audio/voice/');
   const isImage = url.includes('/assets/images/');
+  const isFont = url.includes('/assets/fonts/');
   const isStatic =
     isVoice ||
     isImage ||
+    isFont ||
     url.includes('/assets/') ||
     url.includes('/data/') ||
     url.includes('/js/') ||
@@ -136,8 +169,8 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => cached);
 
-      // Cache-first for voice + images (offline-friendly)
-      if (isVoice || isImage) {
+      // Cache-first for media that makes offline play smooth
+      if (isVoice || isImage || isFont) {
         return cached || fetchPromise;
       }
       return cached || fetchPromise;

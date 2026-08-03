@@ -1,6 +1,7 @@
 /**
- * Image + audio preloader — warm browser cache
+ * Image + audio preloader — warm browser cache + SW
  */
+import { swCacheUrls } from './cache.js';
 
 /**
  * @param {string[]} urls
@@ -10,7 +11,8 @@
 export function preloadImages(urls, concurrency = 6) {
   if (!urls?.length) return Promise.resolve();
 
-  const list = [...new Set(urls.filter(Boolean))];
+  const list = [...new Set(urls.filter(Boolean).map((u) => u.split('?')[0]))];
+  swCacheUrls(list);
   let i = 0;
 
   const worker = () =>

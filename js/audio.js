@@ -3,6 +3,7 @@
  * Handles Chrome cancel/speak race, voice loading, Safari unlock.
  */
 import { CONFIG } from './config.js';
+import { warmFetch, swCacheUrls } from './cache.js';
 
 const VOICE_MANIFEST = 'assets/audio/voice/manifest.json';
 
@@ -87,35 +88,8 @@ export class AudioManager {
     const bag = this._voiceManifest[this._langCode] || {};
     let paths = Object.values(bag).filter((p) => typeof p === 'string');
     if (limit > 0) paths = paths.slice(0, limit);
-
-    // Ask service worker to cache (if controlling)
-    try {
-      if (navigator.serviceWorker?.controller) {
-        navigator.serviceWorker.controller.postMessage({
-          type: 'CACHE_URLS',
-          urls: paths,
-        });
-      }
-    } catch {
-      /* ignore */
-    }
-
-    // Also fetch in page (fills HTTP cache + SW on response)
-    const CONC = 6;
-    let i = 0;
-    const worker = async () => {
-      while (i < paths.length) {
-        const src = paths[i++];
-        try {
-          await fetch(src, { cache: 'force-cache', mode: 'same-origin' });
-        } catch {
-          /* ignore */
-        }
-      }
-    };
-    await Promise.all(
-      Array.from({ length: Math.min(CONC, paths.length || 1) }, () => worker())
-    );
+    swCacheUrls(paths);
+    await warmFetch(paths, { concurrency: 6 });
   }
 
   /**

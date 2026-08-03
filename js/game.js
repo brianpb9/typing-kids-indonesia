@@ -22,6 +22,12 @@ import {
   classBoardCsv,
 } from './storage.js';
 import { preloadImages, preloadAudio } from './preload.js';
+import {
+  whenIdle,
+  warmFetch,
+  imagePathsFromWords,
+  swCacheUrls,
+} from './cache.js';
 import { getStrings } from './i18n.js';
 import { getDailyMission, dateKey, applyDailyToSave } from './daily.js';
 import { getWeeklyMission, applyWeeklyToSave } from './weekly.js';
@@ -119,12 +125,7 @@ export class Game {
     this._refreshClassUI();
 
     this.audio.onSpeakingChange = (on) => this.ui.setSpeakingPulse(on);
-    this.audio
-      .loadVoicePack()
-      .then((ok) => {
-        if (ok) this.audio.warmVoiceCache(0).catch(() => {});
-      })
-      .catch(() => {});
+    this.audio.loadVoicePack().catch(() => {});
 
     const urlCode = classCodeFromUrl();
     if (urlCode) this._joinClass(urlCode, { silent: true });
@@ -136,6 +137,12 @@ export class Game {
       this.ui.setEncouragement(this._t().loadError);
       return;
     }
+
+    // Offline warm: voice + all word images when browser is idle
+    whenIdle(() => {
+      this.audio.warmVoiceCache(0).catch(() => {});
+      this._warmAllImages().catch(() => {});
+    }, 1500);
 
     this.ui.onStart(() => this.requestStart());
     this.ui.onReplay(() => this.startMission());
@@ -303,7 +310,19 @@ export class Game {
     this.words.setLanguage(this.language);
     this.words.setDifficulty(this.difficulty);
     this.words.setCategory(this.category);
+    // Priority: first batch for current pool
     preloadImages(this.words.imageUrls(30)).catch(() => {});
+  }
+
+  /** Warm all word images for offline play */
+  async _warmAllImages() {
+    const paths = imagePathsFromWords(this.words.words || []);
+    if (!paths.length) return;
+    swCacheUrls(paths);
+    // Decode via Image() for smoother first paint
+    await preloadImages(paths, 8);
+    // Also fetch so SW stores response bodies
+    await warmFetch(paths, { concurrency: 6 });
   }
 
   async setLanguage(lang) {

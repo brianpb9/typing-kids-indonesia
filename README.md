@@ -170,19 +170,19 @@ Tidak ada mouse wajib di mode bermain (kecuali tombol speaker opsional).
 
 ---
 
-## Fitur v1.7
+## Fitur v1.7.3
 
 - 4 mode: Mudah / Sedang / Sulit / **Huruf A–Z** + ID/EN  
 - On-screen QWERTY + finger guide + highlight target key  
 - Letter TTS (Easy + A–Z) · speaker pulse saat bicara  
-- Voice pack offline 100 kata × 2 bahasa + preload  
+- **Offline-first PWA**: voice pack + 100 gambar + shell (SW v20)  
 - Misi harian + **misi minggu** + streak  
 - Combo, achievements/lencana, mastery kata  
 - Parent dashboard (akurasi, waktu, badges, a11y)  
 - Sertifikat PNG share/download  
-- Classroom: kode, papan skor lokal, export CSV  
+- Classroom: kode, papan skor lokal, export CSV · **Main kelas**  
 - Tema **Huruf susah**, high-contrast / large text  
-- PWA (cache voice) + unit + Playwright E2E
+- Unit + Playwright smoke + deep E2E (`npm test` / `npm run test:e2e`)
 
 ---
 

@@ -143,4 +143,29 @@ test.describe('Deep flows', () => {
     await expect(page.locator('#game-screen')).toBeVisible({ timeout: 10_000 });
     await expect(page.locator('#goal-label')).toHaveText(/Mission target/i);
   });
+
+  test('word images and voice manifest are fetchable offline-ready', async ({
+    page,
+  }) => {
+    const man = await page.request.get('/assets/audio/voice/manifest.json');
+    expect(man.ok()).toBeTruthy();
+    const json = await man.json();
+    const sampleId = Object.values(json.id || {})[0];
+    const sampleEn = Object.values(json.en || {})[0];
+    expect(sampleId).toBeTruthy();
+    const a = await page.request.get('/' + String(sampleId).replace(/^\//, ''));
+    expect(a.ok()).toBeTruthy();
+    if (sampleEn) {
+      const b = await page.request.get(
+        '/' + String(sampleEn).replace(/^\//, '')
+      );
+      expect(b.ok()).toBeTruthy();
+    }
+    const words = await page.request.get('/data/words.json');
+    expect(words.ok()).toBeTruthy();
+    const data = await words.json();
+    const img = data.words[0].image.split('?')[0];
+    const imgRes = await page.request.get('/' + img.replace(/^\//, ''));
+    expect(imgRes.ok()).toBeTruthy();
+  });
 });
