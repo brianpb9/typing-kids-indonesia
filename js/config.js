@@ -6,7 +6,7 @@ export const CONFIG = {
   app: {
     name: 'Typing Kids Indonesia',
     subtitle: 'Belajar Mengetik Sambil Bermain',
-    version: '1.7.1',
+    version: '1.7.2',
     language: 'id',
   },
 

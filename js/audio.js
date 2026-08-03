@@ -22,7 +22,11 @@ export class AudioManager {
     this._unlocked = false;
     /** Keep utterance ref so browser GC doesn't kill speech mid-sentence */
     this._currentUtterance = null;
+    /** Main TTS token (words / praise) — soft letters never touch this */
     this._speakToken = 0;
+    /** Soft letter TTS token — isolated from main speech */
+    this._softToken = 0;
+    this._mainSpeaking = false;
 
     /** @type {'id'|'en'} */
     this._langCode = 'id';
@@ -62,12 +66,56 @@ export class AudioManager {
       this._voicePackReady = Boolean(
         this._voiceManifest?.id || this._voiceManifest?.en
       );
+      // Warm SW/browser cache for current language clips (non-blocking)
+      if (this._voicePackReady) {
+        this.warmVoiceCache().catch(() => {});
+      }
       return this._voicePackReady;
     } catch {
       this._voiceManifest = null;
       this._voicePackReady = false;
       return false;
     }
+  }
+
+  /**
+   * Fetch voice MP3s so SW + HTTP cache hold them for offline.
+   * @param {number} [limit] 0 = all for current lang
+   */
+  async warmVoiceCache(limit = 0) {
+    if (!this._voiceManifest) return;
+    const bag = this._voiceManifest[this._langCode] || {};
+    let paths = Object.values(bag).filter((p) => typeof p === 'string');
+    if (limit > 0) paths = paths.slice(0, limit);
+
+    // Ask service worker to cache (if controlling)
+    try {
+      if (navigator.serviceWorker?.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: 'CACHE_URLS',
+          urls: paths,
+        });
+      }
+    } catch {
+      /* ignore */
+    }
+
+    // Also fetch in page (fills HTTP cache + SW on response)
+    const CONC = 6;
+    let i = 0;
+    const worker = async () => {
+      while (i < paths.length) {
+        const src = paths[i++];
+        try {
+          await fetch(src, { cache: 'force-cache', mode: 'same-origin' });
+        } catch {
+          /* ignore */
+        }
+      }
+    };
+    await Promise.all(
+      Array.from({ length: Math.min(CONC, paths.length || 1) }, () => worker())
+    );
   }
 
   /**
@@ -221,12 +269,13 @@ export class AudioManager {
    * @returns {Promise<boolean>} true if played from pack
    */
   /**
-   * True while a word pack clip should not be interrupted by letter TTS
+   * True while a word (pack or main TTS) should not be interrupted by letter TTS
    */
   isWordPlaying() {
     return (
       performance.now() < this._wordPlayUntil ||
-      (this._packAudio && !this._packAudio.paused)
+      this._mainSpeaking ||
+      Boolean(this._packAudio && !this._packAudio.paused)
     );
   }
 
@@ -292,79 +341,128 @@ export class AudioManager {
    * @param {{ rate?: number, pitch?: number, force?: boolean }} [opts]
    * @returns {Promise<void>}
    */
+  /**
+   * Main TTS (words / praise). Soft letters never use this path.
+   * @param {string} text
+   * @param {{ rate?: number, pitch?: number, force?: boolean }} [opts]
+   */
   speak(text, opts = {}) {
     if (this.muted && !opts.force) return Promise.resolve();
     if (!this._speechReady || !text) return Promise.resolve();
 
-    // Soft letter feedback: never cut word pack mid-play
-    if (opts.soft && this.isWordPlaying()) {
-      return Promise.resolve();
-    }
-
     this._loadVoices();
     const token = ++this._speakToken;
+    // Bump soft token so pending soft letters abort quietly
+    this._softToken += 1;
     const clean = String(text).trim();
     if (!clean) return Promise.resolve();
 
     return new Promise((resolve) => {
-      const run = () => {
-        if (token !== this._speakToken) {
-          resolve();
-          return;
-        }
+      try {
+        window.speechSynthesis.cancel();
 
-        try {
-          if (!opts.soft) {
-            window.speechSynthesis.cancel();
+        setTimeout(() => {
+          if (token !== this._speakToken) {
+            resolve();
+            return;
           }
 
-          setTimeout(() => {
-            if (token !== this._speakToken) {
-              resolve();
-              return;
-            }
+          try {
+            window.speechSynthesis.resume();
+          } catch {
+            /* ignore */
+          }
 
-            try {
-              window.speechSynthesis.resume();
-            } catch {
-              /* ignore */
-            }
+          const u = new SpeechSynthesisUtterance(clean);
+          this._currentUtterance = u;
+          this._mainSpeaking = true;
+          this._wordPlayUntil = Math.max(
+            this._wordPlayUntil,
+            performance.now() + Math.max(1200, clean.length * 280)
+          );
+          this._setSpeaking(true);
 
-            const u = new SpeechSynthesisUtterance(clean);
-            this._currentUtterance = u;
-            if (!opts.soft) this._setSpeaking(true);
+          const voice = this._preferredVoice;
+          u.lang =
+            voice?.lang || this._speechLang || CONFIG.speech.lang || 'id-ID';
+          u.rate = opts.rate ?? CONFIG.speech.rate ?? 0.85;
+          u.pitch = opts.pitch ?? CONFIG.speech.pitch ?? 1.1;
+          u.volume = CONFIG.speech.volume ?? 1;
+          if (voice) u.voice = voice;
 
-            const voice = this._preferredVoice;
-            u.lang =
-              voice?.lang || this._speechLang || CONFIG.speech.lang || 'id-ID';
-            u.rate = opts.rate ?? CONFIG.speech.rate ?? 0.85;
-            u.pitch = opts.pitch ?? CONFIG.speech.pitch ?? 1.1;
-            u.volume = opts.soft
-              ? Math.min(1, (CONFIG.speech.volume ?? 1) * 0.85)
-              : CONFIG.speech.volume ?? 1;
-            if (voice) u.voice = voice;
+          let done = false;
+          const finish = () => {
+            if (done) return;
+            done = true;
+            if (this._currentUtterance === u) this._currentUtterance = null;
+            this._mainSpeaking = false;
+            this._setSpeaking(false);
+            resolve();
+          };
 
-            let done = false;
-            const finish = () => {
-              if (done) return;
-              done = true;
-              if (this._currentUtterance === u) this._currentUtterance = null;
-              if (!opts.soft) this._setSpeaking(false);
-              resolve();
-            };
+          u.onend = finish;
+          u.onerror = finish;
 
-            u.onend = finish;
-            u.onerror = finish;
+          window.speechSynthesis.speak(u);
+          setTimeout(finish, Math.max(2500, clean.length * 400));
+        }, 60);
+      } catch {
+        this._mainSpeaking = false;
+        resolve();
+      }
+    });
+  }
 
-            window.speechSynthesis.speak(u);
-            setTimeout(finish, Math.max(2500, clean.length * 400));
-          }, opts.soft ? 40 : 60);
-        } catch {
+  /**
+   * Soft letter TTS — isolated token; never cancels main speak/pack.
+   * @param {string} text
+   */
+  _speakSoft(text) {
+    if (this.muted || !this._speechReady || !text) return Promise.resolve();
+    if (this.isWordPlaying()) return Promise.resolve();
+
+    this._loadVoices();
+    const token = ++this._softToken;
+    const clean = String(text).trim();
+
+    return new Promise((resolve) => {
+      try {
+        // Do NOT cancel — would kill main word TTS. Soft utterances queue.
+        const u = new SpeechSynthesisUtterance(clean);
+        const voice = this._preferredVoice;
+        u.lang =
+          voice?.lang || this._speechLang || CONFIG.speech.lang || 'id-ID';
+        u.rate = 1.05;
+        u.pitch = 1.15;
+        u.volume = Math.min(1, (CONFIG.speech.volume ?? 1) * 0.8);
+        if (voice) u.voice = voice;
+
+        let done = false;
+        const finish = () => {
+          if (done) return;
+          done = true;
           resolve();
-        }
-      };
+        };
 
-      run();
+        u.onend = finish;
+        u.onerror = finish;
+
+        // Abort if superseded by newer soft letter or main speech started
+        const poll = setInterval(() => {
+          if (token !== this._softToken || this._mainSpeaking) {
+            clearInterval(poll);
+            finish();
+          }
+        }, 80);
+
+        window.speechSynthesis.speak(u);
+        setTimeout(() => {
+          clearInterval(poll);
+          finish();
+        }, 1800);
+      } catch {
+        resolve();
+      }
     });
   }
 
@@ -375,34 +473,30 @@ export class AudioManager {
    */
   async speakWord(wordDisplay, wordId = '') {
     if (this.muted) return;
-    const id = wordId || String(wordDisplay || '').toLowerCase().replace(/\s+/g, '');
-    this._wordPlayUntil = performance.now() + 4000;
+    const id =
+      wordId ||
+      String(wordDisplay || '')
+        .toLowerCase()
+        .replace(/\s+/g, '');
+    this._wordPlayUntil = performance.now() + 4500;
+    this._softToken += 1; // drop pending soft letters
     const played = await this.playPacked(id, { protectWord: true });
     if (played) return;
     return this.speak(wordDisplay, {
       rate: CONFIG.speech.rate ?? 0.85,
       pitch: CONFIG.speech.pitch ?? 1.1,
-    }).finally(() => {
-      this._wordPlayUntil = performance.now();
     });
   }
 
   /**
-   * Soft letter name — skipped while word pack is playing; does not cancel pack.
+   * Soft letter name — skipped while word is playing; isolated from main TTS token.
    * @param {string} spokenName e.g. "be" or "B"
    */
   speakLetter(spokenName) {
     if (this.muted || !spokenName) return Promise.resolve();
     if (this.isWordPlaying()) return Promise.resolve();
-    // Chain soft letters so they don't stampede cancel each other too hard
     this._letterQueue = this._letterQueue
-      .then(() =>
-        this.speak(spokenName, {
-          rate: 1.05,
-          pitch: 1.15,
-          soft: true,
-        })
-      )
+      .then(() => this._speakSoft(spokenName))
       .catch(() => {});
     return this._letterQueue;
   }
@@ -449,7 +543,10 @@ export class AudioManager {
 
   stopSpeech() {
     this._speakToken += 1;
+    this._softToken += 1;
     this._packToken += 1;
+    this._mainSpeaking = false;
+    this._wordPlayUntil = 0;
     if (this._speechReady) {
       try {
         window.speechSynthesis.cancel();
@@ -466,6 +563,7 @@ export class AudioManager {
       this._packAudio = null;
     }
     this._currentUtterance = null;
+    this._setSpeaking(false);
   }
 
   /** Soft click for UI */

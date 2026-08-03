@@ -1,5 +1,5 @@
-/* Typing Kids — offline shell + resilient precache + runtime voice cache */
-const CACHE = 'typing-kids-v18';
+/* Typing Kids — offline shell + full voice pack precache + runtime cache */
+const CACHE = 'typing-kids-v19';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -34,26 +34,57 @@ const PRECACHE = [
   '/manifest.webmanifest',
 ];
 
-/** addAll fails entirely on one 404 — cache individually instead */
+/** Cache each URL independently (one 404 must not fail the rest) */
 async function precacheAll(cache, urls) {
-  await Promise.all(
-    urls.map(async (url) => {
+  const list = [...new Set(urls.filter(Boolean))];
+  // Bound concurrency to avoid hammering install
+  const CONC = 8;
+  let i = 0;
+  async function worker() {
+    while (i < list.length) {
+      const url = list[i++];
       try {
-        const res = await fetch(url, { cache: 'reload' });
-        if (res && res.ok) await cache.put(url, res);
+        const abs = url.startsWith('http')
+          ? url
+          : new URL(url.startsWith('/') ? url : `/${url}`, self.location.origin).pathname;
+        const res = await fetch(abs, { cache: 'reload' });
+        if (res && res.ok) await cache.put(abs, res);
       } catch {
-        /* skip missing */
+        /* skip */
       }
-    })
-  );
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(CONC, list.length) }, () => worker()));
+}
+
+/** Pull every voice pack path from manifest (~0.8MB total) */
+async function precacheVoicePack(cache) {
+  try {
+    const res = await fetch('/assets/audio/voice/manifest.json', { cache: 'reload' });
+    if (!res.ok) return;
+    await cache.put('/assets/audio/voice/manifest.json', res.clone());
+    const m = await res.json();
+    const paths = [];
+    for (const bag of [m.id, m.en]) {
+      if (!bag || typeof bag !== 'object') continue;
+      for (const p of Object.values(bag)) {
+        if (typeof p === 'string') paths.push(p);
+      }
+    }
+    await precacheAll(cache, paths);
+  } catch {
+    /* voice optional on install */
+  }
 }
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE)
-      .then((cache) => precacheAll(cache, PRECACHE))
-      .then(() => self.skipWaiting())
+    (async () => {
+      const cache = await caches.open(CACHE);
+      await precacheAll(cache, PRECACHE);
+      await precacheVoicePack(cache);
+      await self.skipWaiting();
+    })()
   );
 });
 
@@ -68,32 +99,45 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+/** Client can ask SW to warm additional URLs (images / late voice) */
+self.addEventListener('message', (event) => {
+  const data = event.data || {};
+  if (data.type === 'CACHE_URLS' && Array.isArray(data.urls)) {
+    event.waitUntil(
+      caches.open(CACHE).then((cache) => precacheAll(cache, data.urls))
+    );
+  }
+});
+
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
+
+  const url = req.url;
+  const isVoice = url.includes('/assets/audio/voice/');
+  const isImage = url.includes('/assets/images/');
+  const isStatic =
+    isVoice ||
+    isImage ||
+    url.includes('/assets/') ||
+    url.includes('/data/') ||
+    url.includes('/js/') ||
+    url.includes('/css/');
 
   event.respondWith(
     caches.match(req).then((cached) => {
       const fetchPromise = fetch(req)
         .then((res) => {
-          if (
-            res &&
-            res.ok &&
-            (req.url.includes('/assets/') ||
-              req.url.includes('/data/') ||
-              req.url.includes('/js/') ||
-              req.url.includes('/css/'))
-          ) {
+          if (res && res.ok && isStatic) {
             const clone = res.clone();
             caches.open(CACHE).then((cache) => cache.put(req, clone));
           }
           return res;
         })
         .catch(() => cached);
-      if (
-        req.url.includes('/assets/audio/voice/') ||
-        req.url.includes('/assets/images/')
-      ) {
+
+      // Cache-first for voice + images (offline-friendly)
+      if (isVoice || isImage) {
         return cached || fetchPromise;
       }
       return cached || fetchPromise;

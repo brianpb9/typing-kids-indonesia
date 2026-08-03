@@ -119,7 +119,12 @@ export class Game {
     this._refreshClassUI();
 
     this.audio.onSpeakingChange = (on) => this.ui.setSpeakingPulse(on);
-    this.audio.loadVoicePack().catch(() => {});
+    this.audio
+      .loadVoicePack()
+      .then((ok) => {
+        if (ok) this.audio.warmVoiceCache(0).catch(() => {});
+      })
+      .catch(() => {});
 
     const urlCode = classCodeFromUrl();
     if (urlCode) this._joinClass(urlCode, { silent: true });

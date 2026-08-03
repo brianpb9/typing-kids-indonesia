@@ -120,6 +120,13 @@ describe('voice pack assets', () => {
       assert.ok(m.en[k], `phrase en ${k}`);
     }
   });
+
+  it('service worker precaches voice pack flow', () => {
+    const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+    assert.match(sw, /precacheVoicePack|voice\/manifest/);
+    assert.match(sw, /CACHE_URLS/);
+    assert.match(sw, /typing-kids-v19/);
+  });
 });
 
 describe('i18n new keys', () => {
