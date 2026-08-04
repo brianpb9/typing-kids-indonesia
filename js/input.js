@@ -36,9 +36,10 @@ export class InputManager {
       this.catcher.addEventListener('blur', this._keepFocus);
     }
 
-    // Aggressive re-focus while active (helps laptop trackpad clicks)
+    // Aggressive re-focus on desktop only (mobile uses OSK)
     this._focusTimer = window.setInterval(() => {
       if (!this.enabled || !this.isActive()) return;
+      if (this.prefersTouch()) return;
       if (!this.catcher) return;
       if (document.activeElement === this.catcher) return;
       // Don't steal focus from class input / buttons / a11y toggles
@@ -81,8 +82,25 @@ export class InputManager {
     this.enabled = value;
   }
 
+  /**
+   * Phone/tablet: OSK is primary — avoid focusing hidden input
+   * (would pop the system keyboard and steal screen space).
+   */
+  prefersTouch() {
+    try {
+      if (window.matchMedia('(pointer: coarse)').matches) return true;
+      if (window.matchMedia('(hover: none) and (pointer: coarse)').matches)
+        return true;
+    } catch {
+      /* ignore */
+    }
+    return 'ontouchstart' in window && window.innerWidth < 900;
+  }
+
   focus() {
     if (!this.catcher) return;
+    // Mobile: do not force focus — use on-screen keyboard
+    if (this.prefersTouch()) return;
     try {
       this.catcher.focus({ preventScroll: true });
     } catch {
@@ -99,13 +117,15 @@ export class InputManager {
     const ch = String(letter || '').toLowerCase();
     if (!/^[a-z]$/.test(ch)) return;
     this._emit(ch);
-    this.focus();
+    // Only re-focus physical keyboard path
+    if (!this.prefersTouch()) this.focus();
   }
 
   _keepFocus() {
     if (!this.enabled || !this.isActive()) return;
+    if (this.prefersTouch()) return;
     requestAnimationFrame(() => {
-      if (this.enabled && this.isActive()) this.focus();
+      if (this.enabled && this.isActive() && !this.prefersTouch()) this.focus();
     });
   }
 

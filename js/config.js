@@ -6,7 +6,7 @@ export const CONFIG = {
   app: {
     name: 'Poppu Typing Kids',
     subtitle: 'Belajar Mengetik Sambil Bermain',
-    version: '2.0.0',
+    version: '2.0.1',
     language: 'id',
     brand: {
       line: 'Poppu World',

@@ -197,6 +197,31 @@ body {
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
+  padding-top: max(1.5rem, env(safe-area-inset-top, 0px));
+  padding-left: max(1.5rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1.5rem, env(safe-area-inset-right, 0px));
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+@media (min-width: 901px) {
+  .app {
+    /* Leave room for floating mute/help without covering title */
+    padding-top: max(2rem, env(safe-area-inset-top, 0px));
+  }
+}
+
+/* Prevent iOS double-tap zoom on UI */
+button,
+.osk-key,
+.cat-btn,
+.mode-btn,
+.station-btn,
+.length-btn {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .hidden {
@@ -208,16 +233,18 @@ body {
 .help-btn,
 .back-btn {
   position: fixed;
-  top: 1rem;
+  top: max(0.75rem, env(safe-area-inset-top, 0px));
   z-index: 50;
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
   border: none;
   border-radius: 50%;
   background: var(--card);
   box-shadow: var(--shadow-soft);
   cursor: pointer;
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -225,20 +252,21 @@ body {
   font-family: var(--font);
   font-weight: 900;
   color: var(--primary-deep);
+  touch-action: manipulation;
 }
 
 .back-btn {
-  left: 1rem;
+  left: max(0.75rem, env(safe-area-inset-left, 0px));
   font-size: 1.5rem;
   line-height: 1;
 }
 
 .mute-btn {
-  right: 1rem;
+  right: max(0.75rem, env(safe-area-inset-right, 0px));
 }
 
 .help-btn {
-  right: 4.5rem;
+  right: calc(0.75rem + 52px + env(safe-area-inset-right, 0px));
   font-size: 1.25rem;
 }
 
@@ -1590,6 +1618,8 @@ body {
   color: transparent;
   background: transparent;
   z-index: -1;
+  /* ≥16px prevents iOS auto-zoom on focus */
+  font-size: 16px;
 }
 
 .image-wrap {
@@ -2094,11 +2124,97 @@ body {
 /* Responsive */
 @media (max-width: 600px) {
   .app {
-    padding: 1rem;
+    padding: 0.75rem;
+    padding-top: max(3.5rem, calc(env(safe-area-inset-top, 0px) + 3rem));
+    justify-content: flex-start;
+  }
+
+  .start-screen {
+    max-width: 100%;
+    padding-bottom: 1.5rem;
+  }
+
+  .brand-mascot img {
+    width: clamp(80px, 28vw, 110px);
+  }
+
+  h1#app-title {
+    font-size: clamp(1.45rem, 7vw, 1.85rem);
+    padding: 0 0.5rem;
+  }
+
+  .collection-bar {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 18px;
+    gap: 0.4rem 0.65rem;
+    font-size: 0.8rem;
+    padding: 0.55rem 0.75rem;
+    justify-content: center;
+  }
+
+  .friendship-chip {
+    font-size: 0.75rem;
+  }
+
+  .world-map {
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .mission-row {
+    max-width: 100%;
+    flex-direction: column;
+  }
+
+  .mission-row .daily-card {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .start-card,
+  .sticker-book,
+  .parent-dash,
+  .class-panel {
+    max-width: 100%;
+  }
+
+  .mode-pick-4 {
+    max-width: 100%;
+  }
+
+  .game-screen {
+    min-height: auto;
+    max-width: 100%;
+    width: 100%;
+    padding-bottom: 0.5rem;
+  }
+
+  .goal-banner {
+    padding: 0.65rem 0.75rem;
+  }
+
+  .star-track {
+    gap: 0.1rem;
+  }
+
+  .star-slot {
+    font-size: clamp(0.85rem, 4vw, 1.15rem);
+  }
+
+  .journey {
+    height: 32px;
+  }
+
+  .journey-poppu {
+    width: 30px;
+    top: -6px;
   }
 
   .game-card {
-    padding: 1.25rem;
+    padding: 1rem 0.85rem 1.15rem;
+    width: 100%;
   }
 
   .top-bar {
@@ -2108,6 +2224,64 @@ body {
   .speak-btn {
     width: 44px;
     height: 44px;
+  }
+
+  .target-letter {
+    font-size: clamp(2.5rem, 16vw, 3.5rem);
+  }
+
+  .word-full {
+    font-size: clamp(1.25rem, 6vw, 1.75rem);
+    letter-spacing: 0.08em;
+  }
+
+  .word-slots {
+    gap: 0.35rem;
+  }
+
+  .letter-slot {
+    min-width: 2rem;
+    font-size: 1.15rem;
+  }
+
+  .kb-hint,
+  .kb-hint-hard {
+    font-size: 0.85rem;
+    padding: 0 0.5rem;
+    text-align: center;
+  }
+
+  .mute-btn,
+  .help-btn,
+  .back-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .help-btn {
+    right: calc(0.5rem + 48px + env(safe-area-inset-right, 0px));
+  }
+
+  .victory-card {
+    padding: 1.25rem 1rem;
+    max-width: 100%;
+  }
+
+  .victory-actions {
+    width: 100%;
+  }
+
+  .victory-actions .btn-start,
+  .victory-actions .btn-secondary {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Finger guide less useful / crowded on tiny screens */
+  .osk-finger {
+    display: none;
   }
 }
 
@@ -2476,37 +2650,136 @@ html.a11y-large .osk-key {
 /* Touch / tablet polish */
 @media (max-width: 900px) {
   .btn-start {
-    min-height: 72px;
-    font-size: 1.25rem;
-    width: min(100%, 360px);
+    min-height: 64px;
+    font-size: 1.2rem;
+    width: min(100%, 100%);
+    max-width: 420px;
   }
+
   .osk {
     position: sticky;
-    bottom: 0.25rem;
-    z-index: 5;
+    bottom: 0;
+    z-index: 6;
+    max-width: 100%;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 20px rgba(61, 58, 53, 0.08);
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  .osk-row-mid {
+    padding-left: 0.35rem;
+  }
+
+  .osk-row-bot {
+    padding-left: 0.85rem;
+  }
+
+  .osk-key {
+    min-width: clamp(1.7rem, 8.2vw, 2.4rem);
+    min-height: clamp(2.5rem, 10vw, 3rem);
+    font-size: clamp(0.9rem, 3.2vw, 1.1rem);
+    border-width: 1.5px;
+  }
+
+  /* Game layout: image a bit smaller so OSK fits above fold */
+  :root {
+    --image-size: clamp(120px, 32vw, 200px);
+  }
+
+  .game-mascot {
+    width: 40px;
+    top: 0.1rem;
+    right: 0.05rem;
+    opacity: 0.88;
+  }
+
+  .poppu-bubble {
+    max-width: 100%;
+    font-size: 0.9rem;
+  }
+
+  .poppu-bubble-text {
+    font-size: 0.9rem;
   }
 }
 
 @media (max-width: 600px) {
   .mode-pick-4 {
     grid-template-columns: 1fr 1fr;
+    width: 100%;
+    max-width: 100%;
   }
+
+  .mode-pick-4 .mode-btn {
+    min-height: 68px;
+    padding: 0.5rem 0.35rem;
+  }
+
+  .mode-pick-4 .mode-desc {
+    font-size: 0.68rem;
+  }
+
   .osk-key {
-    min-width: 1.55rem;
+    min-width: clamp(1.55rem, 8vw, 2.2rem);
+    min-height: 2.65rem;
     padding: 0;
   }
+
   .collection-bar {
-    gap: 0.5rem;
-    font-size: 0.85rem;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+  }
+
+  .length-pick {
+    width: 100%;
+  }
+
+  .length-btn {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .cat-pick {
+    justify-content: center;
+  }
+
+  .cat-btn {
+    min-height: 44px;
   }
 }
 
-/* Safe area */
+/* Landscape phones — keep OSK usable */
+@media (max-height: 480px) and (orientation: landscape) {
+  .brand-mascot img {
+    width: 64px;
+  }
+
+  .game-screen .goal-banner {
+    padding: 0.4rem 0.6rem;
+  }
+
+  .journey {
+    display: none;
+  }
+
+  .game-mascot {
+    display: none;
+  }
+
+  :root {
+    --image-size: 88px;
+  }
+
+  .osk-key {
+    min-height: 2.2rem;
+  }
+}
+
+/* Safe area extras */
 @supports (padding: env(safe-area-inset-bottom)) {
   .app {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
-  }
-  .osk {
-    padding-bottom: max(0.85rem, env(safe-area-inset-bottom));
   }
 }
