@@ -19,6 +19,23 @@ export class AnimationManager {
     this.particles = [];
     this.raf = 0;
     this.running = false;
+    /** @type {MediaQueryList | null} */
+    this._motionQuery =
+      typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-reduced-motion: reduce)')
+        : null;
+    // If the user switches to reduced motion mid-burst, drop live particles.
+    this._motionQuery?.addEventListener?.('change', () => {
+      if (this._motionQuery.matches) {
+        this.particles.length = 0;
+        this._clear();
+      }
+    });
+  }
+
+  /** True when the user prefers reduced motion — particles become no-ops. */
+  get _reducedMotion() {
+    return !!this._motionQuery?.matches;
   }
 
   /**
@@ -45,6 +62,7 @@ export class AnimationManager {
 
   /** Burst confetti + stars for word complete */
   celebrate() {
+    if (this._reducedMotion) return;
     const w = window.innerWidth;
     const h = window.innerHeight;
     const cx = w / 2;
@@ -97,7 +115,7 @@ export class AnimationManager {
 
   /** Tiny sparkles near an element (correct letter) */
   sparkleAt(element) {
-    if (!element) return;
+    if (!element || this._reducedMotion) return;
     const rect = element.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;

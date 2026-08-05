@@ -47,10 +47,11 @@ describe('mode matrix', () => {
 });
 
 describe('word data', () => {
+  const expected = { 'data/words.json': 100, 'data/words-en.json': 99 };
   for (const file of ['data/words.json', 'data/words-en.json']) {
-    it(`${file} has 100 valid words and images`, () => {
+    it(`${file} has ${expected[file]} valid words and images`, () => {
       const data = JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
-      assert.equal(data.words.length, 100);
+      assert.equal(data.words.length, expected[file]);
       const ids = new Set();
       for (const w of data.words) {
         assert.match(w.word, /^[a-z]+$/);
@@ -63,14 +64,15 @@ describe('word data', () => {
     });
   }
 
-  it('EN has no dual orange spelling', () => {
+  it('EN has a single "orange" entry (fruit only)', () => {
     const data = JSON.parse(
       fs.readFileSync(path.join(root, 'data/words-en.json'), 'utf8')
     );
     const oranges = data.words.filter((w) => w.word === 'orange');
-    assert.equal(oranges.length, 1, 'only fruit orange');
-    const amber = data.words.find((w) => w.id === 'orange-color');
-    assert.equal(amber.word, 'amber');
+    assert.equal(oranges.length, 1);
+    assert.equal(oranges[0].id, 'orange');
+    assert.equal(oranges[0].category, 'buah');
+    assert.ok(!data.words.some((w) => w.id === 'orange-color'));
   });
 });
 

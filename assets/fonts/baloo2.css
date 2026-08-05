@@ -1,0 +1,10 @@
+/* Baloo 2 (Poppu World brand font) — variable weight 400–800.
+   Subsets from library 08-fonts: -3 is the latin(+ext) subset used for
+   Bahasa Indonesia & English; other subsets kept for completeness. */
+@font-face {
+  font-family: 'Baloo 2';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('baloo2-3.woff2') format('woff2');
+}

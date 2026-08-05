@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.poppuworld.typing",
+      "sha256_cert_fingerprints": [
+        "CB:4A:EF:14:44:EE:D3:C6:B4:EA:79:46:59:A7:E7:8F:5E:7F:8B:87:33:59:9A:56:6D:45:0D:2B:44:C5:72:A3"
+      ]
+    }
+  }
+]

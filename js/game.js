@@ -16,6 +16,8 @@ import {
   addSessionStats,
   accuracyPct,
   masteryStats,
+  isLetterMasteryId,
+  isCharMasteryId,
   pushClassScore,
   unlockAchievements,
   buildShareText,
@@ -91,6 +93,10 @@ export class Game {
     /** Wrong keys on current word (for perfect-word bonus) */
     this._wordWrongs = 0;
     this._prevFriendshipId = '';
+    /** @type {string|null} active friend companion this mission */
+    this._friend = null;
+    /** Pending gameplay timeouts (cancelled on goHome) */
+    this._pendingTimers = new Set();
 
     this.input = new InputManager({
       onLetter: (letter) => this.handleLetter(letter),
@@ -137,14 +143,53 @@ export class Game {
     const urlCode = classCodeFromUrl();
     if (urlCode) this._joinClass(urlCode, { silent: true });
 
+    // Parental gate must be active even if word data fails to load
+    // (offline first-run) — bind before _loadWordsForLanguage
+    this._bindParentGate();
+
     try {
       await this._loadWordsForLanguage();
     } catch (err) {
       console.error(err);
-      this.ui.setEncouragement(this._t().loadError);
+      this.ui.showLoadError(this._t().loadError, () => this._retryLoadWords());
       return;
     }
 
+    this._afterWordsLoaded();
+  }
+
+  /** "Coba lagi" path — re-fetch word data after a failed init load */
+  async _retryLoadWords() {
+    this.ui.hideLoadError();
+    try {
+      await this._loadWordsForLanguage();
+    } catch (err) {
+      console.error(err);
+      this.ui.showLoadError(this._t().loadError, () => this._retryLoadWords());
+      return;
+    }
+    this._afterWordsLoaded();
+  }
+
+  /**
+   * Parent dashboard stays behind the parental gate — intercept the
+   * <details> toggle and ask the multiplication question first.
+   * Bound once in init() before words load, so the gate is active even
+   * when word data fails to load (offline first-run).
+   */
+  _bindParentGate() {
+    const parentDash = this.ui.els.parentDash;
+    parentDash?.querySelector('summary')?.addEventListener('click', (e) => {
+      if (parentDash.open || this.ui.gatePassed()) return; // closing is free
+      e.preventDefault();
+      this.ui.requireGate(() => {
+        parentDash.open = true;
+      });
+    });
+  }
+
+  /** Second half of init — runs once word data is available */
+  _afterWordsLoaded() {
     // Offline warm: shell SW already installed; media warmed in background
     whenIdle(() => {
       try {
@@ -162,8 +207,9 @@ export class Game {
     this.ui.setStationUI('meadow');
     {
       const s = loadSave();
-      const stickers = Object.values(s.mastery || {}).filter(
-        (m) => (m?.count || 0) >= 1
+      const stickers = Object.entries(s.mastery || {}).filter(
+        ([id, m]) =>
+          !isLetterMasteryId(id) && !isCharMasteryId(id) && (m?.count || 0) >= 1
       ).length;
       this._prevFriendshipId = getFriendship(s.totalStars || 0, stickers).id;
     }
@@ -197,10 +243,15 @@ export class Game {
     this.ui.onHelp(() => this.openHelp());
     this.ui.onDaily(() => this.startDailyMission());
     this.ui.onWeekly(() => this.startWeeklyMission());
-    this.ui.onShare(() => this.shareParentSummary());
+    this.ui.onShare(() =>
+      this.ui.requireGate(() => this.shareParentSummary())
+    );
     this.ui.onMissionLength((len) => this.setMissionLength(len));
     this.ui.onStation((st) => this.pickStation(st));
-    this.ui.onCert(() => this.shareCertificate());
+    this.ui.onCert(() => this.ui.requireGate(() => this.shareCertificate()));
+    this.ui.onChildName((name) => {
+      patchSave({ childName: name });
+    });
     this.ui.onOsk((letter) => this.input.virtualKey(letter));
     this.ui.onA11y({
       onContrast: (v) => this._setA11y({ highContrast: v }),
@@ -213,7 +264,7 @@ export class Game {
     this.ui.onClassroom({
       onJoin: (code) => this._joinClass(code),
       onCreate: () => this._createClass(),
-      onShare: () => this._shareClass(),
+      onShare: () => this.ui.requireGate(() => this._shareClass()),
       onClear: () => this._clearClass(),
       onExport: () => this._exportClassCsv(),
       onPlay: () => this.startClassMission(),
@@ -280,6 +331,7 @@ export class Game {
       achievements: save.achievements || [],
       analyticsOptIn: Boolean(save.analyticsOptIn),
       a11y: save.a11y || {},
+      childName: save.childName || '',
       badgeLabels,
     });
     this.ui.renderCollection(save);
@@ -421,11 +473,13 @@ export class Game {
 
   goHome() {
     this._stopTimer();
+    this._clearPendingTimers();
     this.audio.stopSpeech();
     this._transitionLock = false;
     this.state = 'start';
     this.current = null;
     this.cursor = 0;
+    this.ui.closeGate();
     this.ui.hideTimer();
     this.ui.hidePraise();
     this.ui.hideMilestone();
@@ -475,7 +529,15 @@ export class Game {
       mastery: save.mastery || {},
       onTap: (w) => {
         this.audio.unlock();
-        this.audio.speakWord(w.display, w.id);
+        if (isCharMasteryId(w.id)) {
+          // Friend sticker — play that friend's voice, Poppu as fallback
+          const fid = w.id.replace(/^char-/, '');
+          this.audio.playVoiceReaction('leveldone', fid).then((ok) => {
+            if (!ok) this.audio.playVoiceReaction('leveldone');
+          });
+        } else {
+          this.audio.speakWord(w.display, w.id);
+        }
         this.audio.playClick();
       },
     });
@@ -512,6 +574,17 @@ export class Game {
     }
     // Auto-start for map magic (after optional tutorial)
     this.requestStart();
+  }
+
+  /**
+   * Canon friend for the current mission context (null → Poppu only).
+   * letters→Peeky, easy→Puffy, hard→Orby, daily→Zaza (CONFIG.friendsByStation).
+   */
+  _activeFriendId() {
+    const map = CONFIG.friendsByStation || {};
+    if (this._missionKind === 'daily') return map.daily || null;
+    if (this._missionKind !== 'normal') return null;
+    return map[this.difficulty] || null;
   }
 
   requestStart() {
@@ -610,14 +683,8 @@ export class Game {
     if (!cls) return;
     this._classCode = cls.code;
     patchSave({ classCode: cls.code });
-    this.difficulty = cls.mode;
-    this.category = cls.category;
-    this._sessionTarget = cls.target;
-    this.ui.setSessionTarget(cls.target);
-    this.ui.setDifficultyUI(this.difficulty);
-    this.ui.setCategoryUI(this.category);
-    this.words.setDifficulty(this.difficulty);
-    this.words.setCategory(this.category);
+    // Class params apply only via "Main kelas" (startClassMission) —
+    // free-play difficulty/category/target stay untouched here
     this._refreshClassUI();
     if (!opts.silent) {
       this.audio.playClick();
@@ -668,8 +735,8 @@ export class Game {
   _clearClass() {
     this._classCode = '';
     this._missionKind = 'normal';
-    this._sessionTarget = CONFIG.goals.sessionTarget;
-    this.ui.setSessionTarget(this._sessionTarget);
+    // Back to the player's own mini/full pick (not the class target)
+    this._applyMissionLengthTarget();
     patchSave({ classCode: '' });
     this._refreshClassUI();
     this.ui.setClassMsg('');
@@ -724,6 +791,7 @@ export class Game {
   }
 
   _tutorialFinish(_skipped) {
+    this._clearPendingTimers();
     if (this.language === 'en') patchSave({ tutorialDoneEn: true });
     else patchSave({ tutorialDone: true });
     this.ui.hideTutorial();
@@ -820,8 +888,20 @@ export class Game {
       mode: this.difficulty,
       kind: this._missionKind,
     });
+
+    // Friend companion for this context (corner buddy + voice pool)
+    this._friend = this._activeFriendId();
+    this.audio.setActiveFriend(this._friend);
+    this.ui.setCompanion(this._friend);
+
     preloadImages(this.words.imageUrls(40)).catch(() => {});
     this.loadNextWord();
+    if (this._friend) {
+      const name = this._t().friendNames?.[this._friend] || this._friend;
+      this.ui.setEncouragement(
+        this._t().friendJoin ? this._t().friendJoin(name) : name
+      );
+    }
     this.input.focus();
   }
 
@@ -842,6 +922,13 @@ export class Game {
   }
 
   loadNextWord() {
+    if (
+      this.state !== 'playing' &&
+      this.state !== 'celebrating' &&
+      this.state !== 'milestone'
+    ) {
+      return;
+    }
     this._stopTimer();
     this._transitionLock = false;
     this._wrongStreak = 0;
@@ -865,7 +952,9 @@ export class Game {
       showFullWord: Boolean(mode.showFullWord),
       dimTypedLetters: Boolean(mode.dimTypedLetters),
     });
-    this.ui.setOskTarget(this.current.word[0] || '');
+    this.ui.setOskTarget(
+      mode.oskHint === false ? '' : this.current.word[0] || ''
+    );
     this.ui.setEncouragement(this._goalEncouragement());
     this.ui.showPoppuSay(
       this._t().poppuStart
@@ -877,7 +966,7 @@ export class Game {
     this.input.focus();
     this._preloadUpcoming();
 
-    setTimeout(() => {
+    this._defer(() => {
       this.speakCurrentWord();
       this.input.focus();
     }, CONFIG.timing.speakDelayAfterLoadMs);
@@ -927,6 +1016,34 @@ export class Game {
     }
   }
 
+  /**
+   * Gameplay timeout — tracked so goHome() can cancel pending callbacks.
+   * The callback no-ops once the game has left the play states.
+   * @param {() => void} fn
+   * @param {number} ms
+   */
+  _defer(fn, ms) {
+    const id = setTimeout(() => {
+      this._pendingTimers.delete(id);
+      if (
+        this.state !== 'playing' &&
+        this.state !== 'celebrating' &&
+        this.state !== 'milestone'
+      ) {
+        return;
+      }
+      fn();
+    }, ms);
+    this._pendingTimers.add(id);
+    return id;
+  }
+
+  /** Cancel all pending gameplay timeouts. */
+  _clearPendingTimers() {
+    for (const id of this._pendingTimers) clearTimeout(id);
+    this._pendingTimers.clear();
+  }
+
   _onTimeout() {
     if (this.state !== 'playing' || this._transitionLock) return;
     this._stopTimer();
@@ -940,9 +1057,9 @@ export class Game {
     this.audio.speakPhrase('timeout', this._t().timeout);
     this.ui.shakeWord();
 
-    setTimeout(() => {
+    this._defer(() => {
       this.ui.hidePraise();
-      setTimeout(() => this.loadNextWord(), CONFIG.timing.nextWordDelayMs);
+      this._defer(() => this.loadNextWord(), CONFIG.timing.nextWordDelayMs);
     }, 1400);
   }
 
@@ -1006,9 +1123,9 @@ export class Game {
         }
       }
       this.ui.setOskTarget(
-        this.cursor < this.current.word.length
-          ? this.current.word[this.cursor]
-          : ''
+        mode.oskHint === false || this.cursor >= this.current.word.length
+          ? ''
+          : this.current.word[this.cursor]
       );
     }
 
@@ -1061,7 +1178,7 @@ export class Game {
       const need = this.current.word[this.cursor]?.toUpperCase() || '';
       this.ui.setEncouragement(this._t().findLetter(need));
       if (this._wrongStreak === letterHintAt || this._wrongStreak % 5 === 0) {
-        this.speakCurrentWord();
+        this._speakStuck();
       }
       return;
     }
@@ -1073,15 +1190,28 @@ export class Game {
           : this.words.randomEncouragement()
       );
       if (this._wrongStreak === 3 || this._wrongStreak % 4 === 0) {
-        this.speakCurrentWord();
+        this._speakStuck();
       }
       return;
     }
 
     this.ui.setEncouragement(this.words.randomEncouragement());
     if (this._wrongStreak >= 4 && this._wrongStreak % 3 === 0) {
-      this.speakCurrentWord();
+      this._speakStuck();
     }
+  }
+
+  /**
+   * Wrong-streak encouragement — Poppu vo_stuck clip first,
+   * falls back to re-speaking the current word via pack/TTS.
+   */
+  _speakStuck() {
+    this.audio
+      .playVoiceReaction('stuck')
+      .then((ok) => {
+        if (!ok) this.speakCurrentWord();
+      })
+      .catch(() => this.speakCurrentWord());
   }
 
   _onWordComplete() {
@@ -1165,6 +1295,7 @@ export class Game {
       pop: true,
     });
     this.ui.cheerGameMascot();
+    this.ui.cheerCompanion();
     if (firstSticker && this.current) {
       this.ui.showStickerUnlock(this.current);
     }
@@ -1183,7 +1314,7 @@ export class Game {
     // Soft achievement checks mid-session
     this._tryAchievements(save, { sessionBestCombo: this._sessionBestCombo });
 
-    setTimeout(() => {
+    this._defer(() => {
       this.ui.hidePraise();
       if (hitMissionEnd) {
         this._finishMission(save);
@@ -1193,7 +1324,7 @@ export class Game {
         this._showMilestoneThenContinue(milestone);
         return;
       }
-      setTimeout(() => this.loadNextWord(), CONFIG.timing.nextWordDelayMs);
+      this._defer(() => this.loadNextWord(), CONFIG.timing.nextWordDelayMs);
     }, CONFIG.timing.celebrationMs + (firstSticker ? 200 : 0));
   }
 
@@ -1201,34 +1332,28 @@ export class Game {
     const t = this._t();
     const ats =
       this._sessionTarget <= 5
-        ? CONFIG.goals.miniMilestoneAts || [2, 4, 5]
+        ? (CONFIG.goals.miniMilestoneAts || [2, 4, 5]).filter(
+            (a) => a < this._sessionTarget
+          )
         : null;
-    let list = t.milestones || [];
+    let list;
     if (ats) {
-      // reuse milestone copy for nearest at values under target
-      list = list
-        .filter((m) => m.at < this._sessionTarget)
-        .map((m, i) => ({
-          ...m,
-          at: ats[i] ?? m.at,
-        }))
-        .filter((m) => m.at < this._sessionTarget);
-      // also add synthetic if needed
-      if (!list.length) {
-        list = ats
-          .filter((a) => a < this._sessionTarget)
-          .map((a) => ({
-            at: a,
-            title: t.poppuJourney || 'Poppu!',
-            subtitle: `★ ${a}`,
-            trophy: '⭐',
-          }));
-      }
+      // Mini mission: pair milestone copy with each mini checkpoint
+      // so every miniMilestoneAts entry (2, 4, …) can show
+      const copy = t.milestones || [];
+      list = ats.map((a, i) => ({
+        at: a,
+        title: copy[i]?.title || t.poppuJourney || 'Poppu!',
+        subtitle: copy[i]?.subtitle || `★ ${a}`,
+        trophy: copy[i]?.trophy || '⭐',
+      }));
     } else {
-      list = list.filter((m) => m.at < this._sessionTarget);
+      list = (t.milestones || []).filter((m) => m.at < this._sessionTarget);
     }
     for (const m of list) {
-      if (this.sessionStars === m.at && !this._milestonesHit.has(m.at)) {
+      // >= so a lucky star (+2) can't jump past a milestone forever;
+      // _milestonesHit keeps each milestone shown exactly once per session
+      if (this.sessionStars >= m.at && !this._milestonesHit.has(m.at)) {
         this._milestonesHit.add(m.at);
         return m;
       }
@@ -1241,9 +1366,9 @@ export class Game {
     this.ui.showMilestone(m);
     this.audio.playSparkle();
     this.audio.speakPraise(m.title);
-    setTimeout(() => {
+    this._defer(() => {
       this.ui.hideMilestone();
-      setTimeout(() => this.loadNextWord(), CONFIG.timing.nextWordDelayMs);
+      this._defer(() => this.loadNextWord(), CONFIG.timing.nextWordDelayMs);
     }, CONFIG.timing.milestoneMs);
   }
 
@@ -1294,9 +1419,6 @@ export class Game {
       });
       updated = patchSave({ weekly });
     }
-    if (this.difficulty === 'letters') {
-      updated = patchSave({ lettersDone: true });
-    }
 
     updated = recordPlayDay(day);
 
@@ -1318,7 +1440,6 @@ export class Game {
       justWonMission: true,
       mode: this.difficulty,
       justDaily: this._missionKind === 'daily',
-      justLetters: this.difficulty === 'letters',
     });
 
     track('mission_win', {
@@ -1374,6 +1495,7 @@ export class Game {
       mode: this._sessionModeLabel,
       theme: this._sessionThemeLabel,
       lang: this.language,
+      childName: String(updated.childName || '').trim(),
       title: t.certTitle,
       subtitle: t.certSub(this.sessionStars),
       footer: t.certFooter,
@@ -1382,6 +1504,22 @@ export class Game {
     this.ui.setShareMsg('');
     this.ui.showVictory();
     this.ui.renderCollection(updated);
+
+    // Friend jump pose on victory + first-completion character sticker
+    const friend = this._activeFriendId();
+    this.ui.setVictoryFriend(friend);
+    if (friend && CONFIG.features.stickers) {
+      const charId = `char-${friend}`;
+      if ((updated.mastery?.[charId]?.count || 0) < 1) {
+        updated = recordMastery(charId, true);
+        const f = CONFIG.assets.friends?.[friend];
+        if (f) {
+          const name = t.friendNames?.[friend] || friend;
+          this.ui.showStickerUnlock({ image: f.sticker, display: name });
+          this.audio.playFriendTada();
+        }
+      }
+    }
     this._refreshDailyUI();
     this._refreshWeeklyUI();
     this._refreshClassUI();
@@ -1390,9 +1528,10 @@ export class Game {
     this.audio.playCelebration();
     this.ui.showPoppuSay(t.poppuWin || t.victorySpeech, 2800);
 
-    // Friendship level-up check
-    const stickers = Object.values(updated.mastery || {}).filter(
-      (m) => (m?.count || 0) >= 1
+    // Friendship level-up check (word stickers only, not letter warm-up / char stickers)
+    const stickers = Object.entries(updated.mastery || {}).filter(
+      ([id, m]) =>
+        !isLetterMasteryId(id) && !isCharMasteryId(id) && (m?.count || 0) >= 1
     ).length;
     const fr = getFriendship(updated.totalStars || 0, stickers);
     const frLabel =
@@ -1454,11 +1593,11 @@ export class Game {
     this.audio.playClick();
     try {
       const blob = await renderCertificate(this._certData);
-      const result = await shareCertificate(blob, {
+      await shareCertificate(blob, {
         title: this._t().certTitle,
         text: this._lastShareText || this._t().certTitle,
       });
-      this.ui.setShareMsg(this._t().certOk + (result === 'downloaded' ? '' : ''));
+      this.ui.setShareMsg(this._t().certOk);
     } catch {
       this.ui.setShareMsg(this._t().shareFail);
     }

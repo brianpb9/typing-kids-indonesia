@@ -1,0 +1,7 @@
+<!-- Star: Filled | 48x48 @1x | Lumi-gold, warm outline -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <polygon
+    points="24,4 27.5,16.5 40.5,16.5 30,24.5 33.5,37 24,29.5 14.5,37 18,24.5 7.5,16.5 20.5,16.5"
+    fill="#FFE566" stroke="#3A2A1A" stroke-width="2" stroke-linejoin="round"
+  />
+</svg>

@@ -141,7 +141,7 @@ describe('voice pack assets', () => {
   it('service worker progressive shell + deferred media', () => {
     const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
     assert.match(sw, /PRECACHE_SHELL/);
-    assert.match(sw, /typing-kids-v22/);
+    assert.match(sw, /typing-kids-v26/);
     assert.match(sw, /warmMedia|WARM_MEDIA/);
     assert.match(sw, /precacheVoicePack/);
     assert.match(sw, /precacheWordImages/);

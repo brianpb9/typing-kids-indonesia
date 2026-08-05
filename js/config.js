@@ -13,9 +13,78 @@ export const CONFIG = {
       url: 'https://www.poppu.world',
       mascotIdle: 'assets/brand/poppu/poppu-idle.png',
       mascotHappy: 'assets/brand/poppu/poppu-happy.png',
+      mascotReact: 'assets/brand/poppu/poppu-react.png',
       icon192: 'assets/brand/poppu/icon-192.png',
       icon512: 'assets/brand/poppu/icon-512.png',
     },
+  },
+
+  /** Poppu World reskin assets (see assets/brand/ATTRIBUTION.md) */
+  assets: {
+    uiIcons: {
+      starFilled: 'assets/ui-icons/star-filled.svg',
+    },
+    backgrounds: {
+      garden: 'assets/backgrounds/bg-garden.png',
+      worldmap: 'assets/backgrounds/worldmap.png',
+    },
+    sfx: {
+      click: 'assets/audio/sfx/click.mp3',
+      correct: 'assets/audio/sfx/correct.mp3',
+      wrong: 'assets/audio/sfx/wrong.mp3',
+      star1: 'assets/audio/sfx/star-1.mp3',
+      star2: 'assets/audio/sfx/star-2.mp3',
+      star3: 'assets/audio/sfx/star-3.mp3',
+      win: 'assets/audio/sfx/win.mp3',
+      milestone: 'assets/audio/sfx/milestone.mp3',
+    },
+    /** Poppu voice reactions; arrays per kind, resolved per language at play time */
+    voice: {
+      correct: [1, 2, 3, 4, 5],
+      stuck: [1, 2, 3, 4],
+      leveldone: { id: [1], en: [1, 2, 3] },
+      hello: [1],
+      dir: 'assets/audio/sfx/voice',
+      /**
+       * Friend voice pools (same dir, vo_{friend}_{kind}_{n}_{lang}.mp3;
+       * friend 'stuck' files are named vo_{friend}_hmm_*). Puffy has no
+       * voice in the library → callers fall back to Poppu.
+       */
+      friends: {
+        zaza: { correct: [1, 2, 3, 4], stuck: [1], leveldone: [1, 2, 3] },
+        peeky: {
+          correct: [1, 2, 3, 4],
+          stuck: [1],
+          leveldone: [1, 2, 3],
+          tada: 'assets/audio/sfx/voice/vo_peeky_tada.mp3',
+        },
+        orby: { correct: [1, 2, 3, 4], stuck: [1], leveldone: [1, 2, 3] },
+      },
+    },
+    /** Canon friend characters (Poppu World) — base/jump poses + reward sticker */
+    friends: {
+      zaza: {
+        base: 'assets/brand/friends/zaza-base.png',
+        jump: 'assets/brand/friends/zaza-jump.png',
+        sticker: 'assets/brand/friends/sticker-zaza.png',
+      },
+      peeky: {
+        base: 'assets/brand/friends/peeky-base.png',
+        jump: 'assets/brand/friends/peeky-jump.png',
+        sticker: 'assets/brand/friends/sticker-peeky.png',
+      },
+      orby: {
+        base: 'assets/brand/friends/orby-base.png',
+        jump: 'assets/brand/friends/orby-jump.png',
+        sticker: 'assets/brand/friends/sticker-orby.png',
+      },
+      puffy: {
+        base: 'assets/brand/friends/puffy-base.png',
+        jump: 'assets/brand/friends/puffy-jump.png',
+        sticker: 'assets/brand/friends/sticker-puffy.png',
+      },
+    },
+    bgm: 'assets/audio/bgm/poppu-bg-loop.mp3',
   },
 
   speech: {
@@ -48,6 +117,13 @@ export const CONFIG = {
    * hard    — image + voice + timer
    * letters — A–Z warm-up (single letter, no image)
    */
+  /** Canon friend companion per context (see assets.friends) */
+  friendsByStation: {
+    letters: 'peeky',
+    easy: 'puffy',
+    hard: 'orby',
+    daily: 'zaza',
+  },
   modes: {
     easy: {
       id: 'easy',
@@ -97,6 +173,7 @@ export const CONFIG = {
       showBigLetter: false,
       showSlots: false,
       showKbHint: false,
+      oskHint: false,
       showLetterProgress: false,
       showFullWord: false,
       dimTypedLetters: false,

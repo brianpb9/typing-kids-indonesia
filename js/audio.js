@@ -31,6 +31,8 @@ export class AudioManager {
 
     /** @type {'id'|'en'} */
     this._langCode = 'id';
+    /** @type {string|null} active friend companion (voice pool) */
+    this._activeFriend = null;
     /** @type {{ id?: Record<string,string>, en?: Record<string,string>, meta?: object }|null} */
     this._voiceManifest = null;
     this._voicePackReady = false;
@@ -42,6 +44,13 @@ export class AudioManager {
     /** Guard: don't cut word pack with letter TTS mid-play */
     this._wordPlayUntil = 0;
     this._letterQueue = Promise.resolve();
+
+    /** SFX file pool (one element per src, reused) */
+    this._sfxEls = new Map();
+    /** Sources that failed to load (404/decode) — skip retry, use synth */
+    this._sfxBroken = new Set();
+    /** @type {HTMLAudioElement|null} background music loop */
+    this._bgm = null;
 
     if (this._speechReady) {
       this._loadVoices();
@@ -134,6 +143,158 @@ export class AudioManager {
         /* ignore */
       }
     }
+
+    // BGM loop starts with the first user gesture (autoplay policy)
+    this.startBgm();
+  }
+
+  /**
+   * Play an SFX/voice file once. Resolves false when the file is missing
+   * or playback is blocked so callers can fall back to WebAudio synth.
+   * @param {string} src
+   * @param {{ volume?: number }} [opts]
+   * @returns {Promise<boolean>}
+   */
+  playFile(src, opts = {}) {
+    if (this.muted || !src) return Promise.resolve(false);
+    if (this._sfxBroken.has(src)) return Promise.resolve(false);
+    return new Promise((resolve) => {
+      try {
+        let a = this._sfxEls.get(src);
+        if (!a) {
+          a = new Audio(src);
+          a.preload = 'auto';
+          a.addEventListener('error', () => this._sfxBroken.add(src));
+          this._sfxEls.set(src, a);
+        }
+        a.volume = Math.min(1, (opts.volume ?? 1) * this.masterVolume * 1.6);
+        let done = false;
+        const finish = (ok) => {
+          if (done) return;
+          done = true;
+          clearTimeout(watchdog);
+          resolve(ok);
+        };
+        // Watchdog: a play() promise that never settles must not hang the
+        // caller — fall back to synth after ~3s (mirrors playPacked).
+        const watchdog = setTimeout(() => finish(false), 3000);
+        a.currentTime = 0;
+        const p = a.play();
+        if (p && typeof p.then === 'function') {
+          p.then(() => finish(true)).catch((err) => {
+            // AbortError here means our own currentTime reset (rapid re-click)
+            // or mute pause superseded this play — the element is (re)playing,
+            // so don't fire the synth fallback on top of the file.
+            finish(Boolean(err && err.name === 'AbortError'));
+          });
+        } else {
+          finish(true);
+        }
+      } catch {
+        resolve(false);
+      }
+    });
+  }
+
+  /**
+   * Try an SFX file from CONFIG.assets.sfx; run synth fallback when it fails.
+   * @param {string} name key in CONFIG.assets.sfx
+   * @param {() => void} fallback synth path
+   */
+  _sfx(name, fallback) {
+    const src = CONFIG.assets?.sfx?.[name];
+    if (!src) {
+      fallback();
+      return;
+    }
+    this.playFile(src).then((ok) => {
+      if (!ok) fallback();
+    });
+  }
+
+  /**
+   * Active friend companion ('zaza'|'peeky'|'orby'|'puffy'|null) — its voice
+   * pool plays first in playVoiceReaction; Poppu stays the fallback.
+   * @param {string|null} id
+   */
+  setActiveFriend(id) {
+    this._activeFriend = typeof id === 'string' && id ? id : null;
+  }
+
+  /**
+   * Random Poppu voice reaction clip for the current language.
+   * @param {'correct'|'stuck'|'leveldone'|'hello'} kind
+   * @param {string|null} [friendId] override active friend (default: active)
+   * @returns {Promise<boolean>} true when a clip actually played
+   */
+  playVoiceReaction(kind, friendId = this._activeFriend) {
+    if (this.muted) return Promise.resolve(false);
+    const v = CONFIG.assets?.voice;
+    if (!v) return Promise.resolve(false);
+    // Active friend pool first (Puffy has none → falls through to Poppu)
+    const fp = v.friends?.[friendId];
+    if (fp) {
+      const nums = fp[kind];
+      if (Array.isArray(nums) && nums.length) {
+        const n = nums[Math.floor(Math.random() * nums.length)];
+        const fileKind = kind === 'stuck' ? 'hmm' : kind;
+        return this.playFile(
+          `${v.dir}/vo_${friendId}_${fileKind}_${n}_${this._langCode}.mp3`,
+          { volume: 1.2 }
+        );
+      }
+    }
+    let nums = v[kind];
+    if (kind === 'leveldone') {
+      nums = v.leveldone?.[this._langCode] || v.leveldone?.en;
+    }
+    if (!Array.isArray(nums) || !nums.length) return Promise.resolve(false);
+    const n = nums[Math.floor(Math.random() * nums.length)];
+    return this.playFile(`${v.dir}/vo_${kind}_${n}_${this._langCode}.mp3`, {
+      volume: 1.2,
+    });
+  }
+
+  /** Friend one-off celebration clip (e.g. Peeky's ta-da) if the pool has one */
+  playFriendTada() {
+    if (this.muted) return Promise.resolve(false);
+    const src = CONFIG.assets?.voice?.friends?.[this._activeFriend]?.tada;
+    if (!src) return Promise.resolve(false);
+    return this.playFile(src, { volume: 1.2 });
+  }
+
+  /**
+   * Background music loop — starts after first gesture (autoplay policy),
+   * respects the master mute toggle.
+   */
+  startBgm() {
+    if (this.muted) return;
+    const src = CONFIG.assets?.bgm;
+    if (!src) return;
+    try {
+      if (!this._bgm) {
+        const a = new Audio(src);
+        a.loop = true;
+        // Master-volume-scaled like SFX/voice (0.45 × 0.55 ≈ the old 0.25)
+        a.volume = Math.min(1, 0.45 * this.masterVolume);
+        a.preload = 'auto';
+        this._bgm = a;
+      }
+      if (this._bgm.paused) {
+        this._bgm.play().catch(() => {});
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  stopBgm() {
+    if (!this._bgm) return;
+    try {
+      this._bgm.pause();
+    } catch {
+      /* ignore */
+    }
   }
 
   _ensureCtx() {
@@ -201,7 +362,20 @@ export class AudioManager {
    */
   setMuted(muted) {
     this.muted = Boolean(muted);
-    if (this.muted) this.stopSpeech();
+    if (this.muted) {
+      this.stopSpeech();
+      this.stopBgm();
+      // Pause in-flight pooled SFX too (elements stay pooled for reuse)
+      for (const a of this._sfxEls.values()) {
+        try {
+          a.pause();
+        } catch {
+          /* ignore */
+        }
+      }
+    } else {
+      this.startBgm();
+    }
   }
 
   toggleMute() {
@@ -302,7 +476,7 @@ export class AudioManager {
         if (p && typeof p.then === 'function') {
           p.catch(() => finish(false));
         }
-        setTimeout(() => finish(true), 8000);
+        setTimeout(() => finish(false), 8000);
       } catch {
         resolve(false);
       }
@@ -494,6 +668,9 @@ export class AudioManager {
     else if (/mantap|yes|good|wow|super/.test(t)) key = '_praise_good';
 
     if (key) {
+      // Poppu voice reaction first (win → level-done clips), then pack, then TTS
+      const voKind = key === '_praise_win' ? 'leveldone' : 'correct';
+      if (await this.playVoiceReaction(voKind)) return;
       const played = await this.playPacked(key);
       if (played) return;
     }
@@ -543,61 +720,74 @@ export class AudioManager {
   /** Soft click for UI */
   playClick() {
     if (this.muted) return;
-    this._tone({ freq: 520, duration: 0.06, type: 'sine', vol: 0.15, attack: 0.005, decay: 0.05 });
+    this._sfx('click', () => {
+      this._tone({ freq: 520, duration: 0.06, type: 'sine', vol: 0.15, attack: 0.005, decay: 0.05 });
+    });
   }
 
   playCorrect() {
     if (this.muted) return;
-    this._tone({ freq: 660, duration: 0.1, type: 'sine', vol: 0.22, attack: 0.005, decay: 0.09 });
-    setTimeout(() => {
-      if (this.muted) return;
-      this._tone({ freq: 880, duration: 0.12, type: 'sine', vol: 0.18, attack: 0.005, decay: 0.1 });
-    }, 40);
+    this._sfx('correct', () => {
+      this._tone({ freq: 660, duration: 0.1, type: 'sine', vol: 0.22, attack: 0.005, decay: 0.09 });
+      setTimeout(() => {
+        if (this.muted) return;
+        this._tone({ freq: 880, duration: 0.12, type: 'sine', vol: 0.18, attack: 0.005, decay: 0.1 });
+      }, 40);
+    });
   }
 
   playWrong() {
     if (this.muted) return;
-    this._tone({ freq: 280, duration: 0.12, type: 'triangle', vol: 0.12, attack: 0.01, decay: 0.1 });
+    this._sfx('wrong', () => {
+      this._tone({ freq: 280, duration: 0.12, type: 'triangle', vol: 0.12, attack: 0.01, decay: 0.1 });
+    });
   }
 
   playSparkle() {
     if (this.muted) return;
-    const notes = [880, 1100, 1320, 1760];
-    notes.forEach((freq, i) => {
-      setTimeout(() => {
-        if (this.muted) return;
-        this._tone({ freq, duration: 0.15, type: 'sine', vol: 0.1, attack: 0.005, decay: 0.12 });
-      }, i * 45);
+    this._sfx('milestone', () => {
+      const notes = [880, 1100, 1320, 1760];
+      notes.forEach((freq, i) => {
+        setTimeout(() => {
+          if (this.muted) return;
+          this._tone({ freq, duration: 0.15, type: 'sine', vol: 0.1, attack: 0.005, decay: 0.12 });
+        }, i * 45);
+      });
     });
   }
 
   playCelebration() {
     if (this.muted) return;
-    const melody = [523, 659, 784, 1047];
-    melody.forEach((freq, i) => {
-      setTimeout(() => {
-        if (this.muted) return;
-        this._tone({ freq, duration: 0.2, type: 'sine', vol: 0.2, attack: 0.01, decay: 0.18 });
-      }, i * 90);
+    this._sfx('win', () => {
+      const melody = [523, 659, 784, 1047];
+      melody.forEach((freq, i) => {
+        setTimeout(() => {
+          if (this.muted) return;
+          this._tone({ freq, duration: 0.2, type: 'sine', vol: 0.2, attack: 0.01, decay: 0.18 });
+        }, i * 90);
+      });
     });
   }
 
-  /** Rising combo chime */
+  /** Rising combo chime — star 1/2/3 clips by combo level */
   playCombo(level = 1) {
     if (this.muted) return;
-    const base = 660 + Math.min(level, 8) * 40;
-    this._tone({ freq: base, duration: 0.08, type: 'sine', vol: 0.16, attack: 0.005, decay: 0.07 });
-    setTimeout(() => {
-      if (this.muted) return;
-      this._tone({
-        freq: base * 1.25,
-        duration: 0.1,
-        type: 'sine',
-        vol: 0.14,
-        attack: 0.005,
-        decay: 0.09,
-      });
-    }, 50);
+    const star = Math.max(1, Math.min(3, Math.round(level)));
+    this._sfx(`star${star}`, () => {
+      const base = 660 + Math.min(level, 8) * 40;
+      this._tone({ freq: base, duration: 0.08, type: 'sine', vol: 0.16, attack: 0.005, decay: 0.07 });
+      setTimeout(() => {
+        if (this.muted) return;
+        this._tone({
+          freq: base * 1.25,
+          duration: 0.1,
+          type: 'sine',
+          vol: 0.14,
+          attack: 0.005,
+          decay: 0.09,
+        });
+      }, 50);
+    });
   }
 
   /**

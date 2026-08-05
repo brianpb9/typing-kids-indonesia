@@ -5,6 +5,9 @@ import { CONFIG, getMode } from './config.js';
 
 const KEY = CONFIG.storage.key;
 
+/** In-memory mirror — keeps progress alive when localStorage fails (private mode) */
+let memFallback = null;
+
 /**
  * @typedef {{
  *   totalStars: number,
@@ -29,6 +32,7 @@ const KEY = CONFIG.storage.key;
  *   classBoard: Record<string, Array<{name:string,stars:number,at:number}>>,
  *   lettersDone: boolean,
  *   playerName: string,
+ *   childName: string,
  * }} SaveData
  */
 
@@ -57,7 +61,26 @@ function defaults() {
     classBoard: {},
     lettersDone: false,
     playerName: '',
+    childName: '',
   };
+}
+
+/**
+ * Letter warm-up mastery ids (`letter-a`…) are not words —
+ * excluded from sticker/word counts but still recorded.
+ * @param {string} id
+ */
+export function isLetterMasteryId(id) {
+  return typeof id === 'string' && id.startsWith('letter-');
+}
+
+/**
+ * Friend character sticker ids (`char-peeky`…) are not words either —
+ * excluded from word/mastery counts like letter warm-up ids.
+ * @param {string} id
+ */
+export function isCharMasteryId(id) {
+  return typeof id === 'string' && id.startsWith('char-');
 }
 
 function normalizeDifficulty(d) {
@@ -74,7 +97,7 @@ function normalizeLang(l) {
 export function loadSave() {
   try {
     const raw = localStorage.getItem(KEY);
-    if (!raw) return defaults();
+    if (!raw) return memFallback || defaults();
     const parsed = JSON.parse(raw);
     const base = { ...defaults(), ...parsed };
     base.difficulty = normalizeDifficulty(base.difficulty);
@@ -94,9 +117,10 @@ export function loadSave() {
     if (typeof base.analyticsOptIn !== 'boolean') base.analyticsOptIn = false;
     if (typeof base.lettersDone !== 'boolean') base.lettersDone = false;
     if (typeof base.playerName !== 'string') base.playerName = '';
+    if (typeof base.childName !== 'string') base.childName = '';
     return base;
   } catch {
-    return defaults();
+    return memFallback || defaults();
   }
 }
 
@@ -114,6 +138,7 @@ export function patchSave(patch) {
   if (patch.mastery) next.mastery = { ...prev.mastery, ...patch.mastery };
   if (patch.achievements) next.achievements = patch.achievements;
   if (patch.classBoard) next.classBoard = { ...prev.classBoard, ...patch.classBoard };
+  memFallback = next;
   try {
     localStorage.setItem(KEY, JSON.stringify(next));
   } catch {
@@ -193,7 +218,10 @@ export function accuracyPct(stats) {
  * @param {Record<string,{count:number}>} [mastery]
  */
 export function masteryStats(mastery = {}) {
-  const ids = Object.keys(mastery);
+  // Letter warm-up (letter-a…) and friend sticker (char-…) ids aren't words
+  const ids = Object.keys(mastery).filter(
+    (id) => !isLetterMasteryId(id) && !isCharMasteryId(id)
+  );
   const seen = ids.length;
   const mastered = ids.filter((id) => (mastery[id]?.count || 0) >= 2).length;
   return { seen, mastered };
@@ -320,6 +348,8 @@ export default {
   addSessionStats,
   accuracyPct,
   masteryStats,
+  isLetterMasteryId,
+  isCharMasteryId,
   pushClassScore,
   unlockAchievements,
   buildShareText,

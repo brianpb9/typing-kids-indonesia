@@ -2,7 +2,12 @@
  * UI — screens, i18n, modes, categories, language
  */
 import { CONFIG, getMode } from './config.js';
-import { getRank, remainingCopy } from './storage.js';
+import {
+  getRank,
+  remainingCopy,
+  isLetterMasteryId,
+  isCharMasteryId,
+} from './storage.js';
 import { getStrings } from './i18n.js';
 import { getFriendship } from './friendship.js';
 
@@ -55,6 +60,9 @@ export class UI {
       wordSlots: document.getElementById('word-slots'),
       progressFill: document.getElementById('progress-fill'),
       progressLabel: document.getElementById('progress-label'),
+      progressTrack:
+        document.getElementById('progress-track') ||
+        document.querySelector('.progress-track[role="progressbar"]'),
       letterProgressBar: document.getElementById('letter-progress-bar'),
       encouragement: document.getElementById('encouragement'),
       praiseOverlay: document.getElementById('praise-overlay'),
@@ -170,6 +178,17 @@ export class UI {
       classPlayBtn: document.getElementById('class-play-btn'),
       classBoard: document.getElementById('class-board'),
       classBoardTitle: document.getElementById('class-board-title'),
+      companion: document.getElementById('game-companion'),
+      victoryFriend: document.getElementById('victory-friend'),
+      // Parental gate
+      gateOverlay: document.getElementById('gate-overlay'),
+      gateTitle: document.getElementById('gate-title'),
+      gateInstruction: document.getElementById('gate-instruction'),
+      gateQuestion: document.getElementById('gate-question'),
+      gateAnswers: document.getElementById('gate-answers'),
+      gateMsg: document.getElementById('gate-msg'),
+      gateClose: document.getElementById('gate-close'),
+      privacyLink: document.getElementById('privacy-link'),
     };
 
     this._oskBuilt = false;
@@ -182,6 +201,18 @@ export class UI {
     this.mode = getMode('easy');
     this.category = 'all';
     this.language = 'id';
+
+    // Parental gate — parent session lives in memory only (5 min),
+    // never persisted to localStorage
+    this._gatePassedAt = 0;
+    this._gateOnPass = null;
+    this._gatePrevFocus = null;
+    this._gateAnswer = 0;
+    // Deterministic bypass for automated tests (?e2e), same pattern as main.js
+    this._gateE2E =
+      typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).has('e2e');
+    this._bindGate();
 
     this._sessionTarget = CONFIG.goals.sessionTarget;
     this._buildStarTrack(this._sessionTarget);
@@ -296,6 +327,11 @@ export class UI {
     if (this.els.weeklyBtn) this.els.weeklyBtn.textContent = t.weeklyBtn;
     if (this.els.parentDashTitle)
       this.els.parentDashTitle.textContent = t.parentDashTitle;
+    if (this.els.privacyLink) this.els.privacyLink.textContent = t.privacyLink;
+    if (this.els.gateTitle) this.els.gateTitle.textContent = t.gateTitle;
+    if (this.els.gateInstruction)
+      this.els.gateInstruction.textContent = t.gateInstruction;
+    if (this.els.gateClose) this.els.gateClose.textContent = t.gateClose;
     if (this.els.masteryTitle) this.els.masteryTitle.textContent = t.masteryTitle;
     if (this.els.badgesTitle) this.els.badgesTitle.textContent = t.parentBadges;
     if (this.els.analyticsLabel)
@@ -362,7 +398,11 @@ export class UI {
       const s = document.createElement('span');
       s.className = 'star-slot';
       s.dataset.index = String(i);
-      s.textContent = '★';
+      const img = document.createElement('img');
+      img.className = 'star-icon';
+      img.src = CONFIG.assets?.uiIcons?.starFilled || '';
+      img.alt = '';
+      s.appendChild(img);
       s.setAttribute('aria-hidden', 'true');
       track.appendChild(s);
     }
@@ -398,10 +438,11 @@ export class UI {
         this.els.collectionStreak.title = this.t.streakBest(save.streak.best);
       }
     }
-    // Friendship hearts
+    // Friendship hearts (word stickers only — letter warm-up + char sticker ids excluded)
     if (CONFIG.features?.friendship) {
-      const stickers = Object.values(save.mastery || {}).filter(
-        (m) => (m?.count || 0) >= 1
+      const stickers = Object.entries(save.mastery || {}).filter(
+        ([id, m]) =>
+          !isLetterMasteryId(id) && !isCharMasteryId(id) && (m?.count || 0) >= 1
       ).length;
       const fr = getFriendship(save.totalStars || 0, stickers);
       const label =
@@ -517,7 +558,24 @@ export class UI {
     this.els.modeMedium?.classList.toggle('is-active', id === 'medium');
     this.els.modeHard?.classList.toggle('is-active', id === 'hard');
     this.els.modeLetters?.classList.toggle('is-active', id === 'letters');
+    this._updateCategoryPickState();
     this.applyModeLayout();
+  }
+
+  /**
+   * Category pick is ignored by WordBank in letters mode —
+   * grey it out + aria-disabled so it's not a fake choice.
+   */
+  _updateCategoryPickState() {
+    const host = this.els.catPick;
+    if (!host) return;
+    const disabled = this.mode?.id === 'letters';
+    host.classList.toggle('is-disabled', disabled);
+    host.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+    host.querySelectorAll('.cat-btn').forEach((btn) => {
+      btn.classList.toggle('is-active', btn.dataset.cat === this.category);
+      btn.disabled = disabled;
+    });
   }
 
   /**
@@ -525,9 +583,7 @@ export class UI {
    */
   setCategoryUI(categoryId) {
     this.category = categoryId || 'all';
-    this.els.catPick?.querySelectorAll('.cat-btn').forEach((btn) => {
-      btn.classList.toggle('is-active', btn.dataset.cat === this.category);
-    });
+    this._updateCategoryPickState();
   }
 
   /** Show/hide big letter, slots, full word, timer, hints based on mode */
@@ -621,20 +677,21 @@ export class UI {
     this.els.backBtn?.setAttribute('aria-hidden', on ? 'false' : 'true');
   }
 
-  /** Brief Poppu cheer on word complete */
+  /** Brief Poppu cheer on word complete — excited react pose */
   cheerGameMascot() {
     const el = document.getElementById('game-mascot');
     if (!el) return;
-    const happy = 'assets/brand/poppu/poppu-happy.png';
-    const idle = 'assets/brand/poppu/poppu-idle.png';
+    const brand = CONFIG.app?.brand || {};
+    const react = brand.mascotReact || 'assets/brand/poppu/poppu-react.png';
+    const idle = brand.mascotIdle || 'assets/brand/poppu/poppu-idle.png';
     el.classList.remove('is-cheer');
     void el.offsetWidth;
     el.classList.add('is-cheer');
-    if (el.getAttribute('src') !== happy) {
-      el.setAttribute('src', happy);
+    if (el.getAttribute('src') !== react) {
+      el.setAttribute('src', react);
     }
     if (this.els.journeyPoppu) {
-      this.els.journeyPoppu.setAttribute('src', happy);
+      this.els.journeyPoppu.setAttribute('src', react);
     }
     clearTimeout(this._mascotTimer);
     this._mascotTimer = setTimeout(() => {
@@ -644,6 +701,68 @@ export class UI {
         this.els.journeyPoppu.setAttribute('src', idle);
       }
     }, 1200);
+  }
+
+  /**
+   * Show the station friend companion in-game (base pose), or hide it.
+   * @param {string|null} friendId key of CONFIG.assets.friends
+   */
+  setCompanion(friendId) {
+    const el = this.els.companion;
+    if (!el) return;
+    // Never show a broken-image icon to a kid — hide on load error
+    if (!el.onerror) el.onerror = () => el.classList.add('hidden');
+    const friend = CONFIG.assets?.friends?.[friendId];
+    if (!friend) {
+      el.classList.add('hidden');
+      return;
+    }
+    clearTimeout(this._companionTimer);
+    el.classList.remove('is-cheer');
+    if (el.getAttribute('src') !== friend.base) {
+      el.setAttribute('src', friend.base);
+    }
+    el.classList.remove('hidden');
+  }
+
+  /** Brief companion cheer — jump pose, then back to base (mirrors cheerGameMascot) */
+  cheerCompanion() {
+    const el = this.els.companion;
+    if (!el || el.classList.contains('hidden')) return;
+    const src = el.getAttribute('src') || '';
+    const friend = Object.values(CONFIG.assets?.friends || {}).find(
+      (f) => f.base === src || f.jump === src
+    );
+    if (!friend) return;
+    el.classList.remove('is-cheer');
+    void el.offsetWidth;
+    el.classList.add('is-cheer');
+    el.setAttribute('src', friend.jump);
+    clearTimeout(this._companionTimer);
+    this._companionTimer = setTimeout(() => {
+      el.setAttribute('src', friend.base);
+      el.classList.remove('is-cheer');
+    }, 1200);
+  }
+
+  /**
+   * Friend jump pose beside Poppu on the victory screen (or hide).
+   * @param {string|null} friendId key of CONFIG.assets.friends
+   */
+  setVictoryFriend(friendId) {
+    const el = this.els.victoryFriend;
+    if (!el) return;
+    // Never show a broken-image icon to a kid — hide on load error
+    if (!el.onerror) el.onerror = () => el.classList.add('hidden');
+    const friend = CONFIG.assets?.friends?.[friendId];
+    if (!friend) {
+      el.classList.add('hidden');
+      return;
+    }
+    if (el.getAttribute('src') !== friend.jump) {
+      el.setAttribute('src', friend.jump);
+    }
+    el.classList.remove('hidden');
   }
 
   /**
@@ -738,9 +857,20 @@ export class UI {
     if (!grid) return;
     const words = data.words || [];
     const mastery = data.mastery || {};
-    const unlocked = words.filter((w) => (mastery[w.id]?.count || 0) >= 1);
+    const unlocked = words.filter(
+      (w) =>
+        !isCharMasteryId(w.id) && (mastery[w.id]?.count || 0) >= 1
+    );
+    // Friend character stickers (char-*) — pinned first, never cut by the cap
+    const friends = Object.entries(CONFIG.assets?.friends || {})
+      .filter(([id]) => (mastery[`char-${id}`]?.count || 0) >= 1)
+      .map(([id, f]) => ({
+        id: `char-${id}`,
+        display: this.t.friendNames?.[id] || id,
+        image: f.sticker,
+      }));
     grid.innerHTML = '';
-    if (!unlocked.length) {
+    if (!unlocked.length && !friends.length) {
       const empty = document.createElement('p');
       empty.className = 'sticker-hint';
       empty.textContent = this.t.stickerEmpty || '';
@@ -748,8 +878,8 @@ export class UI {
       grid.appendChild(empty);
       return;
     }
-    // Show unlocked first (max 40 for light UI)
-    for (const w of unlocked.slice(0, 40)) {
+    // Show unlocked first (max 40 word stickers for light UI)
+    for (const w of [...friends, ...unlocked.slice(0, 40)]) {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'sticker-cell is-on';
@@ -884,7 +1014,7 @@ export class UI {
       img.classList.remove('image-enter', 'float-idle');
       void img.offsetWidth;
       if (word.image) {
-        img.src = word.image;
+        img.src = (word.image || '').split('?')[0];
         img.alt = showFull ? word.display : word.display || 'Gambar kata';
         img.classList.add('image-enter');
         setTimeout(() => img.classList.add('float-idle'), 450);
@@ -999,7 +1129,8 @@ export class UI {
     if (!el) return;
 
     if (!letter) {
-      el.textContent = '★';
+      const starSrc = CONFIG.assets?.uiIcons?.starFilled || '';
+      el.innerHTML = `<img class="star-icon" src="${starSrc}" alt="★" />`;
       el.classList.add('done');
       if (hint) hint.textContent = this.t.done;
       this.setOskTarget('');
@@ -1021,29 +1152,45 @@ export class UI {
     const container = this.els.wordSlots;
     if (!container) return;
 
-    container.innerHTML = '';
     const letters = word.toUpperCase().split('');
 
-    letters.forEach((letter, i) => {
-      const slot = document.createElement('span');
-      slot.className = 'letter-slot';
-      slot.dataset.index = String(i);
-      slot.setAttribute('aria-hidden', 'true');
+    // Build slot DOM once per word, then mutate class/text in place
+    // (avoids full innerHTML rebuild on every correct keystroke)
+    if (
+      this._slotWord !== word ||
+      container.childElementCount !== letters.length
+    ) {
+      container.innerHTML = '';
+      this._slotStates = [];
+      letters.forEach((letter, i) => {
+        const slot = document.createElement('span');
+        slot.className = 'letter-slot';
+        slot.dataset.index = String(i);
+        slot.setAttribute('aria-hidden', 'true');
+        container.appendChild(slot);
+        this._slotStates.push('');
+      });
+      this._slotWord = word;
+    }
 
-      if (i < filledCount) {
-        slot.textContent = letter;
-        slot.classList.add('filled');
-      } else if (i === filledCount) {
-        slot.innerHTML = '<span class="slot-dash"></span>';
-        slot.classList.add('current');
-        slot.setAttribute('aria-current', 'true');
+    const slots = container.children;
+    for (let i = 0; i < letters.length; i++) {
+      const slot = slots[i];
+      const state =
+        i < filledCount ? 'filled' : i === filledCount ? 'current' : 'empty';
+      if (this._slotStates[i] === state) continue;
+      this._slotStates[i] = state;
+      slot.classList.remove('filled', 'current', 'empty');
+      slot.classList.add(state);
+      if (state === 'filled') {
+        slot.textContent = letters[i];
+        slot.removeAttribute('aria-current');
       } else {
         slot.innerHTML = '<span class="slot-dash"></span>';
-        slot.classList.add('empty');
+        if (state === 'current') slot.setAttribute('aria-current', 'true');
+        else slot.removeAttribute('aria-current');
       }
-
-      container.appendChild(slot);
-    });
+    }
 
     // Big letter tile only when mode allows
     if (this.mode.showBigLetter) {
@@ -1107,6 +1254,12 @@ export class UI {
     if (this.els.progressLabel) {
       this.els.progressLabel.textContent = `${current} / ${total}`;
     }
+    // Keep progressbar aria in sync (same pattern as the star track)
+    if (this.els.progressTrack) {
+      this.els.progressTrack.setAttribute('aria-valuenow', String(pct));
+      this.els.progressTrack.setAttribute('aria-valuemin', '0');
+      this.els.progressTrack.setAttribute('aria-valuemax', '100');
+    }
   }
 
   setEncouragement(text) {
@@ -1116,6 +1269,47 @@ export class UI {
       void this.els.encouragement.offsetWidth;
       this.els.encouragement.classList.add('fade-in');
     }
+  }
+
+  /**
+   * Visible load-error box with a retry button (words.json fetch failed).
+   * Created once on the start screen; reused on repeat failures.
+   * @param {string} message
+   * @param {() => void} onRetry
+   */
+  showLoadError(message, onRetry) {
+    let box = document.getElementById('load-error');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'load-error';
+      box.className = 'load-error';
+      box.setAttribute('role', 'alert');
+      const msg = document.createElement('p');
+      msg.id = 'load-error-msg';
+      msg.className = 'load-error-msg';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.id = 'load-error-retry';
+      btn.className = 'btn-secondary';
+      box.appendChild(msg);
+      box.appendChild(btn);
+      (this.els.startScreen || document.body).appendChild(box);
+    }
+    const msg = box.querySelector('#load-error-msg');
+    if (msg) msg.textContent = message || '';
+    const btn = box.querySelector('#load-error-retry');
+    if (btn instanceof HTMLButtonElement) {
+      btn.textContent = this.t.retry || 'Coba lagi';
+      btn.onclick = (e) => {
+        e.preventDefault();
+        onRetry?.();
+      };
+    }
+    box.classList.remove('hidden');
+  }
+
+  hideLoadError() {
+    document.getElementById('load-error')?.classList.add('hidden');
   }
 
   showPraise(text) {
@@ -1180,10 +1374,15 @@ export class UI {
     const vs = this.els.victoryStars;
     if (vs) {
       vs.innerHTML = '';
+      const starSrc = CONFIG.assets?.uiIcons?.starFilled || '';
       for (let i = 0; i < data.target; i++) {
         const s = document.createElement('span');
         s.className = 'victory-star';
-        s.textContent = '★';
+        const img = document.createElement('img');
+        img.className = 'star-icon';
+        img.src = starSrc;
+        img.alt = '';
+        s.appendChild(img);
         s.style.animationDelay = `${i * 0.06}s`;
         vs.appendChild(s);
       }
@@ -1306,7 +1505,11 @@ export class UI {
       [t.parentTotal, String(data.total)],
     ];
     if (data.accuracy != null) {
-      rows.push([t.parentAccuracy, `${data.accuracy}%`]);
+      // Lifetime stats, not this session — label it honestly
+      rows.push([
+        t.parentAccuracyLifetime || t.parentAccuracy,
+        `${data.accuracy}%`,
+      ]);
     }
     list.innerHTML = rows
       .map(
@@ -1515,6 +1718,42 @@ export class UI {
   }
 
   /**
+   * Optional child name for the certificate — created once inside the
+   * parent dashboard so index.html stays untouched.
+   */
+  _ensureChildNameInput() {
+    if (this.els.childNameInput instanceof HTMLInputElement) return;
+    const body = document.querySelector('#parent-dash .parent-dash-body');
+    if (!body) return;
+    const label = document.createElement('label');
+    label.className = 'a11y-check child-name-row';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.id = 'child-name-input';
+    input.className = 'class-input';
+    input.maxLength = 24;
+    input.autocomplete = 'off';
+    input.spellcheck = false;
+    const span = document.createElement('span');
+    span.id = 'child-name-label';
+    label.appendChild(input);
+    label.appendChild(span);
+    body.insertBefore(label, body.firstChild);
+    this.els.childNameInput = input;
+    this.els.childNameLabel = span;
+    input.addEventListener('change', () => {
+      this._onChildName?.(input.value.trim());
+    });
+  }
+
+  /**
+   * @param {(name: string) => void} handler
+   */
+  onChildName(handler) {
+    this._onChildName = handler;
+  }
+
+  /**
    * @param {{
    *   totalStars: number,
    *   missionsWon: number,
@@ -1524,11 +1763,23 @@ export class UI {
    *   achievements: string[],
    *   analyticsOptIn: boolean,
    *   a11y: { highContrast?: boolean, largeText?: boolean },
+   *   childName?: string,
    *   badgeLabels: Array<{ id: string, emoji: string, title: string, unlocked: boolean }>,
    * }} data
    */
   renderParentDash(data) {
     const t = this.t;
+    this._ensureChildNameInput();
+    if (this.els.childNameLabel) {
+      this.els.childNameLabel.textContent = t.childNameLabel || '';
+    }
+    if (this.els.childNameInput instanceof HTMLInputElement) {
+      this.els.childNameInput.placeholder = t.childNameLabel || '';
+      // Don't clobber the field while the parent is typing
+      if (document.activeElement !== this.els.childNameInput) {
+        this.els.childNameInput.value = data.childName || '';
+      }
+    }
     const list = this.els.parentDashList;
     if (list) {
       const rows = [
@@ -1717,6 +1968,134 @@ export class UI {
         handlers.onJoin?.(code);
       }
     });
+  }
+
+  // ——— Parental gate ———
+  _bindGate() {
+    this.els.gateAnswers?.addEventListener('click', (e) => {
+      const t = e.target;
+      if (!(t instanceof Element)) return;
+      const btn = t.closest('.gate-answer');
+      if (!(btn instanceof HTMLElement)) return;
+      e.preventDefault();
+      this._answerGate(Number(btn.dataset.value));
+    });
+    this.els.gateClose?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this._closeGate(false);
+    });
+    // Escape closes the gate but never grants access
+    this.els.gateOverlay?.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        this._closeGate(false);
+      }
+    });
+  }
+
+  /** True while the in-memory parent session (5 min) is still valid */
+  gatePassed() {
+    if (this._gateE2E) return true;
+    return Date.now() - this._gatePassedAt < 5 * 60 * 1000;
+  }
+
+  /** Close the gate overlay if open — never grants access, never fires onPass */
+  closeGate() {
+    this._closeGate(false);
+  }
+
+  /**
+   * Run `onPass` immediately if the gate is already passed,
+   * otherwise show the gate first.
+   * @param {() => void} onPass
+   */
+  requireGate(onPass) {
+    if (this.gatePassed()) {
+      onPass?.();
+      return;
+    }
+    this._gateOnPass = onPass || null;
+    this._openGate();
+  }
+
+  _openGate() {
+    const overlay = this.els.gateOverlay;
+    if (!overlay) return;
+    this._gatePrevFocus =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    this._newGateQuestion();
+    overlay.classList.remove('hidden');
+    overlay.setAttribute('aria-hidden', 'false');
+    const first = overlay.querySelector('.gate-answer');
+    if (first instanceof HTMLElement) first.focus();
+  }
+
+  _newGateQuestion() {
+    const a = 2 + Math.floor(Math.random() * 8); // 2–9
+    const b = 2 + Math.floor(Math.random() * 8);
+    this._gateAnswer = a * b;
+    if (this.els.gateQuestion) {
+      this.els.gateQuestion.textContent = this.t.gateQuestion
+        ? this.t.gateQuestion(a, b)
+        : `${a} × ${b} = ?`;
+    }
+    // 1 correct + 3 close-but-wrong options, shuffled
+    const options = new Set([this._gateAnswer]);
+    while (options.size < 4) {
+      const delta =
+        (1 + Math.floor(Math.random() * 5)) * (Math.random() < 0.5 ? -1 : 1);
+      const wrong = this._gateAnswer + delta;
+      if (wrong > 0) options.add(wrong);
+    }
+    const shuffled = [...options].sort(() => Math.random() - 0.5);
+    const host = this.els.gateAnswers;
+    if (host) {
+      host.innerHTML = '';
+      for (const v of shuffled) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-secondary gate-answer';
+        btn.dataset.value = String(v);
+        btn.textContent = String(v);
+        host.appendChild(btn);
+      }
+    }
+    if (this.els.gateMsg) this.els.gateMsg.textContent = '';
+  }
+
+  /**
+   * @param {number} value
+   */
+  _answerGate(value) {
+    if (value === this._gateAnswer) {
+      this._closeGate(true);
+      return;
+    }
+    // Wrong — gentle retry with a fresh question
+    this._newGateQuestion();
+    if (this.els.gateMsg) this.els.gateMsg.textContent = this.t.gateWrong || '';
+    const first = this.els.gateAnswers?.querySelector('.gate-answer');
+    if (first instanceof HTMLElement) first.focus();
+  }
+
+  /**
+   * @param {boolean} passed
+   */
+  _closeGate(passed) {
+    const overlay = this.els.gateOverlay;
+    overlay?.classList.add('hidden');
+    overlay?.setAttribute('aria-hidden', 'true');
+    const onPass = this._gateOnPass;
+    this._gateOnPass = null;
+    if (passed) {
+      this._gatePassedAt = Date.now();
+      onPass?.();
+    }
+    this._gatePrevFocus?.focus();
+    this._gatePrevFocus = null;
   }
 }
 

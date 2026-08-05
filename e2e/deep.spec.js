@@ -176,6 +176,21 @@ test.describe('Deep flows', () => {
     await expect(page.locator('#game-screen')).toHaveClass(/mode-letters/);
   });
 
+  test('station friends show on map and as in-game companion', async ({
+    page,
+  }) => {
+    await boot(page, seedDone());
+    await expect(page.locator('#station-abc .station-friend')).toBeVisible();
+    await expect(page.locator('#station-meadow .station-friend')).toBeVisible();
+    await expect(page.locator('#station-castle .station-friend')).toBeVisible();
+    // ABC station → Peeky companion in-game
+    await page.locator('#station-abc').click();
+    await expect(page.locator('#game-screen')).toBeVisible({ timeout: 10_000 });
+    const companion = page.locator('#game-companion');
+    await expect(companion).toBeVisible();
+    await expect(companion).toHaveAttribute('src', /peeky-base/);
+  });
+
   test('word images and voice manifest are fetchable offline-ready', async ({
     page,
   }) => {

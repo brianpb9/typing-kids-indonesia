@@ -1,6 +1,7 @@
 /**
  * Achievement badges — unlock conditions checked after progress events
  */
+import { isLetterMasteryId, isCharMasteryId } from './storage.js';
 
 /** @typedef {{ id: string, emoji: string, titleId: string, descId: string }} BadgeDef */
 
@@ -29,7 +30,6 @@ export const BADGES = [
  *   mode?: string,
  *   justWonMission?: boolean,
  *   justDaily?: boolean,
- *   justLetters?: boolean,
  * }} [ctx]
  * @returns {string[]} newly unlocked badge ids
  */
@@ -44,8 +44,14 @@ export function evaluateAchievements(save, ctx = {}) {
     }
   };
 
-  const masteryCount = Object.values(save.mastery || {}).filter(
-    (m) => (m?.count || 0) >= 2
+  // Word mastery only — letter warm-up ids (letter-a…) and char ids are not words
+  const masteryCount = Object.entries(save.mastery || {}).filter(
+    ([id, m]) =>
+      !isLetterMasteryId(id) && !isCharMasteryId(id) && (m?.count || 0) >= 2
+  ).length;
+  // Letters badge is honest: every A–Z letter practiced at least once
+  const lettersPracticed = Object.entries(save.mastery || {}).filter(
+    ([id, m]) => isLetterMasteryId(id) && (m?.count || 0) >= 1
   ).length;
 
   tryUnlock('first_star', (save.totalStars || 0) >= 1);
@@ -58,7 +64,7 @@ export function evaluateAchievements(save, ctx = {}) {
   tryUnlock('master_10', masteryCount >= 10);
   tryUnlock('master_50', masteryCount >= 50);
   tryUnlock('hard_win', Boolean(ctx.justWonMission && ctx.mode === 'hard'));
-  tryUnlock('letters_done', Boolean(ctx.justLetters) || Boolean(save.lettersDone));
+  tryUnlock('letters_done', lettersPracticed >= 26);
   tryUnlock('stars_30', (save.totalStars || 0) >= 30);
   tryUnlock('stars_100', (save.totalStars || 0) >= 100);
 

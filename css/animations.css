@@ -14,15 +14,13 @@
 
 @keyframes bird-fly {
   0% {
-    left: -5%;
-    transform: translateY(0);
+    transform: translateX(0) translateY(0);
   }
   50% {
-    transform: translateY(-12px);
+    transform: translateX(55vw) translateY(-12px);
   }
   100% {
-    left: 105%;
-    transform: translateY(4px);
+    transform: translateX(calc(100vw + 120px)) translateY(4px);
   }
 }
 
@@ -70,13 +68,13 @@
   0%,
   100% {
     box-shadow:
-      0 0 0 3px rgba(108, 180, 238, 0.4),
-      0 4px 12px rgba(108, 180, 238, 0.2);
+      0 0 0 3px rgba(255, 217, 77, 0.4),
+      0 4px 12px rgba(255, 217, 77, 0.2);
   }
   50% {
     box-shadow:
-      0 0 0 5px rgba(108, 180, 238, 0.55),
-      0 6px 18px rgba(108, 180, 238, 0.3);
+      0 0 0 5px rgba(255, 217, 77, 0.55),
+      0 6px 18px rgba(255, 217, 77, 0.3);
   }
 }
 

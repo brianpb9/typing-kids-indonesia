@@ -86,35 +86,47 @@ test.describe('Offline + hard mode edges', () => {
     }
   });
 
-  test('offline: cached navigation after visit (best-effort)', async ({
+  test('offline: app shell loads from SW cache after a warm visit', async ({
     browser,
   }) => {
     const context = await browser.newContext();
     const page = await context.newPage();
-    await page.goto('http://127.0.0.1:4173/');
-    await page.waitForTimeout(2000);
-    // Ask SW to warm if present
-    await page.evaluate(() => {
-      navigator.serviceWorker?.controller?.postMessage({ type: 'WARM_MEDIA' });
-    });
-    await page.waitForTimeout(1500);
-
-    // Go offline
-    await context.setOffline(true);
-    // Reload shell — may still work if SW cached
     try {
-      await page.reload({ waitUntil: 'domcontentloaded', timeout: 8000 });
-      const title = await page.locator('#app-title').textContent({ timeout: 5000 });
-      // If SW active, we get the app; if not, offline fails — both acceptable signals
-      if (title) {
-        expect(title).toMatch(/Poppu|Typing/i);
-      }
-    } catch {
-      // No SW offline support in this serve setup — not a hard fail
-      test.info().annotations.push({
-        type: 'note',
-        description: 'Offline reload failed (SW may not control page under static serve)',
+      await page.goto('http://127.0.0.1:4173/');
+
+      // Wait until the SW is active (install precaches the shell)
+      await page.waitForFunction(
+        async () => {
+          if (!('serviceWorker' in navigator)) return false;
+          const reg = await navigator.serviceWorker.getRegistration();
+          return Boolean(reg?.active);
+        },
+        null,
+        { timeout: 20_000 }
+      );
+
+      // Reload so the active SW controls this page, then warm-render online
+      await page.reload();
+      await page.waitForFunction(
+        () => Boolean(navigator.serviceWorker?.controller),
+        null,
+        { timeout: 10_000 }
+      );
+      await page.waitForFunction(() => window.__typingKids?.game, null, {
+        timeout: 10_000,
       });
+      await expect(page.locator('#start-btn')).toBeVisible({ timeout: 10_000 });
+
+      // Fully offline: the shell (HTML/JS/data) must render from SW cache
+      await context.setOffline(true);
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      await expect(page.locator('#start-screen')).toBeVisible({
+        timeout: 10_000,
+      });
+      await expect(page.locator('#app-title')).toHaveText(
+        /Poppu Typing Kids/i
+      );
+      await expect(page.locator('#start-btn')).toBeVisible({ timeout: 10_000 });
     } finally {
       await context.setOffline(false);
       await context.close();

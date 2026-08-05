@@ -1,11 +1,11 @@
 {
   "name": "Poppu Typing Kids",
   "short_name": "Poppu Type",
-  "description": "Learn typing while playing with Poppu — ages 5–6. Part of Poppu World.",
+  "description": "Belajar mengetik sambil bermain bersama Poppu — untuk anak usia 5–6 tahun. Bagian dari Poppu World.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FFF8F0",
-  "theme_color": "#FFF8F0",
+  "background_color": "#FFF6E9",
+  "theme_color": "#FFF6E9",
   "lang": "id",
   "icons": [
     {

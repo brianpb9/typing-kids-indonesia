@@ -2,12 +2,13 @@
  * Install: app shell only (fast).
  * Activate: warm voice + word images in background.
  */
-const CACHE = 'typing-kids-v22';
+const CACHE = 'typing-kids-v26';
 
 /** Critical shell — keep small for fast first install */
 const PRECACHE_SHELL = [
   '/',
   '/index.html',
+  '/privacy.html',
   '/css/styles.css',
   '/css/animations.css',
   '/assets/fonts/nunito.css',
@@ -15,11 +16,114 @@ const PRECACHE_SHELL = [
   '/assets/fonts/nunito-700.woff2',
   '/assets/fonts/nunito-800.woff2',
   '/assets/fonts/nunito-900.woff2',
+  '/assets/fonts/baloo2.css',
+  '/assets/fonts/baloo2-3.woff2',
   '/assets/brand/poppu/poppu-idle.png',
   '/assets/brand/poppu/poppu-happy.png',
+  '/assets/brand/poppu/poppu-react.png',
+  '/assets/brand/poppu/favicon-64.png',
   '/assets/brand/poppu/icon-192.png',
   '/assets/brand/poppu/icon-512.png',
   '/assets/brand/poppu/icon-512-maskable.png',
+  '/assets/brand/decor/cloud.png',
+  '/assets/brand/decor/bird.png',
+  '/assets/backgrounds/bg-garden.png',
+  '/assets/backgrounds/worldmap.png',
+  '/assets/ui-icons/star-filled.svg',
+  '/assets/audio/sfx/click.mp3',
+  '/assets/audio/sfx/correct.mp3',
+  '/assets/audio/sfx/wrong.mp3',
+  '/assets/audio/sfx/star-1.mp3',
+  '/assets/audio/sfx/star-2.mp3',
+  '/assets/audio/sfx/star-3.mp3',
+  '/assets/audio/sfx/win.mp3',
+  '/assets/audio/sfx/milestone.mp3',
+  '/assets/audio/sfx/voice/vo_correct_1_en.mp3',
+  '/assets/audio/sfx/voice/vo_correct_1_id.mp3',
+  '/assets/audio/sfx/voice/vo_correct_2_en.mp3',
+  '/assets/audio/sfx/voice/vo_correct_2_id.mp3',
+  '/assets/audio/sfx/voice/vo_correct_3_en.mp3',
+  '/assets/audio/sfx/voice/vo_correct_3_id.mp3',
+  '/assets/audio/sfx/voice/vo_correct_4_en.mp3',
+  '/assets/audio/sfx/voice/vo_correct_4_id.mp3',
+  '/assets/audio/sfx/voice/vo_correct_5_en.mp3',
+  '/assets/audio/sfx/voice/vo_correct_5_id.mp3',
+  '/assets/audio/sfx/voice/vo_stuck_1_en.mp3',
+  '/assets/audio/sfx/voice/vo_stuck_1_id.mp3',
+  '/assets/audio/sfx/voice/vo_stuck_2_en.mp3',
+  '/assets/audio/sfx/voice/vo_stuck_2_id.mp3',
+  '/assets/audio/sfx/voice/vo_stuck_3_en.mp3',
+  '/assets/audio/sfx/voice/vo_stuck_3_id.mp3',
+  '/assets/audio/sfx/voice/vo_stuck_4_en.mp3',
+  '/assets/audio/sfx/voice/vo_stuck_4_id.mp3',
+  '/assets/audio/sfx/voice/vo_leveldone_1_en.mp3',
+  '/assets/audio/sfx/voice/vo_leveldone_1_id.mp3',
+  '/assets/audio/sfx/voice/vo_leveldone_2_en.mp3',
+  '/assets/audio/sfx/voice/vo_leveldone_3_en.mp3',
+  '/assets/audio/sfx/voice/vo_hello_1_en.mp3',
+  '/assets/audio/sfx/voice/vo_hello_1_id.mp3',
+  '/assets/brand/friends/zaza-base.png',
+  '/assets/brand/friends/zaza-jump.png',
+  '/assets/brand/friends/peeky-base.png',
+  '/assets/brand/friends/peeky-jump.png',
+  '/assets/brand/friends/orby-base.png',
+  '/assets/brand/friends/orby-jump.png',
+  '/assets/brand/friends/puffy-base.png',
+  '/assets/brand/friends/puffy-jump.png',
+  '/assets/brand/friends/sticker-zaza.png',
+  '/assets/brand/friends/sticker-peeky.png',
+  '/assets/brand/friends/sticker-orby.png',
+  '/assets/brand/friends/sticker-puffy.png',
+  '/assets/audio/sfx/voice/vo_zaza_correct_1_en.mp3',
+  '/assets/audio/sfx/voice/vo_zaza_correct_1_id.mp3',
+  '/assets/audio/sfx/voice/vo_zaza_correct_2_en.mp3',
+  '/assets/audio/sfx/voice/vo_zaza_correct_2_id.mp3',
+  '/assets/audio/sfx/voice/vo_zaza_correct_3_en.mp3',
+  '/assets/audio/sfx/voice/vo_zaza_correct_3_id.mp3',
+  '/assets/audio/sfx/voice/vo_zaza_correct_4_en.mp3',
+  '/assets/audio/sfx/voice/vo_zaza_correct_4_id.mp3',
+  '/assets/audio/sfx/voice/vo_zaza_hmm_1_en.mp3',
+  '/assets/audio/sfx/voice/vo_zaza_hmm_1_id.mp3',
+  '/assets/audio/sfx/voice/vo_zaza_leveldone_1_en.mp3',
+  '/assets/audio/sfx/voice/vo_zaza_leveldone_1_id.mp3',
+  '/assets/audio/sfx/voice/vo_zaza_leveldone_2_en.mp3',
+  '/assets/audio/sfx/voice/vo_zaza_leveldone_2_id.mp3',
+  '/assets/audio/sfx/voice/vo_zaza_leveldone_3_en.mp3',
+  '/assets/audio/sfx/voice/vo_zaza_leveldone_3_id.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_correct_1_en.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_correct_1_id.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_correct_2_en.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_correct_2_id.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_correct_3_en.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_correct_3_id.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_correct_4_en.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_correct_4_id.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_hmm_1_en.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_hmm_1_id.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_leveldone_1_en.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_leveldone_1_id.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_leveldone_2_en.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_leveldone_2_id.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_leveldone_3_en.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_leveldone_3_id.mp3',
+  '/assets/audio/sfx/voice/vo_peeky_tada.mp3',
+  '/assets/audio/sfx/voice/vo_orby_correct_1_en.mp3',
+  '/assets/audio/sfx/voice/vo_orby_correct_1_id.mp3',
+  '/assets/audio/sfx/voice/vo_orby_correct_2_en.mp3',
+  '/assets/audio/sfx/voice/vo_orby_correct_2_id.mp3',
+  '/assets/audio/sfx/voice/vo_orby_correct_3_en.mp3',
+  '/assets/audio/sfx/voice/vo_orby_correct_3_id.mp3',
+  '/assets/audio/sfx/voice/vo_orby_correct_4_en.mp3',
+  '/assets/audio/sfx/voice/vo_orby_correct_4_id.mp3',
+  '/assets/audio/sfx/voice/vo_orby_hmm_1_en.mp3',
+  '/assets/audio/sfx/voice/vo_orby_hmm_1_id.mp3',
+  '/assets/audio/sfx/voice/vo_orby_leveldone_1_en.mp3',
+  '/assets/audio/sfx/voice/vo_orby_leveldone_1_id.mp3',
+  '/assets/audio/sfx/voice/vo_orby_leveldone_2_en.mp3',
+  '/assets/audio/sfx/voice/vo_orby_leveldone_2_id.mp3',
+  '/assets/audio/sfx/voice/vo_orby_leveldone_3_en.mp3',
+  '/assets/audio/sfx/voice/vo_orby_leveldone_3_id.mp3',
+  '/assets/audio/bgm/poppu-bg-loop.mp3',
   '/js/main.js',
   '/js/config.js',
   '/js/game.js',
@@ -173,15 +277,7 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
 
   const url = req.url;
-  const isVoice = url.includes('/assets/audio/voice/');
-  const isImage = url.includes('/assets/images/');
-  const isBrand = url.includes('/assets/brand/');
-  const isFont = url.includes('/assets/fonts/');
   const isStatic =
-    isVoice ||
-    isImage ||
-    isBrand ||
-    isFont ||
     url.includes('/assets/') ||
     url.includes('/data/') ||
     url.includes('/js/') ||
@@ -199,9 +295,6 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => cached);
 
-      if (isVoice || isImage || isBrand || isFont) {
-        return cached || fetchPromise;
-      }
       return cached || fetchPromise;
     })
   );

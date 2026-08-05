@@ -10,13 +10,13 @@
       name="description"
       content="Poppu Typing Kids — Belajar mengetik sambil bermain untuk anak usia 5–6 tahun. Bagian dari Poppu World."
     />
-    <meta name="theme-color" content="#FFF8F0" />
+    <meta name="theme-color" content="#FFF6E9" />
     <title>Poppu Typing Kids — Belajar Mengetik Sambil Bermain</title>
 
     <!-- Self-hosted font (offline-friendly) + critical preloads -->
     <link
       rel="preload"
-      href="assets/fonts/nunito-800.woff2"
+      href="assets/fonts/baloo2-3.woff2"
       as="font"
       type="font/woff2"
       crossorigin
@@ -26,6 +26,7 @@
     <link rel="modulepreload" href="js/game.js" />
     <link rel="modulepreload" href="js/ui.js" />
     <link rel="modulepreload" href="js/config.js" />
+    <link rel="stylesheet" href="assets/fonts/baloo2.css" />
     <link rel="stylesheet" href="assets/fonts/nunito.css" />
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/animations.css" />
@@ -131,16 +132,19 @@
           <p class="world-map-title" id="world-map-title">🗺️ Peta Poppu</p>
           <div class="world-stations">
             <button type="button" class="station-btn" data-station="abc" id="station-abc">
+              <img class="station-friend" src="assets/brand/friends/peeky-base.png" alt="" width="52" height="70" decoding="async" loading="lazy" draggable="false" aria-hidden="true" onerror="this.style.display='none'" />
               <span class="station-emoji">🏖️</span>
               <span class="station-name" id="station-abc-name">Pantai ABC</span>
               <span class="station-desc" id="station-abc-desc">Huruf A–Z</span>
             </button>
             <button type="button" class="station-btn is-active" data-station="meadow" id="station-meadow">
+              <img class="station-friend" src="assets/brand/friends/puffy-base.png" alt="" width="52" height="70" decoding="async" loading="lazy" draggable="false" aria-hidden="true" onerror="this.style.display='none'" />
               <span class="station-emoji">🌼</span>
               <span class="station-name" id="station-meadow-name">Padang Ketik</span>
               <span class="station-desc" id="station-meadow-desc">Misi kata</span>
             </button>
             <button type="button" class="station-btn" data-station="castle" id="station-castle">
+              <img class="station-friend" src="assets/brand/friends/orby-base.png" alt="" width="52" height="70" decoding="async" loading="lazy" draggable="false" aria-hidden="true" onerror="this.style.display='none'" />
               <span class="station-emoji">🏰</span>
               <span class="station-name" id="station-castle-name">Istana Bintang</span>
               <span class="station-desc" id="station-castle-desc">Mode sulit</span>
@@ -221,6 +225,23 @@
                 <span id="a11y-large-label">Teks besar</span>
               </label>
             </div>
+            <!-- External links live behind the parental gate -->
+            <p class="parent-links">
+              <a
+                id="privacy-link"
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Kebijakan Privasi</a
+              >
+              <a
+                id="brand-line"
+                href="https://www.poppu.world"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Bagian dari Poppu World</a
+              >
+            </p>
           </div>
         </details>
 
@@ -297,15 +318,6 @@
         </button>
 
         <p class="start-footer" id="start-footer">Untuk anak usia 5–6 tahun · Keyboard QWERTY</p>
-        <p class="brand-line">
-          <a
-            id="brand-line"
-            href="https://www.poppu.world"
-            target="_blank"
-            rel="noopener noreferrer"
-            >Bagian dari Poppu World</a
-          >
-        </p>
       </section>
 
       <!-- Tutorial first-run -->
@@ -317,6 +329,29 @@
           <div class="tutorial-dots" id="tutorial-dots" aria-hidden="true"></div>
           <button type="button" id="tutorial-next" class="btn-start">Lanjut</button>
           <button type="button" id="tutorial-skip" class="btn-secondary tutorial-skip">Lewati</button>
+        </div>
+      </div>
+
+      <!-- Parental gate (multiplication check for parent areas) -->
+      <div
+        id="gate-overlay"
+        class="gate-overlay hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="gate-title"
+        aria-hidden="true"
+      >
+        <div class="gate-card">
+          <h2 id="gate-title">👨‍👩‍👧 Area orang tua</h2>
+          <p id="gate-instruction" class="gate-instruction">
+            Jawab soal perkalian ini untuk lanjut
+          </p>
+          <p id="gate-question" class="gate-question">7 × 8 = ?</p>
+          <div id="gate-answers" class="gate-answers"></div>
+          <p id="gate-msg" class="gate-msg" aria-live="polite"></p>
+          <button type="button" id="gate-close" class="btn-secondary gate-close">
+            Tutup
+          </button>
         </div>
       </div>
 
@@ -335,6 +370,18 @@
           alt=""
           width="72"
           height="96"
+          decoding="async"
+          draggable="false"
+          aria-hidden="true"
+        />
+        <!-- Friend companion (corner, next to Poppu; set per station) -->
+        <img
+          id="game-companion"
+          class="game-companion hidden"
+          src="assets/brand/friends/puffy-base.png"
+          alt=""
+          width="56"
+          height="75"
           decoding="async"
           draggable="false"
           aria-hidden="true"
@@ -396,7 +443,7 @@
               <span id="progress-meta-label">Huruf di kata ini</span>
               <span id="progress-label">0 / 0</span>
             </div>
-            <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
               <div id="progress-fill" class="progress-fill"></div>
             </div>
           </div>
@@ -497,7 +544,7 @@
         <p id="kb-hint" class="kb-hint">
           <span id="kb-hint-before">Tekan tombol</span>
           <kbd id="hint-key">A</kbd>
-          <span id="kb-hint-after">di keyboard laptop</span>
+          <span id="kb-hint-after">di keyboard</span>
         </p>
         <p id="kb-hint-hard" class="kb-hint kb-hint-hard hidden">
           Dengar kata, lalu ketik di keyboard~
@@ -548,6 +595,16 @@
               alt=""
               width="120"
               height="150"
+              decoding="async"
+              draggable="false"
+            />
+            <img
+              id="victory-friend"
+              class="victory-friend hidden"
+              src="assets/brand/friends/puffy-jump.png"
+              alt=""
+              width="80"
+              height="107"
               decoding="async"
               draggable="false"
             />

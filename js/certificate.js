@@ -80,10 +80,21 @@ export async function renderCertificate(data) {
     data.mode,
     data.theme,
     data.rank,
-    `${data.lang === 'en' ? 'Total' : 'Total'} ★ ${data.totalStars}`,
+    `Total ★ ${data.totalStars}`,
   ];
+  let lineY = 320;
+  // Optional child name (collected in the parent dashboard)
+  const childName = String(data.childName || '').trim();
+  if (childName) {
+    ctx.font = `800 30px ${font}`;
+    ctx.fillStyle = '#3D3A35';
+    ctx.fillText(childName.slice(0, 24), w / 2, 296);
+    ctx.font = `800 26px ${font}`;
+    ctx.fillStyle = '#7A756C';
+    lineY = 340;
+  }
   lines.forEach((line, i) => {
-    ctx.fillText(String(line), w / 2, 320 + i * 40);
+    ctx.fillText(String(line), w / 2, lineY + i * 40);
   });
 
   ctx.font = `700 18px ${font}`;

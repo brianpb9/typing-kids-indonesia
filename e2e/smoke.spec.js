@@ -188,11 +188,42 @@ test.describe('Typing Kids smoke', () => {
   });
 
   test('parent dash a11y toggles apply classes', async ({ page }) => {
-    await page.goto('/');
+    // ?e2e auto-passes the parental gate (same debug pattern as main.js)
+    await page.goto('/?e2e');
     await page.locator('#parent-dash').locator('summary').click();
     await page.locator('#a11y-contrast').check();
     await expect(page.locator('html')).toHaveClass(/a11y-contrast/);
     await page.locator('#a11y-large').check();
     await expect(page.locator('html')).toHaveClass(/a11y-large/);
+  });
+
+  test('parental gate blocks parent dash until answered', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('#brand-line')).toBeHidden();
+    await page.locator('#parent-dash').locator('summary').click();
+    await expect(page.locator('#gate-overlay')).toBeVisible();
+    await expect(page.locator('#a11y-contrast')).toBeHidden();
+    // Escape closes without granting access
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#gate-overlay')).toBeHidden();
+    await expect(page.locator('#a11y-contrast')).toBeHidden();
+    // Reopen and answer correctly
+    await page.locator('#parent-dash').locator('summary').click();
+    await expect(page.locator('#gate-overlay')).toBeVisible();
+    const answer = await page.evaluate(() => {
+      const m = /\s*(\d+)\s*×\s*(\d+)\s*/.exec(
+        document.getElementById('gate-question')?.textContent || ''
+      );
+      return m ? Number(m[1]) * Number(m[2]) : null;
+    });
+    expect(answer).not.toBeNull();
+    await page
+      .locator('.gate-answer', { hasText: new RegExp(`^${answer}$`) })
+      .click();
+    await expect(page.locator('#gate-overlay')).toBeHidden();
+    await expect(page.locator('#a11y-contrast')).toBeVisible();
+    // Parent-only links live behind the gate
+    await expect(page.locator('#privacy-link')).toBeVisible();
+    await expect(page.locator('#brand-line')).toBeVisible();
   });
 });

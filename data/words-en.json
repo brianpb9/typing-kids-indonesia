@@ -97,30 +97,30 @@
     },
     {
       "id": "pineapple",
-      "word": "pina",
+      "word": "pineapple",
       "display": "Pineapple",
       "category": "buah",
       "image": "assets/images/nanas.png?v=en1",
       "audio": null,
-      "letters": 4
+      "letters": 9
     },
     {
       "id": "watermelon",
-      "word": "water",
+      "word": "watermelon",
       "display": "Watermelon",
       "category": "buah",
       "image": "assets/images/semangka.png?v=en1",
       "audio": null,
-      "letters": 5
+      "letters": 10
     },
     {
       "id": "strawberry",
-      "word": "berry",
+      "word": "strawberry",
       "display": "Strawberry",
       "category": "buah",
       "image": "assets/images/stroberi.png?v=en1",
       "audio": null,
-      "letters": 5
+      "letters": 10
     },
     {
       "id": "coconut",
@@ -196,21 +196,21 @@
     },
     {
       "id": "rambutan",
-      "word": "rambu",
+      "word": "rambutan",
       "display": "Rambutan",
       "category": "buah",
       "image": "assets/images/rambutan.svg?v=en1",
       "audio": null,
-      "letters": 5
+      "letters": 8
     },
     {
       "id": "starfruit",
-      "word": "star",
+      "word": "starfruit",
       "display": "Starfruit",
       "category": "buah",
       "image": "assets/images/belimbing.svg?v=en1",
       "audio": null,
-      "letters": 4
+      "letters": 9
     },
     {
       "id": "cat",
@@ -259,12 +259,12 @@
     },
     {
       "id": "elephant",
-      "word": "jumbo",
+      "word": "elephant",
       "display": "Elephant",
       "category": "hewan",
       "image": "assets/images/gajah.png?v=en1",
       "audio": null,
-      "letters": 5
+      "letters": 8
     },
     {
       "id": "rabbit",
@@ -385,12 +385,12 @@
     },
     {
       "id": "butterfly",
-      "word": "fly",
+      "word": "butterfly",
       "display": "Butterfly",
       "category": "hewan",
       "image": "assets/images/kupu.png?v=en1",
       "audio": null,
-      "letters": 3
+      "letters": 9
     },
     {
       "id": "house",
@@ -655,12 +655,12 @@
     },
     {
       "id": "rickshaw",
-      "word": "cart",
+      "word": "rickshaw",
       "display": "Rickshaw",
       "category": "kendaraan",
       "image": "assets/images/becak.svg?v=en1",
       "audio": null,
-      "letters": 4
+      "letters": 8
     },
     {
       "id": "red",
@@ -733,15 +733,6 @@
       "image": "assets/images/pink.png?v=en1",
       "audio": null,
       "letters": 4
-    },
-    {
-      "id": "orange-color",
-      "word": "amber",
-      "display": "Amber",
-      "category": "warna",
-      "image": "assets/images/oranye.png?v=en1",
-      "audio": null,
-      "letters": 5
     },
     {
       "id": "brown",
