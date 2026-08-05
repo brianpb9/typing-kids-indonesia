@@ -187,10 +187,16 @@ export class UI {
       gateTitle: document.getElementById('gate-title'),
       gateInstruction: document.getElementById('gate-instruction'),
       gateQuestion: document.getElementById('gate-question'),
+      gateReadout: document.querySelector('.gate-readout'),
       gateAnswers: document.getElementById('gate-answers'),
       gateMsg: document.getElementById('gate-msg'),
       gateClose: document.getElementById('gate-close'),
       privacyLink: document.getElementById('privacy-link'),
+      eraseDataBtn: document.getElementById('erase-data-btn'),
+      eraseConfirm: document.getElementById('erase-confirm'),
+      eraseQ: document.getElementById('erase-q'),
+      eraseYes: document.getElementById('erase-yes'),
+      eraseCancel: document.getElementById('erase-cancel'),
     };
 
     this._oskBuilt = false;
@@ -216,9 +222,18 @@ export class UI {
     this._gateOnPass = null;
     this._gatePrevFocus = null;
     this._gateAnswer = 0;
-    // Deterministic bypass for automated tests (?e2e), same pattern as main.js
+    // Typed-answer state: digits entered, failed attempts, cooldown lockout
+    this._gateTyped = '';
+    this._gateFails = 0;
+    this._gateCooldownUntil = 0;
+    this._gateCooldownTimer = 0;
+    // Deterministic bypass for automated tests (?e2e) — honored ONLY on
+    // loopback hosts (the Playwright suite runs on localhost/127.0.0.1).
+    // On any public hostname the parental gate can never be bypassed via URL.
+    const host =
+      typeof window !== 'undefined' ? window.location.hostname : '';
     this._gateE2E =
-      typeof window !== 'undefined' &&
+      (host === 'localhost' || host === '127.0.0.1') &&
       new URLSearchParams(window.location.search).has('e2e');
     this._bindGate();
 
@@ -249,7 +264,15 @@ export class UI {
     document.documentElement.lang = this.language === 'en' ? 'en' : 'id';
     document.title = `${t.appName} — ${t.subtitle}`;
 
-    if (this.els.appTitle) this.els.appTitle.textContent = t.appName;
+    if (this.els.appTitle) {
+      // Judul dua warna ala mockup store: kata pertama cokelat, sisanya oranye.
+      // textContent gabungan tetap "Poppu Typing Kids" (dipakai e2e toHaveText).
+      const parts = t.appName.split(' ');
+      const rest = parts.slice(1).join(' ');
+      this.els.appTitle.innerHTML = rest
+        ? `<span class="title-brand">${parts[0]}</span> <span class="title-rest">${rest}</span>`
+        : `<span class="title-brand">${parts[0]}</span>`;
+    }
     if (this.els.appSubtitle) this.els.appSubtitle.textContent = t.subtitle;
     const brandHost = document.getElementById('brand-host');
     if (brandHost && t.brandHost) brandHost.textContent = t.brandHost;
@@ -339,9 +362,15 @@ export class UI {
     if (this.els.parentDashTitle)
       this.els.parentDashTitle.textContent = t.parentDashTitle;
     if (this.els.privacyLink) this.els.privacyLink.textContent = t.privacyLink;
+    if (this.els.eraseDataBtn) this.els.eraseDataBtn.textContent = t.eraseData;
+    if (this.els.eraseQ) this.els.eraseQ.textContent = t.eraseDataQ;
+    if (this.els.eraseYes) this.els.eraseYes.textContent = t.eraseDataYes;
+    if (this.els.eraseCancel) this.els.eraseCancel.textContent = t.eraseDataCancel;
     if (this.els.gateTitle) this.els.gateTitle.textContent = t.gateTitle;
     if (this.els.gateInstruction)
       this.els.gateInstruction.textContent = t.gateInstruction;
+    if (this.els.gateReadout)
+      this.els.gateReadout.setAttribute('aria-label', t.gateAnswerLabel || '');
     if (this.els.gateClose) this.els.gateClose.textContent = t.gateClose;
     if (this.els.masteryTitle) this.els.masteryTitle.textContent = t.masteryTitle;
     if (this.els.badgesTitle) this.els.badgesTitle.textContent = t.parentBadges;
@@ -680,6 +709,8 @@ export class UI {
     this.els.startScreen?.classList.remove('hidden');
     this.els.startScreen?.setAttribute('aria-hidden', 'false');
     this.setBackVisible(false);
+    // Scroll reset di setiap transisi layar SPA (pelajaran BUG-1)
+    window.scrollTo(0, 0);
   }
 
   showGame() {
@@ -687,6 +718,9 @@ export class UI {
     this.els.gameScreen?.classList.remove('hidden');
     this.els.gameScreen?.setAttribute('aria-hidden', 'false');
     this.setBackVisible(true);
+    // Reset scroll sisa dari home supaya banner + tombol Kembali tidak
+    // terdorong keluar viewport di HP (BUG-1)
+    window.scrollTo(0, 0);
   }
 
   showVictory() {
@@ -695,6 +729,8 @@ export class UI {
     this.els.victoryScreen?.setAttribute('aria-hidden', 'false');
     // Victory already has "Ke Awal" — keep floating back too
     this.setBackVisible(true);
+    // Scroll reset di setiap transisi layar SPA (pelajaran BUG-1)
+    window.scrollTo(0, 0);
   }
 
   /**
@@ -1433,6 +1469,31 @@ export class UI {
         vs.appendChild(s);
       }
     }
+
+    // Journey bar — CSS keyframes grow it from 0 when the screen becomes
+    // visible (display:none → flex restarts animations), so here we only
+    // publish the target via a custom property
+    const vj = this.els.victoryScreen?.querySelector('.victory-journey');
+    if (vj instanceof HTMLElement) {
+      const from = vj.querySelector('.vj-from');
+      const to = vj.querySelector('.vj-to');
+      const next = rank.next;
+      const pct = next
+        ? Math.min(
+            1,
+            Math.max(
+              0,
+              (data.totalStars - rank.min) / Math.max(1, next.min - rank.min)
+            )
+          )
+        : 1;
+      if (from) from.textContent = rank.emoji;
+      if (to) {
+        to.textContent = next ? next.emoji : rank.emoji;
+        to.classList.toggle('hidden', !next);
+      }
+      vj.style.setProperty('--vj-pct', `${Math.round(pct * 100)}%`);
+    }
   }
 
   onStart(handler) {
@@ -2021,6 +2082,27 @@ export class UI {
     });
   }
 
+  /**
+   * GDPR-K erasure flow inside the gated parent dashboard:
+   * button reveals a gentle confirm step; only "yes" fires the handler.
+   * @param {() => void} handler
+   */
+  onEraseData(handler) {
+    this.els.eraseDataBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.els.eraseConfirm?.classList.remove('hidden');
+    });
+    this.els.eraseCancel?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.els.eraseConfirm?.classList.add('hidden');
+    });
+    this.els.eraseYes?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.els.eraseConfirm?.classList.add('hidden');
+      handler?.();
+    });
+  }
+
   getPlayerName() {
     if (this.els.classNameInput instanceof HTMLInputElement) {
       return this.els.classNameInput.value.trim();
@@ -2084,10 +2166,10 @@ export class UI {
     this.els.gateAnswers?.addEventListener('click', (e) => {
       const t = e.target;
       if (!(t instanceof Element)) return;
-      const btn = t.closest('.gate-answer');
+      const btn = t.closest('.gate-key');
       if (!(btn instanceof HTMLElement)) return;
       e.preventDefault();
-      this._answerGate(Number(btn.dataset.value));
+      this._gatePadPress(btn.dataset.key || '');
     });
     this.els.gateClose?.addEventListener('click', (e) => {
       e.preventDefault();
@@ -2101,6 +2183,16 @@ export class UI {
         this._closeGate(false);
       } else if (e.key === 'Tab') {
         this._trapGateTab(e);
+      } else if (/^[0-9]$/.test(e.key)) {
+        // Desktop parents can type digits straight from the keyboard
+        e.preventDefault();
+        this._gatePadPress(e.key);
+      } else if (e.key === 'Backspace') {
+        e.preventDefault();
+        this._gatePadPress('del');
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        this._gatePadPress('ok');
       }
     });
   }
@@ -2170,7 +2262,7 @@ export class UI {
     this._newGateQuestion();
     overlay.classList.remove('hidden');
     overlay.setAttribute('aria-hidden', 'false');
-    const first = overlay.querySelector('.gate-answer');
+    const first = overlay.querySelector('.gate-key');
     if (first instanceof HTMLElement) first.focus();
   }
 
@@ -2178,48 +2270,138 @@ export class UI {
     const a = 2 + Math.floor(Math.random() * 8); // 2–9
     const b = 2 + Math.floor(Math.random() * 8);
     this._gateAnswer = a * b;
+    this._gateTyped = '';
     if (this.els.gateQuestion) {
       this.els.gateQuestion.textContent = this.t.gateQuestion
         ? this.t.gateQuestion(a, b)
         : `${a} × ${b} = ?`;
     }
-    // 1 correct + 3 close-but-wrong options, shuffled
-    const options = new Set([this._gateAnswer]);
-    while (options.size < 4) {
-      const delta =
-        (1 + Math.floor(Math.random() * 5)) * (Math.random() < 0.5 ? -1 : 1);
-      const wrong = this._gateAnswer + delta;
-      if (wrong > 0) options.add(wrong);
-    }
-    const shuffled = [...options].sort(() => Math.random() - 0.5);
-    const host = this.els.gateAnswers;
-    if (host) {
-      host.innerHTML = '';
-      for (const v of shuffled) {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'btn-secondary gate-answer';
-        btn.dataset.value = String(v);
-        btn.textContent = String(v);
-        host.appendChild(btn);
-      }
-    }
+    this._renderGatePad();
+    this._updateGateReadout();
     if (this.els.gateMsg) this.els.gateMsg.textContent = '';
+    // A lockout from an earlier visit in this session still applies
+    if (Date.now() < this._gateCooldownUntil) this._applyGateCooldown();
+  }
+
+  /** Numeric pad: digits 1–9, 0, delete, OK — no guessing, no native keyboard */
+  _renderGatePad() {
+    const host = this.els.gateAnswers;
+    if (!host) return;
+    const t = this.t;
+    host.innerHTML = '';
+    const keys = ['1','2','3','4','5','6','7','8','9','del','0','ok'];
+    for (const key of keys) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.dataset.key = key;
+      if (key === 'del') {
+        btn.className = 'btn-secondary gate-key gate-key-del';
+        btn.textContent = '⌫';
+        btn.setAttribute('aria-label', t.gateDelLabel || 'Hapus');
+      } else if (key === 'ok') {
+        btn.className = 'btn-secondary gate-key gate-key-ok';
+        btn.textContent = '✓';
+        btn.setAttribute('aria-label', t.gateOkLabel || 'OK');
+      } else {
+        btn.className = 'btn-secondary gate-key';
+        btn.textContent = key;
+      }
+      host.appendChild(btn);
+    }
+  }
+
+  _updateGateReadout() {
+    const el = this.els.gateReadout;
+    if (!el) return;
+    // Placeholder dots keep the layout stable while typing
+    const padded = (this._gateTyped + '••').slice(0, 2);
+    el.textContent = padded.split('').join(' ');
   }
 
   /**
-   * @param {number} value
+   * Handle a pad/keyboard press while the gate is open.
+   * @param {string} key digit, 'del', or 'ok'
    */
-  _answerGate(value) {
-    if (value === this._gateAnswer) {
+  _gatePadPress(key) {
+    const overlay = this.els.gateOverlay;
+    if (!overlay || overlay.classList.contains('hidden')) return;
+    if (Date.now() < this._gateCooldownUntil) return; // locked out
+    if (/^[0-9]$/.test(key)) {
+      // Answers are ≤ 81 — two digits max
+      if (this._gateTyped.length >= 2) return;
+      this._gateTyped += key;
+      this._updateGateReadout();
+      return;
+    }
+    if (key === 'del') {
+      this._gateTyped = this._gateTyped.slice(0, -1);
+      this._updateGateReadout();
+      return;
+    }
+    if (key === 'ok') this._submitGateAnswer();
+  }
+
+  _submitGateAnswer() {
+    if (!this._gateTyped) {
+      if (this.els.gateMsg)
+        this.els.gateMsg.textContent = this.t.gateEmpty || '';
+      return;
+    }
+    if (Number(this._gateTyped) === this._gateAnswer) {
+      this._gateFails = 0;
       this._closeGate(true);
       return;
     }
-    // Wrong — gentle retry with a fresh question
-    this._newGateQuestion();
-    if (this.els.gateMsg) this.els.gateMsg.textContent = this.t.gateWrong || '';
-    const first = this.els.gateAnswers?.querySelector('.gate-answer');
-    if (first instanceof HTMLElement) first.focus();
+    // Wrong — gentle retry with the same question (no shaming)
+    this._gateFails += 1;
+    this._gateTyped = '';
+    this._updateGateReadout();
+    const maxFails = CONFIG.ui?.gateMaxFails || 3;
+    if (this._gateFails >= maxFails) {
+      this._startGateCooldown();
+      return;
+    }
+    if (this.els.gateMsg)
+      this.els.gateMsg.textContent = this.t.gateWrong || '';
+  }
+
+  _startGateCooldown() {
+    const sec = CONFIG.ui?.gateCooldownSec || 30;
+    this._gateCooldownUntil = Date.now() + sec * 1000;
+    this._applyGateCooldown();
+  }
+
+  /** Tick the lockout countdown; re-enable the pad with a fresh question */
+  _applyGateCooldown() {
+    this._setGatePadEnabled(false);
+    const tick = () => {
+      const left = Math.ceil((this._gateCooldownUntil - Date.now()) / 1000);
+      if (left <= 0) {
+        clearInterval(this._gateCooldownTimer);
+        this._gateCooldownTimer = 0;
+        this._gateFails = 0;
+        this._newGateQuestion();
+        this._setGatePadEnabled(true);
+        return;
+      }
+      if (this.els.gateMsg) {
+        this.els.gateMsg.textContent = this.t.gateCooldown
+          ? this.t.gateCooldown(left)
+          : `Tunggu ${left} detik ya`;
+      }
+    };
+    tick();
+    clearInterval(this._gateCooldownTimer);
+    this._gateCooldownTimer = setInterval(tick, 500);
+  }
+
+  /** @param {boolean} on */
+  _setGatePadEnabled(on) {
+    this.els.gateAnswers
+      ?.querySelectorAll('.gate-key')
+      .forEach((btn) => {
+        if (btn instanceof HTMLButtonElement) btn.disabled = !on;
+      });
   }
 
   /**
@@ -2229,6 +2411,8 @@ export class UI {
     const overlay = this.els.gateOverlay;
     overlay?.classList.add('hidden');
     overlay?.setAttribute('aria-hidden', 'true');
+    clearInterval(this._gateCooldownTimer);
+    this._gateCooldownTimer = 0;
     const onPass = this._gateOnPass;
     this._gateOnPass = null;
     if (passed) {

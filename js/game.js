@@ -265,6 +265,7 @@ export class Game {
         this._refreshParentDash();
       },
     });
+    this.ui.onEraseData(() => this.eraseAllData());
     this.ui.onClassroom({
       onJoin: (code) => this._joinClass(code),
       onCreate: () => this._createClass(),
@@ -497,6 +498,28 @@ export class Game {
     this._refreshStickerBook();
     this.audio.playClick();
     this.ui.showStart();
+  }
+
+  /**
+   * GDPR-K erasure from the gated parent dashboard: wipe every
+   * localStorage key owned by this app, then restart on the start screen.
+   */
+  eraseAllData() {
+    this._stopTimer();
+    this._clearPendingTimers();
+    this.audio.stopSpeech();
+    try {
+      const doomed = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('typingKids')) doomed.push(k);
+      }
+      doomed.forEach((k) => localStorage.removeItem(k));
+    } catch {
+      /* private mode — in-memory state is dropped by the reload anyway */
+    }
+    // Fresh boot without query string = clean start screen
+    window.location.assign(window.location.pathname);
   }
 
   /**
@@ -782,6 +805,9 @@ export class Game {
       step: this._tutorialStep,
       total: steps.length,
     });
+    // Voice-narrated tutorial: pre-readers can't read the steps, so each
+    // step is spoken aloud in the active language (respects mute).
+    this.audio.speak(`${s.title}. ${s.body}`);
   }
 
   _tutorialNext() {
@@ -796,6 +822,7 @@ export class Game {
 
   _tutorialFinish(_skipped) {
     this._clearPendingTimers();
+    this.audio.stopSpeech();
     if (this.language === 'en') patchSave({ tutorialDoneEn: true });
     else patchSave({ tutorialDone: true });
     this.ui.hideTutorial();
@@ -1481,6 +1508,8 @@ export class Game {
 
     this.anim.celebrate();
     setTimeout(() => this.anim.celebrate(), 400);
+    // Third wave as the journey bar finishes — the big finale moment
+    setTimeout(() => this.anim.celebrate(), 1500);
 
     const t = this._t();
     const rank = getRank(updated.totalStars, t.ranks);

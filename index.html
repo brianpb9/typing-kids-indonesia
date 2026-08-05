@@ -109,7 +109,7 @@
           </button>
         </div>
 
-        <h1 id="app-title">Poppu Typing Kids</h1>
+        <h1 id="app-title"><span class="title-brand">Poppu</span> <span class="title-rest">Typing Kids</span></h1>
         <p class="subtitle" id="app-subtitle">Belajar Mengetik Sambil Bermain</p>
         <p class="brand-host" id="brand-host">Yuk ketik bareng Poppu!</p>
 
@@ -305,6 +305,26 @@
                 <span id="a11y-large-label">Teks besar</span>
               </label>
             </div>
+            <!-- GDPR-K erasure: in-app data wipe, behind the gate -->
+            <div class="erase-data">
+              <button type="button" id="erase-data-btn" class="btn-secondary btn-sm">
+                Hapus data
+              </button>
+              <div class="erase-confirm hidden" id="erase-confirm">
+                <p class="erase-q" id="erase-q">
+                  Hapus semua data belajar di perangkat ini? Ini tidak bisa
+                  dibatalkan.
+                </p>
+                <div class="erase-actions">
+                  <button type="button" id="erase-yes" class="btn-secondary btn-sm">
+                    Ya, hapus semua
+                  </button>
+                  <button type="button" id="erase-cancel" class="btn-secondary btn-sm">
+                    Batal
+                  </button>
+                </div>
+              </div>
+            </div>
             <!-- External links live behind the parental gate -->
             <p class="parent-links">
               <a
@@ -340,7 +360,7 @@
         </div>
       </div>
 
-      <!-- Parental gate (multiplication check for parent areas) -->
+      <!-- Parental gate (typed multiplication answer — parent areas) -->
       <div
         id="gate-overlay"
         class="gate-overlay hidden"
@@ -352,9 +372,10 @@
         <div class="gate-card">
           <h2 id="gate-title">👨‍👩‍👧 Area orang tua</h2>
           <p id="gate-instruction" class="gate-instruction">
-            Jawab soal perkalian ini untuk lanjut
+            Ketik jawaban soal ini untuk lanjut
           </p>
           <p id="gate-question" class="gate-question">7 × 8 = ?</p>
+          <p class="gate-readout" aria-live="polite">••</p>
           <div id="gate-answers" class="gate-answers"></div>
           <p id="gate-msg" class="gate-msg" aria-live="polite"></p>
           <button type="button" id="gate-close" class="btn-secondary gate-close">
@@ -640,6 +661,25 @@
           </div>
 
           <p id="victory-next" class="victory-next">Main lagi untuk jadi Superstar!</p>
+
+          <!-- Journey bar: progress from current rank toward the next one.
+               Decorative — #victory-next carries the same info as text. -->
+          <div class="victory-journey" aria-hidden="true">
+            <span class="vj-rank vj-from">🌱</span>
+            <div class="vj-track">
+              <div class="vj-fill"></div>
+              <img
+                class="vj-poppu"
+                src="assets/brand/poppu/poppu-idle.png"
+                alt=""
+                width="30"
+                height="38"
+                decoding="async"
+                draggable="false"
+              />
+            </div>
+            <span class="vj-rank vj-to">🏆</span>
+          </div>
 
           <!-- Parent summary -->
           <div id="parent-summary" class="parent-summary" aria-label="Parent summary">

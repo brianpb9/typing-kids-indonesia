@@ -224,13 +224,70 @@ test.describe('Typing Kids smoke', () => {
       return m ? Number(m[1]) * Number(m[2]) : null;
     });
     expect(answer).not.toBeNull();
-    await page
-      .locator('.gate-answer', { hasText: new RegExp(`^${answer}$`) })
-      .click();
+    // Type the answer digit-by-digit on the numeric pad, then submit
+    for (const digit of String(answer)) {
+      await page.locator(`.gate-key[data-key="${digit}"]`).click();
+    }
+    await page.locator('.gate-key[data-key="ok"]').click();
     await expect(page.locator('#gate-overlay')).toBeHidden();
     await expect(page.locator('#a11y-contrast')).toBeVisible();
     // Parent-only links live behind the gate
     await expect(page.locator('#privacy-link')).toBeVisible();
     await expect(page.locator('#brand-line')).toBeVisible();
+  });
+
+  test('parental gate: wrong answers trigger cooldown, then recovery', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    // Shorten the lockout so the test stays fast (live CONFIG object)
+    await page.evaluate(() => {
+      window.__typingKids.config.ui.gateCooldownSec = 1;
+    });
+    await page.locator('#parent-dash').locator('summary').click();
+    await expect(page.locator('#gate-overlay')).toBeVisible();
+
+    // Empty submit is ignored gently, gate stays closed
+    await page.locator('.gate-key[data-key="ok"]').click();
+    await expect(page.locator('#gate-overlay')).toBeVisible();
+
+    // 3 wrong answers → pad locks with a cooldown message (no shaming)
+    const answer = await page.evaluate(() => {
+      const m = /\s*(\d+)\s*×\s*(\d+)\s*/.exec(
+        document.getElementById('gate-question')?.textContent || ''
+      );
+      return m ? Number(m[1]) * Number(m[2]) : 0;
+    });
+    const wrong = answer === 99 ? 98 : 99; // answers are ≤ 81, so 99 is always wrong
+    for (let i = 0; i < 3; i++) {
+      for (const digit of String(wrong)) {
+        await page.locator(`.gate-key[data-key="${digit}"]`).click();
+      }
+      await page.locator('.gate-key[data-key="ok"]').click();
+    }
+    await expect(page.locator('#gate-msg')).toContainText(/tunggu|wait/i);
+    await expect(
+      page.locator('.gate-key[data-key="ok"]')
+    ).toBeDisabled();
+
+    // Cooldown expires → pad re-enables with a fresh question
+    await expect(
+      page.locator('.gate-key[data-key="ok"]')
+    ).toBeEnabled({ timeout: 5_000 });
+
+    // Answer the fresh question correctly → parent area opens
+    const fresh = await page.evaluate(() => {
+      const m = /\s*(\d+)\s*×\s*(\d+)\s*/.exec(
+        document.getElementById('gate-question')?.textContent || ''
+      );
+      return m ? Number(m[1]) * Number(m[2]) : null;
+    });
+    expect(fresh).not.toBeNull();
+    for (const digit of String(fresh)) {
+      await page.locator(`.gate-key[data-key="${digit}"]`).click();
+    }
+    await page.locator('.gate-key[data-key="ok"]').click();
+    await expect(page.locator('#gate-overlay')).toBeHidden();
+    await expect(page.locator('#a11y-contrast')).toBeVisible();
   });
 });

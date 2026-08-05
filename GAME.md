@@ -289,7 +289,7 @@ See `assets/brand/poppu/ATTRIBUTION.md`.
 
 ## 10. PWA / offline
 
-- Service worker: `sw.js` (**typing-kids-v22**)  
+- Service worker: `sw.js` (**typing-kids-v32**)  
 - **Install:** app shell only (fast)  
 - **Activate / idle:** warm voice pack + word images  
 - Client can `postMessage({ type: 'WARM_MEDIA' })`  

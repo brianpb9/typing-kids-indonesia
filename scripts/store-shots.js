@@ -1,5 +1,6 @@
 // Store listing screenshots — Play Store phone screenshots (hi-res via deviceScaleFactor).
-// Output: test-results/store-*.png (1170×2532 effective). Review, then copy keepers to play-store/screenshots/.
+// Output: test-results/store-*.png (1080×1920 effective, exact 9:16 — Play rejects ratios >2:1).
+// Review, then copy keepers to play-store/screenshots/.
 import { chromium } from 'playwright';
 import { spawn } from 'node:child_process';
 
@@ -35,7 +36,7 @@ function waitForServer(url, timeoutMs = 30_000) {
 }
 
 async function newGamePage(browser, lang) {
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3 });
+  const page = await browser.newPage({ viewport: { width: 360, height: 640 }, deviceScaleFactor: 3 });
   await page.goto(BASE + '/');
   await page.evaluate((data) => localStorage.setItem('typingKidsID_v1', JSON.stringify(data)), { ...seed, language: lang });
   await page.reload();

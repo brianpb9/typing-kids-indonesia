@@ -264,6 +264,9 @@ export const CONFIG = {
     starCount: 12,
     sparkleCount: 18,
     victoryConfetti: 120,
+    // Parental gate: max failed attempts before a cooldown lockout
+    gateMaxFails: 3,
+    gateCooldownSec: 30,
   },
 
   paths: {

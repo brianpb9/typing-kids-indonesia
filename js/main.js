@@ -8,14 +8,11 @@ async function boot() {
   document.title = `${CONFIG.app.name} — ${CONFIG.app.subtitle}`;
 
   const game = new Game();
-  // Debug handle on local / e2e hosts (Playwright uses 127.0.0.1)
+  // Debug handle ONLY on loopback hosts (Playwright runs on 127.0.0.1).
+  // A ?e2e URL param alone must never expose internals on a public host.
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
-    const e2e =
-      host === 'localhost' ||
-      host === '127.0.0.1' ||
-      new URLSearchParams(window.location.search).has('e2e');
-    if (e2e) {
+    if (host === 'localhost' || host === '127.0.0.1') {
       window.__typingKids = { game, config: CONFIG };
     }
   }

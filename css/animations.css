@@ -150,6 +150,25 @@
   }
 }
 
+/* Victory trophy entrance — bouncy pop with a happy wiggle */
+@keyframes trophy-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(-14deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.25) rotate(6deg);
+  }
+  80% {
+    transform: scale(0.92) rotate(-3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
 /* Utility animation classes */
 .float-idle {
   animation: float-idle 3.2s ease-in-out infinite;
@@ -177,5 +196,22 @@
   .shake,
   .celebrate-bounce {
     animation: none !important;
+  }
+}
+
+/* Reduced motion: journey bar + trophy jump straight to the final state */
+@media (prefers-reduced-motion: reduce) {
+  .vj-fill,
+  .vj-poppu,
+  .victory-trophy {
+    animation: none !important;
+  }
+
+  .vj-fill {
+    width: var(--vj-pct, 0%);
+  }
+
+  .vj-poppu {
+    left: var(--vj-pct, 0%);
   }
 }

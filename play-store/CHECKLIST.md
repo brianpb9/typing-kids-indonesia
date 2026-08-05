@@ -25,7 +25,7 @@ Artefak yang sudah disiapkan ada di folder `play-store/` ini.
 Play Console → **All apps / Semua aplikasi** → **Create app / Buat aplikasi**:
 
 - **App name / Nama aplikasi:** `Poppu Typing Kids`
-- **Default language / Bahasa default:** Indonesian (id-ID)
+- **Default language / Bahasa default:** **English (en-US)** — keputusan 2026-08-05; terjemahan Indonesian (id-ID) ditambahkan via Manage translations (langkah 3.1).
 - **App or game / Aplikasi atau game:** App / Aplikasi
 - **Free or paid / Gratis atau berbayar:** **Free / Gratis**
 - Centang deklarasi: **Developer Program Policies** dan **US export laws**.
@@ -88,23 +88,23 @@ Jika konsol tetap meminta deklarasi per tipe data: centang **"No data collected"
 
 ## 3. Store listing (Grow → Store presence → Main store listing)
 
-### 3.1 Bahasa default: Indonesian (id-ID)
-Salin dari `play-store/listing-id.md`: judul, deskripsi singkat, deskripsi lengkap.
-Tambahkan terjemahan **English (en-US)** dari `play-store/listing-en.md` via **Manage translations**.
+### 3.1 Bahasa default: English (en-US)
+Salin dari `play-store/listing-en.md`: judul, deskripsi singkat, deskripsi lengkap.
+Tambahkan terjemahan **Indonesian (id-ID)** dari `play-store/listing-id.md` via **Manage translations**.
 
 ### 3.2 Aset grafis wajib
 
 | Aset | Ukuran | Sumber |
 |---|---|---|
-| Ikon aplikasi (hi-res) | 512×512 PNG 32-bit | ✅ `assets/brand/poppu/icon-512.png` |
-| Feature graphic | 1024×500 PNG/JPG | ✅ `play-store/feature-graphic.png` |
-| Screenshot ponsel | **min. 2**, maks 8, rasio 16:9 atau 9:16, sisi 320–3840 px | Gunakan `test-results/reskin-home-mobile.png` + `reskin-game-mobile.png` (+ `reskin-victory-mobile.png`); versi desktop bisa untuk slot tablet 7"/10" bila diklaim. Screenshot diregenerasi via `node scripts/friends-shots.js` (file mendarat di `test-results/`) |
+| Ikon aplikasi (hi-res) | 512×512 PNG 32-bit | ✅ `play-store/icon-512.png` (ikon store versi ilustrasi; ikon in-app di `assets/brand/poppu/icon-512.png` JANGAN dioverride tanpa rebuild AAB) |
+| Feature graphic | 1024×500 PNG/JPG | ✅ `play-store/feature-graphic.png` (versi ilustrasi EN, 2026-08-05) |
+| Screenshot ponsel | **min. 2**, maks 8, rasio ≤ 2:1, sisi 320–3840 px | ✅ Listing EN (default): `play-store/screenshots/store-en-*.png` — set marketing ilustrasi 941×1672 (home, worlds, type, listen, celebrate). Terjemahan ID: `store-id-*.png` 1080×1920 hasil render `node scripts/store-shots.js` |
 | Kategori | — | **Education / Edukasi** |
 | Email kontak | wajib publik | `hdrvstudio@gmail.com` |
 | Situs web | opsional | `https://typing.poppu.world` |
 | Kebijakan privasi | wajib | `https://typing.poppu.world/privacy` |
 
-> Catatan: cek dimensi screenshot `reskin-*.png` dengan `sips -g pixelWidth -g pixelHeight`; bila sisi < 320px atau rasio tidak memenuhi, render ulang via Playwright.
+> Catatan: screenshot marketing EN menampilkan UI tersalin bergaya ilustrasi — bila reviewer Play mempersoalkan kesesuaian dengan UI asli, ganti dengan hasil render `scripts/store-shots.js` (rasio sudah 9:16).
 
 ## 4. Upload & rilis bertahap
 

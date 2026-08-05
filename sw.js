@@ -2,7 +2,7 @@
  * Install: app shell only (fast).
  * Activate: warm voice + word images in background.
  */
-const CACHE = 'typing-kids-v27';
+const CACHE = 'typing-kids-v33';
 
 /** Critical shell — keep small for fast first install */
 const PRECACHE_SHELL = [
