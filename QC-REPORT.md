@@ -6,6 +6,36 @@ Tanggal: 2026-08-04 · Reviewer: Kimi Code (board review) · Basis: review kode 
 
 ---
 
+# Board Review Ronde 4 — RELEASE READINESS (final, 2026-08-04)
+
+Basis: unit **33/33**, e2e **31/31**, audit live site + artefak + materi listing. **Verdict: READY TO UPLOAD — skor 9.5/10.**
+
+## Review fitur baru (belum pernah di-review independen)
+
+- **Friends/companions (Zaza/Peeky/Orby/Puffy): 9/10 — READY.** Mapping stasiun benar, stiker char-* first-completion-only, voice pool 100% cocok dengan disk, fallback Poppu jalan, tidak ada kebocoran ke statistik kata.
+- **Parental gate: 8/10 → diperbaiki.** Ditemukan 1 P1 (gate tidak terikat jika `words.json` gagal load → details terbuka tanpa gerbang) — **sudah di-fix** (binding dipindah sebelum load). Juga di-fix: goHome menutup gate, filter char-* di lencana mastery, onerror di semua img karakter.
+
+## Audit Play Store end-to-end
+
+| Area | Status |
+|---|---|
+| Live site `typing.poppu.world` (+ SSL, privacy, manifest, sw no-cache) | OK |
+| `assetlinks.json` (package + fingerprint CB:4A…) | OK, live |
+| Capacitor AAB vc2 (rilis) — signed, index.html ter-bundle | OK |
+| TWA AAB vc3 (internal) — host domain baru, signed | OK |
+| Feature graphic 1024×500, ikon 512 | OK |
+| Listing ID/EN (judul 17/30, short 66–71/80, full ±1600/4000) | OK |
+| Screenshot ponsel ≥2 (390×844) | OK — 3 file di `play-store/screenshots/` |
+| Privacy policy: email final `hdrvstudio@gmail.com`, TODO dihapus, live | OK |
+| CHECKLIST.md konsisten dengan realitas | OK (dibersihkan) |
+| Working tree | OK — ter-commit (release candidate) |
+
+**Sisa tugas manusia di Play Console** (lihat `play-store/CHECKLIST.md`): akun developer $25, verifikasi identitas, isi Data Safety ("no data collected"), IARC rating, deklarasi Families, upload AAB.
+
+---
+
+
+
 # Board Review Ronde 3 — Fix Semua Temuan Terbuka
 
 Tanggal: 2026-08-04 · Basis: unit **33/33** (+10 test storage baru), e2e **29/29** (test offline kini benar-benar assertif), `scripts/check-assets.js` OK (80 precache + 25 refs + 24 voice clips semua ada).
