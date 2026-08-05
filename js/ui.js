@@ -47,6 +47,8 @@ export class UI {
       friendshipLabel: document.getElementById('friendship-label'),
       worldMap: document.getElementById('world-map'),
       worldMapTitle: document.getElementById('world-map-title'),
+      manualTitle: document.getElementById('manual-title'),
+      moreTitle: document.getElementById('more-title'),
       stationAbc: document.getElementById('station-abc'),
       stationMeadow: document.getElementById('station-meadow'),
       stationCastle: document.getElementById('station-castle'),
@@ -193,6 +195,8 @@ export class UI {
 
     this._oskBuilt = false;
     this._oskTarget = '';
+    /** Adaptive (easy): temporarily re-show kb hint after a struggling word */
+    this._kbHintBoost = false;
     this._onOskLayout = () => {
       if (this._oskTarget) this._positionOskFinger();
     };
@@ -263,6 +267,9 @@ export class UI {
       this.els.stickerToastText.textContent = t.stickerNew;
     if (this.els.worldMapTitle)
       this.els.worldMapTitle.textContent = t.worldMapTitle;
+    if (this.els.manualTitle)
+      this.els.manualTitle.textContent = t.manualTitle;
+    if (this.els.moreTitle) this.els.moreTitle.textContent = t.moreTitle;
     const setSt = (id, key) => {
       const n = document.getElementById(`${id}-name`);
       const d = document.getElementById(`${id}-desc`);
@@ -586,6 +593,21 @@ export class UI {
     this._updateCategoryPickState();
   }
 
+  /**
+   * Adaptive (easy mode): temporarily re-show the keyboard hint for the
+   * next word after a struggling word, even if the mission config would
+   * hide it. Cleared again on the next completed word / mission start.
+   * @param {boolean} on
+   */
+  setKbHintBoost(on) {
+    this._kbHintBoost = Boolean(on);
+    const m = this.mode || {};
+    this.els.kbHint?.classList.toggle(
+      'hidden',
+      !m.showKbHint && !this._kbHintBoost
+    );
+  }
+
   /** Show/hide big letter, slots, full word, timer, hints based on mode */
   applyModeLayout() {
     const m = this.mode;
@@ -597,7 +619,10 @@ export class UI {
     }
     this.els.wordSlots?.classList.toggle('hidden', !m.showSlots);
     this.els.letterProgressBar?.classList.toggle('hidden', !m.showLetterProgress);
-    this.els.kbHint?.classList.toggle('hidden', !m.showKbHint);
+    this.els.kbHint?.classList.toggle(
+      'hidden',
+      !m.showKbHint && !this._kbHintBoost
+    );
     this.els.kbHintHard?.classList.toggle('hidden', m.id !== 'hard');
     this.els.wordFull?.classList.toggle('hidden', !m.showFullWord);
     const hasTimer = (m.timerSeconds || 0) > 0;
@@ -1984,14 +2009,46 @@ export class UI {
       e.preventDefault();
       this._closeGate(false);
     });
-    // Escape closes the gate but never grants access
+    // Escape closes the gate but never grants access; Tab stays inside
     this.els.gateOverlay?.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         e.preventDefault();
         e.stopPropagation();
         this._closeGate(false);
+      } else if (e.key === 'Tab') {
+        this._trapGateTab(e);
       }
     });
+  }
+
+  /**
+   * Focus trap — while the gate overlay is open, Tab / Shift+Tab cycle
+   * within the modal instead of leaking to the page behind it.
+   * @param {KeyboardEvent} e
+   */
+  _trapGateTab(e) {
+    const overlay = this.els.gateOverlay;
+    if (!overlay || overlay.classList.contains('hidden')) return;
+    const focusables = [
+      ...overlay.querySelectorAll('button, [href], input, [tabindex]'),
+    ].filter(
+      (el) =>
+        el instanceof HTMLElement &&
+        !el.disabled &&
+        el.tabIndex >= 0 &&
+        el.getClientRects().length > 0
+    );
+    if (!focusables.length) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = document.activeElement;
+    if (e.shiftKey && (active === first || !overlay.contains(active))) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && (active === last || !overlay.contains(active))) {
+      e.preventDefault();
+      first.focus();
+    }
   }
 
   /** True while the in-memory parent session (5 min) is still valid */

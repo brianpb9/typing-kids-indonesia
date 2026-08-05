@@ -1,11 +1,9 @@
 /**
  * Weekly challenge — ISO week seed (Mon–Sun)
  */
-import { CONFIG } from './config.js';
+import { hash, missionCategories } from './mission-seed.js';
 
-const CATS = (CONFIG.categoryOptions || [])
-  .map((c) => c.id)
-  .filter((id) => id !== 'all' && id !== 'huruf-susah' && id !== 'huruf');
+const CATS = missionCategories(['huruf-susah', 'huruf']);
 
 /**
  * @param {Date} [date]
@@ -18,14 +16,6 @@ export function weekKey(date = new Date()) {
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
   const weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
   return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
-}
-
-function hash(s) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) {
-    h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
-  }
-  return Math.abs(h);
 }
 
 /**

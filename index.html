@@ -174,23 +174,56 @@
           <p class="hint" id="start-hint">✨ Tidak ada yang salah — coba saja terus ✨</p>
         </div>
 
-        <!-- Sticker book (mastery collection) -->
-        <details class="sticker-book" id="sticker-book">
-          <summary id="sticker-book-title">📒 Buku stiker Poppu</summary>
-          <p class="sticker-hint" id="sticker-hint">Selesaikan kata = stiker baru!</p>
-          <div class="sticker-grid" id="sticker-grid" aria-label="Stickers"></div>
-        </details>
-
-        <!-- Daily + weekly -->
-        <div class="mission-row">
-          <div class="daily-card" id="daily-card">
-            <div class="daily-head">
-              <p class="daily-title" id="daily-title">📅 Misi harian</p>
-              <span class="daily-badge hidden" id="daily-badge">✅</span>
-            </div>
-            <p class="daily-desc" id="daily-desc"></p>
-            <button type="button" id="daily-btn" class="btn-daily">Main misi harian</button>
+        <!-- Daily mission (core habit loop — stays visible) -->
+        <div class="daily-card" id="daily-card">
+          <div class="daily-head">
+            <p class="daily-title" id="daily-title">📅 Misi harian</p>
+            <span class="daily-badge hidden" id="daily-badge">✅</span>
           </div>
+          <p class="daily-desc" id="daily-desc"></p>
+          <button type="button" id="daily-btn" class="btn-daily">Main misi harian</button>
+        </div>
+
+        <!-- Manual pick — compact secondary card below the map -->
+        <div class="manual-card" id="manual-card">
+          <p class="manual-title" id="manual-title">🎛️ Atur sendiri</p>
+          <!-- 4 modes -->
+          <div class="mode-pick mode-pick-4" role="group" aria-label="Difficulty" id="mode-pick">
+            <button type="button" class="mode-btn is-active" data-mode="easy" id="mode-easy">
+              <span class="mode-emoji">🌱</span>
+              <span class="mode-name" id="mode-easy-name">Mudah</span>
+              <span class="mode-desc" id="mode-easy-desc">Kata full + huruf</span>
+            </button>
+            <button type="button" class="mode-btn" data-mode="medium" id="mode-medium">
+              <span class="mode-emoji">⚡</span>
+              <span class="mode-name" id="mode-medium-name">Sedang</span>
+              <span class="mode-desc" id="mode-medium-desc">Kata full · tanpa huruf satuan</span>
+            </button>
+            <button type="button" class="mode-btn" data-mode="hard" id="mode-hard">
+              <span class="mode-emoji">🔥</span>
+              <span class="mode-name" id="mode-hard-name">Sulit</span>
+              <span class="mode-desc" id="mode-hard-desc">Gambar + suara + waktu</span>
+            </button>
+            <button type="button" class="mode-btn" data-mode="letters" id="mode-letters">
+              <span class="mode-emoji">🔤</span>
+              <span class="mode-name" id="mode-letters-name">Huruf A–Z</span>
+              <span class="mode-desc" id="mode-letters-desc">Latihan huruf</span>
+            </button>
+          </div>
+
+          <!-- Category pick -->
+          <p class="pick-label" id="pick-theme-label">Pilih tema</p>
+          <div class="cat-pick" id="cat-pick" role="group" aria-label="Theme"></div>
+
+          <button type="button" id="start-btn" class="btn-start" autofocus>
+            Mulai Misi!
+          </button>
+        </div>
+
+        <!-- Lainnya — weekly, sticker book, classroom (collapsed for kids) -->
+        <details class="more-panel" id="more-panel">
+          <summary id="more-title">✨ Lainnya</summary>
+
           <div class="daily-card weekly-card" id="weekly-card">
             <div class="daily-head">
               <p class="daily-title" id="weekly-title">📆 Misi minggu ini</p>
@@ -199,7 +232,54 @@
             <p class="daily-desc" id="weekly-desc"></p>
             <button type="button" id="weekly-btn" class="btn-daily btn-weekly">Main misi minggu</button>
           </div>
-        </div>
+
+          <!-- Sticker book (mastery collection) -->
+          <details class="sticker-book" id="sticker-book">
+            <summary id="sticker-book-title">📒 Buku stiker Poppu</summary>
+            <p class="sticker-hint" id="sticker-hint">Selesaikan kata = stiker baru!</p>
+            <div class="sticker-grid" id="sticker-grid" aria-label="Stickers"></div>
+          </details>
+
+          <!-- Classroom -->
+          <details class="class-panel" id="class-panel">
+            <summary id="class-title">👩‍🏫 Kelas</summary>
+            <div class="class-body">
+              <p class="class-active hidden" id="class-active"></p>
+              <div class="class-row">
+                <input
+                  type="text"
+                  id="class-code-input"
+                  class="class-input"
+                  maxlength="6"
+                  placeholder="Kode"
+                  autocomplete="off"
+                  spellcheck="false"
+                  aria-label="Kode kelas"
+                />
+                <button type="button" id="class-join-btn" class="btn-secondary btn-sm">Gabung</button>
+              </div>
+              <input
+                type="text"
+                id="class-name-input"
+                class="class-input class-name-input"
+                maxlength="20"
+                placeholder="Nama siswa"
+                autocomplete="nickname"
+                spellcheck="false"
+              />
+              <div class="class-actions">
+                <button type="button" id="class-create-btn" class="btn-secondary btn-sm">Buat kode kelas</button>
+                <button type="button" id="class-play-btn" class="btn-secondary btn-sm hidden">Main kelas</button>
+                <button type="button" id="class-share-btn" class="btn-secondary btn-sm hidden">Bagikan kode kelas</button>
+                <button type="button" id="class-export-btn" class="btn-secondary btn-sm hidden">Export CSV</button>
+                <button type="button" id="class-clear-btn" class="btn-secondary btn-sm hidden">Keluar kelas</button>
+              </div>
+              <p class="class-board-title hidden" id="class-board-title">Papan skor kelas</p>
+              <ol class="class-board" id="class-board"></ol>
+              <p class="class-msg" id="class-msg" aria-live="polite"></p>
+            </div>
+          </details>
+        </details>
 
         <!-- Parent dashboard -->
         <details class="parent-dash" id="parent-dash">
@@ -244,78 +324,6 @@
             </p>
           </div>
         </details>
-
-        <!-- Classroom -->
-        <details class="class-panel" id="class-panel">
-          <summary id="class-title">👩‍🏫 Kelas</summary>
-          <div class="class-body">
-            <p class="class-active hidden" id="class-active"></p>
-            <div class="class-row">
-              <input
-                type="text"
-                id="class-code-input"
-                class="class-input"
-                maxlength="6"
-                placeholder="Kode"
-                autocomplete="off"
-                spellcheck="false"
-                aria-label="Kode kelas"
-              />
-              <button type="button" id="class-join-btn" class="btn-secondary btn-sm">Gabung</button>
-            </div>
-            <input
-              type="text"
-              id="class-name-input"
-              class="class-input class-name-input"
-              maxlength="20"
-              placeholder="Nama siswa"
-              autocomplete="nickname"
-              spellcheck="false"
-            />
-            <div class="class-actions">
-              <button type="button" id="class-create-btn" class="btn-secondary btn-sm">Buat kode kelas</button>
-              <button type="button" id="class-play-btn" class="btn-secondary btn-sm hidden">Main kelas</button>
-              <button type="button" id="class-share-btn" class="btn-secondary btn-sm hidden">Bagikan kode kelas</button>
-              <button type="button" id="class-export-btn" class="btn-secondary btn-sm hidden">Export CSV</button>
-              <button type="button" id="class-clear-btn" class="btn-secondary btn-sm hidden">Keluar kelas</button>
-            </div>
-            <p class="class-board-title hidden" id="class-board-title">Papan skor kelas</p>
-            <ol class="class-board" id="class-board"></ol>
-            <p class="class-msg" id="class-msg" aria-live="polite"></p>
-          </div>
-        </details>
-
-        <!-- 4 modes -->
-        <div class="mode-pick mode-pick-4" role="group" aria-label="Difficulty" id="mode-pick">
-          <button type="button" class="mode-btn is-active" data-mode="easy" id="mode-easy">
-            <span class="mode-emoji">🌱</span>
-            <span class="mode-name" id="mode-easy-name">Mudah</span>
-            <span class="mode-desc" id="mode-easy-desc">Kata full + huruf</span>
-          </button>
-          <button type="button" class="mode-btn" data-mode="medium" id="mode-medium">
-            <span class="mode-emoji">⚡</span>
-            <span class="mode-name" id="mode-medium-name">Sedang</span>
-            <span class="mode-desc" id="mode-medium-desc">Kata full · tanpa huruf satuan</span>
-          </button>
-          <button type="button" class="mode-btn" data-mode="hard" id="mode-hard">
-            <span class="mode-emoji">🔥</span>
-            <span class="mode-name" id="mode-hard-name">Sulit</span>
-            <span class="mode-desc" id="mode-hard-desc">Gambar + suara + waktu</span>
-          </button>
-          <button type="button" class="mode-btn" data-mode="letters" id="mode-letters">
-            <span class="mode-emoji">🔤</span>
-            <span class="mode-name" id="mode-letters-name">Huruf A–Z</span>
-            <span class="mode-desc" id="mode-letters-desc">Latihan huruf</span>
-          </button>
-        </div>
-
-        <!-- Category pick -->
-        <p class="pick-label" id="pick-theme-label">Pilih tema</p>
-        <div class="cat-pick" id="cat-pick" role="group" aria-label="Theme"></div>
-
-        <button type="button" id="start-btn" class="btn-start" autofocus>
-          Mulai Misi!
-        </button>
 
         <p class="start-footer" id="start-footer">Untuk anak usia 5–6 tahun · Keyboard QWERTY</p>
       </section>

@@ -1,12 +1,10 @@
 /**
  * Daily mission — deterministic challenge from calendar date
  */
-import { CONFIG } from './config.js';
+import { hash, missionCategories } from './mission-seed.js';
 
 /** Exclude specialty filters that thin the pool (huruf-susah, synthetic huruf) */
-const CATS = (CONFIG.categoryOptions || [])
-  .map((c) => c.id)
-  .filter((id) => id !== 'all' && id !== 'huruf-susah' && id !== 'huruf');
+const CATS = missionCategories(['huruf-susah', 'huruf']);
 
 /**
  * @param {Date} [date]
@@ -17,18 +15,6 @@ export function dateKey(date = new Date()) {
   const m = String(date.getMonth() + 1).padStart(2, '0');
   const d = String(date.getDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
-}
-
-/**
- * Simple stable hash
- * @param {string} s
- */
-function hash(s) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) {
-    h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
-  }
-  return Math.abs(h);
 }
 
 /**

@@ -4,6 +4,31 @@
 import { CONFIG, getMode } from './config.js';
 import { buildLetterBank, filterHardLetterWords } from './letters.js';
 
+/**
+ * Adaptive difficulty — adjust the next word's max length from the base
+ * star ramp. Struggling (≥ struggleWrongs wrong letters on the completed
+ * word) steps the cap DOWN by 1, floored at minLetters+1 so the pool keeps
+ * at least two length bands (getPool's upward expansion still guarantees
+ * minPoolSize, so the pool can never go empty). A fluent streak
+ * (≥ fluentNeeded consecutive 0-wrong words) lets the ramp run 1 letter
+ * ahead of schedule, capped at maxLetters.
+ * @param {number} ramp base ramp value from the star schedule
+ * @param {number} lastWrongCount wrong letters on the completed word
+ * @param {number} fluentStreak consecutive 0-wrong completions so far
+ * @param {{ minLetters?: number, maxLetters?: number, struggleWrongs?: number, fluentNeeded?: number }} [cfg]
+ * @returns {number} max letters for the next refill
+ */
+export function nextMaxLetters(ramp, lastWrongCount, fluentStreak, cfg = {}) {
+  const min = (cfg.minLetters ?? 1) + 1;
+  const max = cfg.maxLetters ?? 10;
+  const struggleAt = cfg.struggleWrongs ?? 3;
+  const fluentNeeded = cfg.fluentNeeded ?? 2;
+  let next = ramp;
+  if (lastWrongCount >= struggleAt) next = ramp - 1;
+  else if (lastWrongCount === 0 && fluentStreak >= fluentNeeded) next = ramp + 1;
+  return Math.min(Math.max(next, min), max);
+}
+
 export class WordBank {
   constructor() {
     /** @type {Array<{id:string,word:string,display:string,category:string,image:string,audio:string|null,letters:number,isLetter?:boolean}>} */

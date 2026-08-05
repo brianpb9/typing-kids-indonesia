@@ -2,7 +2,7 @@
  * Game — modes, OSK, daily/weekly, achievements, mastery, classroom, certificate
  */
 import { CONFIG, getMode } from './config.js';
-import { WordBank } from './words.js';
+import { WordBank, nextMaxLetters } from './words.js';
 import { AudioManager } from './audio.js';
 import { AnimationManager } from './animation.js';
 import { InputManager } from './input.js';
@@ -92,6 +92,10 @@ export class Game {
       CONFIG.gameplay.defaultMissionLength === 'mini' ? 'mini' : 'full';
     /** Wrong keys on current word (for perfect-word bonus) */
     this._wordWrongs = 0;
+    /** Adaptive difficulty: wrongs on the last completed word */
+    this._lastWordWrongs = 0;
+    /** Adaptive difficulty: consecutive 0-wrong word completions */
+    this._fluentStreak = 0;
     this._prevFriendshipId = '';
     /** @type {string|null} active friend companion this mission */
     this._friend = null;
@@ -839,6 +843,10 @@ export class Game {
     this._sessionStartMs = Date.now();
     this._transitionLock = false;
     this._hardBonusUsed = false;
+    // Adaptive difficulty resets per mission
+    this._lastWordWrongs = 0;
+    this._fluentStreak = 0;
+    this.ui.setKbHintBoost(false);
     this._stopTimer();
 
     if (this._missionKind === 'normal') {
@@ -910,7 +918,29 @@ export class Game {
     if (mode.id === 'letters') return 1;
     if (!CONFIG.gameplay.progressiveDifficulty) return mode.maxLetters;
     const ramp = mode.minLetters + Math.floor(this.sessionStars / 2) + 1;
-    return Math.min(Math.max(ramp, mode.minLetters), mode.maxLetters);
+    const base = Math.min(Math.max(ramp, mode.minLetters), mode.maxLetters);
+    // Gentle adaptation on top of the star ramp (see nextMaxLetters)
+    return nextMaxLetters(base, this._lastWordWrongs, this._fluentStreak, mode);
+  }
+
+  /**
+   * Adaptive difficulty bookkeeping — runs when a word completes, before
+   * loadNextWord resets _wordWrongs. Struggling (≥3 wrong) steps the next
+   * word down 1 letter and (easy only) re-shows the keyboard hint for one
+   * word; 2 consecutive 0-wrong words let the ramp run 1 letter ahead.
+   */
+  _updateAdaptation() {
+    const mode = this._mode();
+    if (!CONFIG.gameplay.progressiveDifficulty || mode.id === 'letters') return;
+    const wrongs = this._wordWrongs;
+    if (wrongs >= 3) {
+      this._fluentStreak = 0;
+      this.ui.setKbHintBoost(mode.id === 'easy');
+    } else {
+      this._fluentStreak = wrongs === 0 ? this._fluentStreak + 1 : 0;
+      this.ui.setKbHintBoost(false);
+    }
+    this._lastWordWrongs = wrongs;
   }
 
   _preloadUpcoming() {
@@ -1220,6 +1250,7 @@ export class Game {
     this._transitionLock = true;
     this.sessionStars += 1;
     this._sessionWordsDone += 1;
+    this._updateAdaptation();
 
     if (CONFIG.features.combo) {
       this._combo += 1;
@@ -1516,7 +1547,14 @@ export class Game {
         if (f) {
           const name = t.friendNames?.[friend] || friend;
           this.ui.showStickerUnlock({ image: f.sticker, display: name });
-          this.audio.playFriendTada();
+          // Only Peeky has a tada clip — other friends fall back to their
+          // leveldone voice (playVoiceReaction then falls back to Poppu)
+          this.audio
+            .playFriendTada()
+            .then((ok) => {
+              if (!ok) this.audio.playVoiceReaction('leveldone', friend);
+            })
+            .catch(() => {});
         }
       }
     }

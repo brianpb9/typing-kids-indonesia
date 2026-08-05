@@ -16,7 +16,12 @@ test.describe('Typing Kids smoke', () => {
     await expect(page.locator('#brand-mascot-start')).toBeVisible();
     await expect(page.locator('#length-mini')).toBeVisible();
     await expect(page.locator('#length-full')).toBeVisible();
+    await expect(page.locator('#manual-card')).toBeVisible();
+    await expect(page.locator('#more-panel')).toBeVisible();
+    // Weekly + sticker book live collapsed under "Lainnya" now
+    await page.locator('#more-title').click();
     await expect(page.locator('#sticker-book')).toBeVisible();
+    await expect(page.locator('#weekly-card')).toBeVisible();
     await expect(page.locator('#world-map')).toBeVisible();
     await expect(page.locator('#station-abc')).toBeVisible();
     await expect(page.locator('#friendship-chip')).toBeVisible();
@@ -125,6 +130,8 @@ test.describe('Typing Kids smoke', () => {
     await page.reload();
     await expect(page.locator('#mode-letters')).toBeVisible();
     await expect(page.locator('#parent-dash')).toBeVisible();
+    await expect(page.locator('#weekly-card')).toBeHidden(); // collapsed in Lainnya
+    await page.locator('#more-title').click();
     await expect(page.locator('#weekly-card')).toBeVisible();
     await page.locator('#mode-letters').click();
     await page.locator('#start-btn').click();

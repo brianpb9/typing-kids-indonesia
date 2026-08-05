@@ -2,7 +2,7 @@
  * Install: app shell only (fast).
  * Activate: warm voice + word images in background.
  */
-const CACHE = 'typing-kids-v26';
+const CACHE = 'typing-kids-v27';
 
 /** Critical shell — keep small for fast first install */
 const PRECACHE_SHELL = [
@@ -139,6 +139,7 @@ const PRECACHE_SHELL = [
   '/js/daily.js',
   '/js/weekly.js',
   '/js/classroom.js',
+  '/js/mission-seed.js',
   '/js/achievements.js',
   '/js/letters.js',
   '/js/certificate.js',

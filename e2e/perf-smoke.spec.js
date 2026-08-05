@@ -36,7 +36,8 @@ test.describe('Perf smoke', () => {
     const res = await page.request.get('/sw.js');
     expect(res.ok()).toBeTruthy();
     const text = await res.text();
-    expect(text).toMatch(/PRECACHE_SHELL|v26/);
+    expect(text).toMatch(/PRECACHE_SHELL/);
+    expect(text).toMatch(/typing-kids-v27/);
     expect(text).toMatch(/WARM_MEDIA|warmMedia/);
   });
 });
