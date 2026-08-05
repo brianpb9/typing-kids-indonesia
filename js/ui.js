@@ -195,6 +195,10 @@ export class UI {
 
     this._oskBuilt = false;
     this._oskTarget = '';
+    /** @type {HTMLElement | null} reusable key-popup bubble inside #osk */
+    this._oskPopup = null;
+    /** @type {HTMLElement | null} key currently held down */
+    this._oskPressed = null;
     /** Adaptive (easy): temporarily re-show kb hint after a struggling word */
     this._kbHintBoost = false;
     this._onOskLayout = () => {
@@ -1656,6 +1660,13 @@ export class UI {
       }
       this.els.oskRows.appendChild(rowEl);
     });
+    // Reusable key-popup bubble (Gboard/iOS style), decorative only
+    if (this.els.osk) {
+      this._oskPopup = document.createElement('div');
+      this._oskPopup.className = 'osk-popup';
+      this._oskPopup.setAttribute('aria-hidden', 'true');
+      this.els.osk.appendChild(this._oskPopup);
+    }
     this._oskBuilt = true;
   }
 
@@ -1664,7 +1675,9 @@ export class UI {
    */
   onOsk(handler) {
     this._buildOsk();
-    this.els.oskRows?.addEventListener('pointerdown', (e) => {
+    const rows = this.els.oskRows;
+    if (!rows) return;
+    rows.addEventListener('pointerdown', (e) => {
       const t = e.target;
       if (!(t instanceof Element)) return;
       const key = t.closest('.osk-key');
@@ -1673,8 +1686,62 @@ export class UI {
       e.stopPropagation();
       key.classList.add('is-pressed');
       setTimeout(() => key.classList.remove('is-pressed'), 120);
+      // Native-keyboard feel: haptic tick (silent no-op where unsupported)
+      if ('vibrate' in navigator) {
+        try {
+          navigator.vibrate(10);
+        } catch {
+          /* ignore */
+        }
+      }
+      this._setOskPressed(key);
       handler(key.dataset.key);
     });
+    // Release press state / popup on lift, cancel, or sliding off the key
+    const release = () => this._setOskPressed(null);
+    window.addEventListener('pointerup', release, { passive: true });
+    window.addEventListener('pointercancel', release, { passive: true });
+    rows.addEventListener('pointerout', (e) => {
+      if (this._oskPressed && e.target === this._oskPressed) release();
+    });
+  }
+
+  /**
+   * Track the held key: press animation + popup bubble
+   * @param {HTMLElement | null} key
+   */
+  _setOskPressed(key) {
+    if (this._oskPressed && this._oskPressed !== key) {
+      this._oskPressed.classList.remove('is-pressing');
+    }
+    this._oskPressed = key;
+    if (!key) {
+      this._oskPopup?.classList.remove('is-on');
+      return;
+    }
+    key.classList.add('is-pressing');
+    this._showOskPopup(key);
+  }
+
+  /**
+   * Enlarged letter bubble above the held key, clamped to the viewport
+   * @param {HTMLElement} key
+   */
+  _showOskPopup(key) {
+    const pop = this._oskPopup;
+    const host = this.els.osk;
+    if (!pop || !host) return;
+    pop.textContent = (key.dataset.key || '').toUpperCase();
+    pop.classList.add('is-on');
+    const r = key.getBoundingClientRect();
+    const hostR = host.getBoundingClientRect();
+    const half = pop.offsetWidth / 2;
+    const cx = Math.min(
+      Math.max(r.left + r.width / 2, half + 4),
+      window.innerWidth - half - 4
+    );
+    pop.style.left = `${cx - hostR.left}px`;
+    pop.style.top = `${r.top - hostR.top - 6}px`;
   }
 
   /**

@@ -2711,6 +2711,17 @@ button,
   z-index: 1;
 }
 
+/* Held-key press state — tactile squash (target key stays slightly raised) */
+.osk-key.is-pressing {
+  transform: translateY(2px) scale(0.92);
+  background: #fdf3df;
+  transition-duration: 0.06s;
+}
+
+.osk-key.is-target.is-pressing {
+  transform: translateY(2px) scale(1.02);
+}
+
 .osk-key.is-ok {
   background: #b8e6b8 !important;
   border-color: #5b8c5a !important;
@@ -2739,6 +2750,32 @@ button,
   0%, 100% { transform: translate(-50%, -100%); }
   50% { transform: translate(-50%, calc(-100% - 6px)); }
 }
+
+/* Key popup bubble (Gboard/iOS style) — positioned by _showOskPopup */
+.osk-popup {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -100%);
+  min-width: 2.3rem;
+  padding: 0.2rem 0.55rem 0.3rem;
+  background: #fff8ec;
+  border: 2px solid var(--primary-deep);
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(61, 58, 53, 0.25);
+  color: var(--text);
+  font-family: var(--font);
+  font-weight: 900;
+  font-size: 1.7em;
+  line-height: 1.1;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.06s ease;
+  z-index: 3;
+}
+
+.osk-popup.is-on { opacity: 1; }
 
 /* Speak pulse */
 .speak-btn.is-speaking,
