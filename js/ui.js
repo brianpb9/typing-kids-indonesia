@@ -935,9 +935,26 @@ export class UI {
     if (!CONFIG.features?.stickers) return;
     const toast = this.els.stickerToast;
     if (!toast) return;
+    const hasImg = !!word.image;
     if (this.els.stickerToastImg) {
-      this.els.stickerToastImg.src = (word.image || '').split('?')[0];
+      // Entri tanpa gambar (mis. mode Huruf) — sembunyikan img agar tidak jadi ikon rusak
+      this.els.stickerToastImg.classList.toggle('hidden', !hasImg);
+      if (hasImg) this.els.stickerToastImg.src = word.image.split('?')[0];
       this.els.stickerToastImg.alt = word.display || '';
+    }
+    // Fallback huruf besar untuk stiker tanpa gambar (letter-*)
+    let letterEl = toast.querySelector('.sticker-letter');
+    if (!hasImg) {
+      if (!letterEl) {
+        letterEl = document.createElement('span');
+        letterEl.className = 'sticker-letter';
+        letterEl.setAttribute('aria-hidden', 'true');
+        toast.insertBefore(letterEl, this.els.stickerToastImg || toast.firstChild);
+      }
+      letterEl.textContent = word.display || '';
+      letterEl.classList.remove('hidden');
+    } else if (letterEl) {
+      letterEl.classList.add('hidden');
     }
     if (this.els.stickerToastText) {
       this.els.stickerToastText.textContent = `${this.t.stickerNew || 'Stiker!'} ${word.display || ''}`;

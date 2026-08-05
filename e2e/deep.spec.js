@@ -85,6 +85,26 @@ test.describe('Deep flows', () => {
     });
   });
 
+  test('letters mode: sticker toast shows big letter, no broken image', async ({ page }) => {
+    await boot(page, seedDone({ difficulty: 'letters' }));
+    await page.locator('#mode-letters').click();
+    await page.locator('#start-btn').click();
+    await expect(page.locator('#game-screen')).toBeVisible({ timeout: 10_000 });
+
+    const current = await page.evaluate(() => {
+      const c = window.__typingKids.game.current;
+      return { word: c?.word, display: c?.display };
+    });
+    await page.keyboard.press(current.word[0]);
+
+    // Toast stiker muncul saat selebrasi — tanpa gambar pecah
+    const toast = page.locator('#sticker-toast');
+    await expect(toast).toBeVisible({ timeout: 8_000 });
+    await expect(toast.locator('img')).toBeHidden();
+    await expect(toast.locator('.sticker-letter')).toBeVisible();
+    await expect(toast.locator('.sticker-letter')).toHaveText(current.display);
+  });
+
   test('warm-up has back button to home', async ({ page }) => {
     await boot(page, seedDone({ difficulty: 'letters' }));
     await page.locator('#mode-letters').click();

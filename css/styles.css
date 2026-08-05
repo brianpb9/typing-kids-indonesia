@@ -718,6 +718,26 @@ button,
   filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.12));
 }
 
+/* Fallback huruf besar untuk stiker tanpa gambar (mode Huruf) */
+.sticker-letter {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--primary-deep);
+  background: linear-gradient(180deg, #fff3d1, var(--accent-yellow, #ffe566));
+  border: 3px solid var(--primary-deep);
+  border-radius: 20px;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.12));
+}
+
+.sticker-letter.hidden {
+  display: none;
+}
+
 .sticker-toast-text {
   margin-top: 0.5rem;
   font-weight: 900;
