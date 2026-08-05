@@ -8,7 +8,9 @@ Tanggal: 2026-08-04 · Reviewer: Kimi Code (board review) · Basis: review kode 
 
 # Board Review Ronde 4 — RELEASE READINESS (final, 2026-08-04)
 
-Basis: unit **33/33**, e2e **31/31**, audit live site + artefak + materi listing. **Verdict: READY TO UPLOAD — skor 9.5/10.**
+Basis: unit **42/42**, e2e **31/31**, audit live site + artefak + materi listing. **Verdict: READY TO UPLOAD — 10/10 untuk kesiapan rilis.**
+
+> **Ronde 5 (2026-08-04, pre-upload):** tiga sisa item ronde 3 ditutup — (1) **kesulitan adaptif** (ramp panjang kata kini bereaksi terhadap error: kesulitan → lebih pendek, lancar → naik lebih cepat; fungsi murni + 9 unit test baru), (2) **layar start map-first** (Peta Poppu jadi aksi utama; mode manual di kartu sekunder; weekly/stiker/kelas di panel "Lainnya"; orang tua tetap di balik gate), (3) **dedup hash/CATS** ke `js/mission-seed.js`. Plus sisa P2: fallback voice tada, focus trap gate, SW `v27`. Satu-satunya item yang sengaja ditunda: refactor god-object `game.js`/`ui.js` — murni internal, tidak terlihat pemain/reviewer, dan berisiko dilakukan tepat sebelum submit store. Itulah alasan skor ini penuh untuk *release readiness*.
 
 ## Review fitur baru (belum pernah di-review independen)
 
